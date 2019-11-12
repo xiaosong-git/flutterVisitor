@@ -1,0 +1,162 @@
+name: visitor
+description: 朋悦比邻
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 3.2.1+17
+
+environment:
+  sdk: ">=2.2.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^0.1.2
+  shared_preferences: ^0.5.3+1
+  dio: ^2.1.0
+  crypto: ^2.0.6
+  package_info: ^0.4.0+2
+  gesture_password: ^0.0.4
+  fluttertoast: ^3.1.0
+  flutter_swiper: ^1.1.6
+  image_picker: ^0.6.0+10
+  qr_flutter: ^2.1.0+55
+  url_launcher: ^5.1.3
+  flutter_webview_plugin: ^0.3.8
+  flutter_datetime_picker: ^1.2.4
+  flutter_cupertino_date_picker: ^1.0.3
+  sqflite: ^1.1.6+1
+  web_socket_channel: ^1.0.14
+  flutter_local_notifications: ^0.7.1+3
+  path_provider: ^1.1.2
+  provider: ^3.0.0+1
+  city_pickers: ^0.1.23
+  contacts_service: ^0.2.9
+  intl: ^0.15.8
+  audioplayers: ^0.13.2
+  badges: ^1.1.0
+  date_range_picker: ^1.0.5
+  lpinyin: ^1.0.7
+  tobias: ^1.1.0+1
+  flutter_exif_rotation: ^0.2.4
+  flutter_des: ^1.1.0
+  table_calendar: ^2.1.0
+  amap_location_fluttify: ^0.2.6+10e2842
+  flutter_umpush:
+    path: plugin/flutter_umpush
+  permission_handler:
+    path: plugin/flutter_permission_handler
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+# For information on the generic Dart part of this file, see the
+# following page: https://www.dartlang.org/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/audio/message.mp3
+    - assets/icons/门禁卡icon@2x.png
+    - assets/icons/会议室icon@2x.png
+    - assets/icons/发起访问icon@2x.png
+    - assets/icons/访客二维码icon@2x.png
+    - assets/icons/实名认证V.png
+    - assets/icons/全部icon@2x.png
+    - assets/icons/消息@2x.png
+    - assets/icons/安全管理@2x.png
+    - assets/icons/设置@2x.png
+    - assets/icons/gengduo@2x.png
+    - assets/icons/添加新好友@2x.png
+    - assets/icons/更多@2x.png
+    - assets/icons/公司管理@2x.png
+    - assets/icons/手势密码用户@2x.png
+    - assets/icons/预定成功@2x.png
+    - assets/icons/大楼.png
+    - assets/icons/茶室.png
+    - assets/icons/添加@2x.png
+    - assets/icons/新的好友@2x.png
+    - assets/icons/启动图片.png
+    - assets/icons/跳转图片.png
+    - assets/icons/支付宝logo.png
+    - assets/icons/Logo跳转图片.png
+    - assets/icons/好友.png
+    - assets/icons/邀约.png
+    - assets/icons/访问.png
+    - assets/icons/审核.png
+    - assets/icons/考勤打卡.png
+    - assets/icons/attendance_rule_verify.png
+    - assets/icons/attendance_check.png
+    - assets/icons/attendance_check_verify.png
+    - assets/icons/attendance_rule.png
+    - assets/icons/attendance_statis.png
+    - assets/icons/attendance_statis_verify.png
+    - assets/images/visitor_tab_friends_normal.png
+    - assets/images/visitor_tab_friends_selected.png
+    - assets/images/visitor_tab_homepage_normal.png
+    - assets/images/visitor_tab_homepage_selected.png
+    - assets/images/visitor_tab_profile_center_normal.png
+    - assets/images/visitor_tab_profile_center_selected.png
+    - assets/images/visitor_tab_visitors_normal.png
+    - assets/images/visitor_tab_visitors_selected.png
+    - assets/images/visitor_bg_splash.png
+    - assets/images/visitor_icon_message.png
+    - assets/images/visitor_logo.png
+    - assets/images/open_door.png
+    - assets/images/visitor_icon_action_visit.png
+    - assets/images/visitor_icon_action_qrcode.png
+    - assets/images/visitor_icon_action_more.png
+    - assets/images/visitor_icon_staff.png
+    - assets/images/visitor_icon_next.png
+    - assets/images/visitor_icon_head.png
+    - assets/images/visitor_icon_nodata.png
+    - assets/icons/ic_launcher.png
+    - assets/images/visitor_icon_security.png
+    - assets/images/visitor_icon_setting.png
+    - assets/images/visitor_icon_account.png
+    - assets/images/visitor_icon_meetingroom.png
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware.
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: 楷体_GB2312
+      fonts:
+        - asset: assets/fonts/楷体_GB2312.ttf
+
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages

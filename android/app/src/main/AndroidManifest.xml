@@ -1,0 +1,58 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.goldccm.visitor">
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- io.flutter.app.FlutterApplication is an android.app.Application that
+         calls FlutterMain.startInitialization(this); in its onCreate method.
+         In most cases you can leave this as-is, but you if you want to provide
+         additional functionality it is fine to subclass or reimplement
+         FlutterApplication and put your custom class here. -->
+    <application
+        android:name="com.github.flutterumpush.UmengApplication"
+        android:label="朋悦比邻"
+        android:usesCleartextTraffic="true"
+        android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="UMENG_APPKEY" android:value="5cd398f7570df39d0200125f">
+        </meta-data>
+        <meta-data android:name="UMENG_MESSAGE_SECRET" android:value="39e0af1b149f394651a7ee88d382662c">
+        </meta-data>
+        <meta-data android:name="UMENG_CHANNEL" android:value="umpush" />
+        <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=100787815" />
+        <meta-data android:name="MZ_APP_ID" android:value="\0120513">
+        </meta-data>
+        <meta-data android:name="MZ_APP_KEY" android:value="2ef5d921d35542f5a5cbaec251769a86">
+        </meta-data>
+
+        <meta-data android:name="XM_APP_ID" android:value="\02882303761518000997">
+        </meta-data>
+        <meta-data android:name="XM_APP_KEY" android:value="\05291800098997">
+        </meta-data>
+        <!-- 离线唤醒，使用URL_SCHEME，例如 myproject_url://xxxxxx?order_id=123455554 -->
+        <meta-data android:name="URL_SCHEME" android:value="myproject_url">
+        </meta-data>
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="e5c38f34ff4a8f7fdbaae51a19660dd8">
+        </meta-data>
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- This keeps the window background of the activity showing
+                 until Flutter renders its first frame. It can be removed if
+                 there is no splash screen (such as the default splash screen
+                 defined in @style/LaunchTheme). -->
+            <meta-data
+                android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
+                android:value="true" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
