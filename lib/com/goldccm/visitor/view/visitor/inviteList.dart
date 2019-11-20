@@ -179,7 +179,7 @@ class InviteListState extends State<InviteList> with SingleTickerProviderStateMi
         bottom: TabBar(
             indicatorColor: Colors.blue,
             controller: _tabController,
-            tabs: tabs.map((e)=>Tab(text:e,)).toList()
+            tabs: tabs.map((e)=>Tab(child: Text(e,textScaleFactor: 1.0,),)).toList()
         ),
       ),
       body: TabBarView(
@@ -304,7 +304,7 @@ class InviteListState extends State<InviteList> with SingleTickerProviderStateMi
                     CircularProgressIndicator(),
                     Text(
                       '加载中',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
                     )
                   ],
                 ),
@@ -314,10 +314,10 @@ class InviteListState extends State<InviteList> with SingleTickerProviderStateMi
         );
         break;
       case ConnectionState.active:
-        return Text('active');
+        return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError) return Text(snapshot.error.toString(),textScaleFactor: 1.0,);
         return _buildWhoList();
         break;
       default:
@@ -329,21 +329,21 @@ class InviteListState extends State<InviteList> with SingleTickerProviderStateMi
       itemCount:  _whoInviteMeLists.length,
       itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(_whoInviteMeLists[index].realName!=null?_whoInviteMeLists[index].realName:""),
+            title: Text(_whoInviteMeLists[index].realName!=null?_whoInviteMeLists[index].realName:"",textScaleFactor: 1.0,),
             subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(_whoInviteMeLists[index].startDate!=null?_whoInviteMeLists[index].startDate:""),
-                  Text(_whoInviteMeLists[index].endDate!=null?"至 ${_whoInviteMeLists[index].endDate}":""),
+                  Text(_whoInviteMeLists[index].startDate!=null?_whoInviteMeLists[index].startDate:"",textScaleFactor: 1.0,),
+                  Text(_whoInviteMeLists[index].endDate!=null?"至 ${_whoInviteMeLists[index].endDate}":"",textScaleFactor: 1.0,),
                 ]
             ),
-            trailing: Text(_whoInviteMeLists[index].cstatus!=null?(_whoInviteMeLists[index].cstatus=="applyConfirm"?"审核中":_whoInviteMeLists[index].cstatus=="applySuccess"?"已通过":"未通过"):""),
+            trailing: Text(_whoInviteMeLists[index].cstatus!=null?(_whoInviteMeLists[index].cstatus=="applyConfirm"?"审核中":_whoInviteMeLists[index].cstatus=="applySuccess"?"已通过":"未通过"):"",textScaleFactor: 1.0,),
             onTap: () {
               if(_whoInviteMeLists[index].cstatus=="applyConfirm") {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('访问审核'),
+                      title: Text('访问审核',textScaleFactor: 1.0,),
                       content: StatefulBuilder(
                           builder: (context, StateSetter setState) {
                             return Container(
@@ -351,12 +351,12 @@ class InviteListState extends State<InviteList> with SingleTickerProviderStateMi
                                 child: Column(
                                   children: <Widget>[
                                     ListTile(
-                                      title: Text('访问地址'),
-                                      subtitle: Text(_whoInviteMeLists[index].companyName!=null?_whoInviteMeLists[index].companyName:""),
+                                      title: Text('访问地址',textScaleFactor: 1.0,),
+                                      subtitle: Text(_whoInviteMeLists[index].companyName!=null?_whoInviteMeLists[index].companyName:"",textScaleFactor: 1.0,),
                                     ),
                                     ListTile(
-                                      title: Text('访问理由'),
-                                      subtitle: Text(_whoInviteMeLists[index].reason!=null?_whoInviteMeLists[index].reason:""),
+                                      title: Text('访问理由',textScaleFactor: 1.0,),
+                                      subtitle: Text(_whoInviteMeLists[index].reason!=null?_whoInviteMeLists[index].reason:"",textScaleFactor: 1.0,),
                                     )
                                   ],
                                 ));
@@ -364,7 +364,7 @@ class InviteListState extends State<InviteList> with SingleTickerProviderStateMi
                       actions: <Widget>[
                         new FlatButton(
                           child: new Text("拒绝",
-                              style: TextStyle(color: Colors.red)),
+                              style: TextStyle(color: Colors.red),textScaleFactor: 1.0,),
                           onPressed: () {
                             Navigator.of(context).pop();
                             setState(() {
@@ -375,7 +375,7 @@ class InviteListState extends State<InviteList> with SingleTickerProviderStateMi
                         ),
                         new FlatButton(
                           child: new Text("通过",
-                              style: TextStyle(color: Colors.blue)),
+                              style: TextStyle(color: Colors.blue),textScaleFactor: 1.0,),
                           onPressed: () {
                             Navigator.of(context).pop();
                             setState(() {

@@ -198,7 +198,7 @@ class RoomListState extends State<RoomList>{
         return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError) return Text(snapshot.error.toString(),textScaleFactor: 1.0,);
         return _buildRoomList();
         break;
       default:

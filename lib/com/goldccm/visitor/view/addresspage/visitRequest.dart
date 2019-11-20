@@ -276,7 +276,7 @@ class VisitRequestState extends State<VisitRequest>{
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: ListTile(
-                title: Text('访问地址',style: TextStyle(color: Colors.black,fontSize: 16.0,letterSpacing: 1),),
+                title: Text('访问地址',style: TextStyle(color: Colors.black,fontSize: 16.0,letterSpacing: 1),textScaleFactor: 1.0,),
                 subtitle: Text(_visitInfo.companyName!=null?_visitInfo.companyName:"暂无访问地址",style: TextStyle(color: Colors.black54,fontSize: 16.0,letterSpacing: 1),textScaleFactor: 1.0,),
               ),
             ) : Container(padding: EdgeInsets.symmetric(horizontal: 20),

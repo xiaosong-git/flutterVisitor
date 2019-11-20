@@ -1,7 +1,18 @@
+import 'dart:io';
+
+import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:amap_location_fluttify/amap_location_fluttify.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_arcface/flutter_arcface.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 /*
  * 打卡界面
  * email:hwk@growingpine.com
@@ -19,7 +30,9 @@ class CheckPointPage extends StatefulWidget{
 class CheckPointPageState extends State<CheckPointPage> with SingleTickerProviderStateMixin{
   List _tabLists=['上下班打卡','外出打卡'];
   TabController _tabController;
+  File _currentPhoto;
   Location _location;
+  String shownAddress;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,21 +52,28 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
       ),
       body: TabBarView(children: <Widget>[
         Container(
-          child: Center(
             child: Card(
+              margin: EdgeInsets.all(10),
              child: Column(
                children: <Widget>[
-                 Text('定位位置:${_location.address}'),
-                 FlatButton(onPressed: checkNormal, child: Text('打上下班卡'),),
+                 Text('定位位置:${shownAddress??""}'),
+                 ClipRRect(
+                   borderRadius:BorderRadius.all(Radius.circular(30.0)),
+                   child: FlatButton(onPressed:checkNormal, child: Column(
+                     children: <Widget>[
+                       Text(DateTime.now().hour.toString()+":"+DateTime.now().minute.toString()),
+                       Text('上班打卡')
+                     ],
+                   )),
+                 ),
                ],
              ),
             )
-          ),
         ),
         Container(
           child: Center(
             child: Card(
-              child: FlatButton(onPressed: checkOut, child: Text('打外出卡'),),
+              child: RaisedButton(onPressed: checkOut, child: Text('打外出卡'),),
             )
           ),
         ),
@@ -62,10 +82,25 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
   }
   @override
   void initState() {
-    _tabController=new TabController(length: _tabLists.length, vsync: this);
     super.initState();
+    _tabController=new TabController(length: _tabLists.length, vsync: this);
+    initVariables();
   }
-  appbarMore(){
+  //获取当前经纬度
+  void initVariables()async{
+    if(await requestPermission()){
+      AmapLocation.startLocation(
+          once: true,
+          locationChanged: (location) async {
+            _location=location;
+            shownAddress=await location.address;
+            setState(() {
+
+            });
+          });
+    }
+  }
+  void appbarMore(){
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -217,16 +252,41 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
         }
         );
   }
-  checkNormal() async {
+  /*
+   * 打卡
+   * 先调用摄像头获取现在的人脸图片
+   * 进行活体检测
+   * 再检查本地缓存图片中有没有用于比对的原始人脸图片
+   * 没有则从网络上缓存到本地，有开启比对
+   * 根据比对的结果打卡
+   */
+  void checkNormal() async {
     print('上下班打卡');
-    if(await requestPermission()){
-      AmapLocation.startLocation(
-        once: true,
-            locationChanged: (location){
-            setState(() {
-                _location=location;
-            });
-        });
+    await getPhoto();
+    UserInfo userInfo=await LocalStorage.load("userInfo");
+    if(_currentPhoto!=null){
+      print(_currentPhoto.path);
+      var result=await FlutterArcface.singleImage(path: _currentPhoto.path);
+      print(result);
+      SharedPreferences sp = await SharedPreferences.getInstance();
+      String head=sp.getString("headPhoto");
+      if(head==null){
+//        var filepath=await saveNetworkImageToPhoto(Constant.imageServerUrl+userInfo.idHandleImgUrl);
+//        await sp.setString("headPhoto",filepath);
+      }else{
+        String url = Constant.serverUrl+"";
+      }
+    }else{
+      ToastUtil.showShortToast("头像检测失败");
+    }
+  }
+  Future getPhoto() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    if(image!=null&&image.path!=null){
+      image = await FlutterExifRotation.rotateImage(path: image.path);
+      setState(() {
+        _currentPhoto = image;
+      });
     }
   }
   Future<bool> requestPermission()async{
@@ -234,5 +294,10 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
   }
   checkOut(){
     print('外出打卡');
+  }
+  Future<String> saveNetworkImageToPhoto(String url, {bool useCache: true}) async {
+    var data = await getNetworkImageData(url, useCache: useCache);
+    var filePath = await ImagePickerSaver.saveFile(fileData: data,title: 'headImage',description: 'to compare the face');
+    return filePath;
   }
 }

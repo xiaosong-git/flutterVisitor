@@ -99,7 +99,7 @@ class NewFriendPageState extends State<NewFriendPage> {
         return Text('active',textScaleFactor: 1.0);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError) return Text(snapshot.error.toString(),textScaleFactor: 1.0,);
         return _buildRequestList();
         break;
       default:
@@ -172,8 +172,8 @@ class NewFriendPageState extends State<NewFriendPage> {
               height: 50,
               width: 50,
             ),
-            title: Text('来自通讯录的好友'),
-            subtitle: Text('${_friends[index].name}'),
+            title: Text('来自通讯录的好友',textScaleFactor: 1.0,),
+            subtitle: Text('${_friends[index].name}',textScaleFactor: 1.0,),
             trailing: Container(
               child: SizedBox(
                   width: 75,
@@ -187,6 +187,7 @@ class NewFriendPageState extends State<NewFriendPage> {
                           child: Text(
                             '添加',
                             style: TextStyle(color: Colors.blue[600]),
+                            textScaleFactor: 1.0,
                           ),
                           onPressed: () async {
                             presenter.addFriend(_friends[index].name,
@@ -196,6 +197,7 @@ class NewFriendPageState extends State<NewFriendPage> {
                     child: Text(
                       '已添加',
                       style: TextStyle(color: Colors.black45),
+                      textScaleFactor: 1.0,
                     ),
                     alignment: Alignment.center,
                   )),
@@ -217,8 +219,8 @@ class NewFriendPageState extends State<NewFriendPage> {
                 height: 50,
                 width: 50,
               ),
-              title: Text(_request[index].name),
-              subtitle: Text('留言'),
+              title: Text(_request[index].name,textScaleFactor: 1.0,),
+              subtitle: Text('留言',textScaleFactor: 1.0,),
               trailing: Container(
                 child: SizedBox(
                     width: 75,
@@ -475,7 +477,6 @@ class remarkFriendPage extends StatelessWidget {
                         if (value.isEmpty) {
                           return '输入不能为空';
                         }
-                        return '';
                       },
                     ),
                   ),

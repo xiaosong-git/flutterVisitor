@@ -19,8 +19,8 @@ class VisitAddress extends StatelessWidget{
       ),
       body: ListView.builder(itemBuilder: (context,index){
         return ListTile(
-          title: Text(lists[index].companyName!=null?lists[index].companyName:""),
-          subtitle: Text(lists[index].userName!=null?lists[index].userName:""),
+          title: Text(lists[index].companyName!=null?lists[index].companyName:"",textScaleFactor: 1.0,),
+          subtitle: Text(lists[index].userName!=null?lists[index].userName:"",textScaleFactor: 1.0,),
           onTap: (){
             Navigator.pop(context,index);
           },

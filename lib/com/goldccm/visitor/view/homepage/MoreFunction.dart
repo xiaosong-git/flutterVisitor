@@ -134,6 +134,7 @@ class MoreFunctionState extends State<MoreFunction>{
   void initState() {
     super.initState();
     init();
+//    _activeLists=_lists;
   }
   void init() async{
     UserInfo userInfo=await LocalStorage.load("userInfo");

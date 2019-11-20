@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/addresspage.dart';
 import 'package:visitor/com/goldccm/visitor/view/contract/chatListItem.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/homepage.dart';
@@ -72,6 +74,7 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin{
   @override
   void initState() {
     super.initState();
+    initWebSocket();
     initData();
     checkVersion();
   }
@@ -250,20 +253,21 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin{
       new MinePage(),
     ];
   }
+  Future initWebSocket() async {
+      UserInfo userInfo=await LocalStorage.load("userInfo");
+      int userId = userInfo.id;
+      String token = userInfo.token;
+      MessageUtils.setChannel(userId.toString(),token.toString());
+  }
 
 
   @override
   Widget build(BuildContext context) {
-    if(Provider.of<UserModel>(context).info.id!=null){
-      int userId = Provider.of<UserModel>(context).info.id;
-      String token = Provider.of<UserModel>(context).info.token;
-      MessageUtils.setChannel(userId.toString(),token.toString());
-    }
     _onWillPop() async {
       await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
     }
-    return new WillPopScope(child: Scaffold(
-          body:_pageList[_tabIndex],
+    return MediaQuery(data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0), child:  WillPopScope(child: Scaffold(
+        body:_pageList[_tabIndex],
         bottomNavigationBar: new BottomNavigationBar(
           items: <BottomNavigationBarItem>[
             new BottomNavigationBarItem(
@@ -287,9 +291,10 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin{
             });
           },
         )),onWillPop:(){
-         _onWillPop();
-        return null;
-      },
+      _onWillPop();
+      return null;
+    },
+    )
     );
   }
 

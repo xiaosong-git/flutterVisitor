@@ -56,7 +56,7 @@ class FriendHistoryState extends State<FriendHistory>{
                 height: 50,
                 width: 50,
               ),
-              title: Text( _friendLists[index].name),
+              title: Text( _friendLists[index].name,textScaleFactor: 1.0,),
               subtitle: Text('留言',textScaleFactor: 1.0,),
               trailing: Container(
                 child: SizedBox(

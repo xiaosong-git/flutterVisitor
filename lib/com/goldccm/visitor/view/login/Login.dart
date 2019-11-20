@@ -166,7 +166,7 @@ class LoginState extends State<Login> {
                                   contentPadding: EdgeInsets.all(10)
                                       .copyWith(top: 20.0, bottom: 10.0),
                                   prefixIcon: Icon(Icons.perm_identity),
-                                  hintText: '请输入用户名',
+                                  hintText: '请输入手机号',
                                   fillColor: Colors.black12,
                                   filled: true),
                               autofocus: true,
@@ -472,7 +472,7 @@ class LoginState extends State<Login> {
           "sysPwd": _passNum,
              "deviceToken":deviceToken,
              "deviceType":_deviceType,
-        });
+        },debugMode: true);
       }
     } else if (_loginType == _loginCode) {
       //验证码登录
@@ -484,7 +484,7 @@ class LoginState extends State<Login> {
           "code": _codeNum,
           "deviceToken":deviceToken,
           "deviceType":_deviceType,
-        });
+        },debugMode: true);
       }
     }
 
@@ -506,7 +506,7 @@ class LoginState extends State<Login> {
         return false;
       }
     }else{
-      ToastUtil.showShortClearToast("账号异常");
+      ToastUtil.showShortToast("账号异常");
       return false;
     }
 

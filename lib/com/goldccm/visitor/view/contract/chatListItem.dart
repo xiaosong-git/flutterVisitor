@@ -83,6 +83,7 @@ class ChatListState extends State<ChatList> {
 
   Widget buildMessageListItem(BuildContext context, int index) {
     ChatMessage message = _chatHis[index];
+    print(message);
     return new InkWell(
       onTap: () {
         FriendInfo user = new FriendInfo(

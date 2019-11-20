@@ -386,7 +386,7 @@ class HomePageState extends State<HomePage> {
     );
   }
   getBanner() async {
-    var response = await Http.instance.get(Constant.getBannerUrl);
+    var response = await Http.instance.get(Constant.getBannerUrl,debugMode: true);
 //    new Timer(Duration(milliseconds: 500),(){
       JsonResult responseResult = JsonResult.fromJson(response);
       if (responseResult.sign == 'success') {
@@ -430,7 +430,7 @@ class HomePageState extends State<HomePage> {
   getImageServerUrl() async {
     String url = Constant.serverUrl+Constant.getParamUrl + "imageServerUrl";
     var response = await Http.instance
-        .get(url, queryParameters: {"paramName": "imageServerUrl"});
+        .get(url, queryParameters: {"paramName": "imageServerUrl"},debugMode: true);
     if (!mounted) return;
       JsonResult responseResult = JsonResult.fromJson(response);
       if (responseResult.sign == 'success') {
@@ -550,7 +550,7 @@ class HomePageState extends State<HomePage> {
   }
   _requestVisitor(){
     if(userInfo.isAuth=="T"){
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomeApp(tabIndex: 2,type: 1,)));
+      ToastUtil.showShortToast("暂未开放");
     }else{
       ToastUtil.showShortClearToast("请先实名认证");
     }

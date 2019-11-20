@@ -706,7 +706,7 @@ class Presenter {
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
       "requestVer": CommonUtil.getAppVersion(),
-    });
+    },debugMode: true);
     if (res is String) {
       Map map = jsonDecode(res);
       if (map['verify']['sign'] == "success") {
@@ -717,21 +717,23 @@ class Presenter {
             initFlag = true;
           }
           for (var userInfo in userList) {
-            FriendInfo user = FriendInfo(
-              name: userInfo['realName'],
-              phone: userInfo['phone'],
-              realImageUrl: userInfo['idHandleImgUrl'],
-              virtualImageUrl: userInfo['headImgUrl'],
-              companyName: userInfo['companyName'],
-              userId: userInfo['id'],
-              notice: userInfo['remark'],
-              orgId: userInfo['orgId'].toString(),
-              imageServerUrl: _imageUrl,
-              firstZiMu: PinyinHelper.getFirstWordPinyin(userInfo['realName'])
-                  .substring(0, 1)
-                  .toUpperCase(),
-            );
-            _userlists.add(user);
+            if(userInfo['realName']!=null&&userInfo['phone']!=null){
+              FriendInfo user = FriendInfo(
+                name: userInfo['realName'],
+                phone: userInfo['phone'],
+                realImageUrl: userInfo['idHandleImgUrl'],
+                virtualImageUrl: userInfo['headImgUrl'],
+                companyName: userInfo['companyName'],
+                userId: userInfo['id'],
+                notice: userInfo['remark'],
+                orgId: userInfo['orgId'].toString(),
+                imageServerUrl: _imageUrl,
+                firstZiMu: PinyinHelper.getFirstWordPinyin(userInfo['realName'])
+                    .substring(0, 1)
+                    .toUpperCase(),
+              );
+              _userlists.add(user);
+            }
           }
           _userlists.sort((a, b) => PinyinHelper.getFirstWordPinyin(a.name)
               .substring(0, 1)

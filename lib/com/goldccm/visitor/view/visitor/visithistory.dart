@@ -51,19 +51,19 @@ class VisitHistoryState extends State<VisitHistory>{
       itemBuilder: (BuildContext context, int index) {
         if (index == _visitLists.length) {
           return ListTile(
-            title: Text('加载中'),
+            title: Text('加载中',textScaleFactor: 1.0,),
           );
         } else {
           return ListTile(
-            title: Text(_visitLists[index].realName!=null?_visitLists[index].realName:""),
+            title: Text(_visitLists[index].realName!=null?_visitLists[index].realName:"",textScaleFactor: 1.0,),
             subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(_visitLists[index].startDate!=null?_visitLists[index].startDate:""),
-                  Text(_visitLists[index].endDate!=null?"至 ${_visitLists[index].endDate}":""),
+                  Text(_visitLists[index].startDate!=null?_visitLists[index].startDate:"",textScaleFactor: 1.0,),
+                  Text(_visitLists[index].endDate!=null?"至 ${_visitLists[index].endDate}":"",textScaleFactor: 1.0,),
                 ]
             ),
-            trailing: Text(_visitLists[index].cstatus!=null?(_visitLists[index].cstatus=="applyConfirm"?"审核中":_visitLists[index].cstatus=="applySuccess"?"已通过":"未通过"):""),
+            trailing: Text(_visitLists[index].cstatus!=null?(_visitLists[index].cstatus=="applyConfirm"?"审核中":_visitLists[index].cstatus=="applySuccess"?"已通过":"未通过"):"",textScaleFactor: 1.0,),
             onTap: () {
               if(_visitLists[index].cstatus=="applySuccess") {
                 QrcodeMode model = new QrcodeMode(userInfo: widget.userInfo,
@@ -156,7 +156,7 @@ class VisitHistoryState extends State<VisitHistory>{
   Widget _visitFuture(BuildContext context, AsyncSnapshot snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
-        return Text('无连接');
+        return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
         return Stack(
@@ -185,7 +185,7 @@ class VisitHistoryState extends State<VisitHistory>{
                     CircularProgressIndicator(),
                     Text(
                       '加载中',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
                     )
                   ],
                 ),
@@ -195,10 +195,10 @@ class VisitHistoryState extends State<VisitHistory>{
         );
         break;
       case ConnectionState.active:
-        return Text('active');
+        return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError) return Text(snapshot.error.toString(),textScaleFactor: 1.0,);
         return _buildInviteList();
         break;
       default:
@@ -209,7 +209,7 @@ class VisitHistoryState extends State<VisitHistory>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('访问记录'),
+        title: Text('访问记录',textScaleFactor: 1.0,),
         centerTitle: true,
         backgroundColor: Theme.of(context).appBarTheme.color,
       ),
@@ -225,7 +225,7 @@ class VisitHistoryState extends State<VisitHistory>{
                 child: Image.asset('assets/images/visitor_icon_nodata.png')),
             padding: EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
           ),
-          Center(child: Text('您还没有访问记录'))
+          Center(child: Text('您还没有访问记录',textScaleFactor: 1.0,))
         ],
       ),
     );

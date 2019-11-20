@@ -113,7 +113,7 @@ class FriendSearchState extends State<FriendSearch> {
           return Container(
             color: Colors.white,
             child: ListTile(
-              title: Text( _selectUserLists[index].name),
+              title: Text( _selectUserLists[index].name,textScaleFactor: 1.0,),
               leading:  _selectUserLists[index].virtualImageUrl!=null?CircleAvatar(backgroundImage:NetworkImage(_imageUrl+ _selectUserLists[index].virtualImageUrl),):CircleAvatar(backgroundImage: AssetImage("assets/images/visitor_icon_head.png"),),
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>FriendDetailPage(user: _selectUserLists[index],)));

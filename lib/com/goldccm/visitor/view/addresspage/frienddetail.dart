@@ -14,7 +14,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class FriendDetailPage extends StatefulWidget {
   final FriendInfo user;
   final int type;
-  FriendDetailPage({Key key,this.user,this.type}):super(key:key);
+  FriendDetailPage({Key key, this.user, this.type}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return FriendDetailPageState();
@@ -26,20 +26,27 @@ class FriendDetailPageState extends State<FriendDetailPage> {
   @override
   void initState() {
     super.initState();
-    _user=widget.user;
+    _user = widget.user;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('好友信息',textScaleFactor: 1.0),
+        title: Text('好友信息', textScaleFactor: 1.0),
         centerTitle: true,
         leading: IconButton(
             icon: Icon(Icons.arrow_back_ios),
             onPressed: () {
               Navigator.pop(context);
             }),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.more_horiz),
+              onPressed: () {
+                showOption();
+              }),
+        ],
       ),
       body: _drawDetail(),
     );
@@ -57,14 +64,15 @@ class FriendDetailPageState extends State<FriendDetailPage> {
               Container(
                 height: 60,
                 child: CircleAvatar(
-                  backgroundImage:_user.virtualImageUrl != null
+                  backgroundImage: _user.virtualImageUrl != null
                       ? NetworkImage(
-                         Constant.imageServerUrl+ _user.virtualImageUrl,
+                          Constant.imageServerUrl + _user.virtualImageUrl,
                         )
                       : _user.realImageUrl != null
-                      ? NetworkImage(
-                    Constant.imageServerUrl+ _user.realImageUrl,
-                  ):AssetImage('assets/images/visitor_icon_head.png'),
+                          ? NetworkImage(
+                              Constant.imageServerUrl + _user.realImageUrl,
+                            )
+                          : AssetImage('assets/images/visitor_icon_head.png'),
                   radius: 100,
                 ),
                 width: 60.0,
@@ -74,35 +82,33 @@ class FriendDetailPageState extends State<FriendDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  Text(_user.name != null ? _user.name : '昵称',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textScaleFactor: 1.0),
+                  Text("手机号码：" + (_user.phone != null ? _user.phone : '手机号码'),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15.0,
+                      ),
+                      textScaleFactor: 1.0),
+                  Text("备注：" + (_user.notice != null ? _user.notice : '备注为空'),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15.0,
+                      ),
+                      textScaleFactor: 1.0),
                   Text(
-                    _user.name != null ? _user.name : '昵称',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),textScaleFactor: 1.0
-                  ),
-                  Text(
-                    "手机号码："+(_user.phone != null ? _user.phone: '手机号码'),
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 15.0,
-                    ),textScaleFactor: 1.0
-                  ),
-                  Text(
-                    "备注："+(_user.notice != null ? _user.notice : '备注为空'),
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 15.0,
-                    ),textScaleFactor: 1.0
-                  ),
-                  Text(
-                    "所属公司："+(_user.companyName != null ? _user.companyName : '无') ,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 15.0,
-                    ),textScaleFactor: 1.0
-                  ),
+                      "所属公司：" +
+                          (_user.companyName != null ? _user.companyName : '无'),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15.0,
+                      ),
+                      textScaleFactor: 1.0),
                 ],
               ),
             ],
@@ -116,20 +122,99 @@ class FriendDetailPageState extends State<FriendDetailPage> {
             child: new RaisedButton(
               color: Colors.blue,
               textColor: Colors.white,
-              child:widget.type==1?Text(
-                '访问',
-                style: TextStyle(fontSize:  Constant.normalFontSize),textScaleFactor: 1.0
-              ):Text(
-                '洽谈',
-                style: TextStyle(fontSize:  Constant.normalFontSize),textScaleFactor: 1.0
-              ),
+              child: widget.type == 1
+                  ? Text('访问',
+                      style: TextStyle(fontSize: Constant.normalFontSize),
+                      textScaleFactor: 1.0)
+                  : Text('洽谈',
+                      style: TextStyle(fontSize: Constant.normalFontSize),
+                      textScaleFactor: 1.0),
               onPressed: () async {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatPage(user: widget.user,)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatPage(
+                              user: widget.user,
+                            )));
               },
             ),
           ),
         ),
       ],
     );
+  }
+
+  void showOption() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return new Material(
+            //创建透明层
+            type: MaterialType.transparency, //透明类型
+            child: Container(
+              //保证控件居中效果
+              alignment: Alignment.bottomCenter,
+//              margin: EdgeInsets.all(15.0),
+              child: new SizedBox(
+                height: 120,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      decoration: ShapeDecoration(
+                        color: Color(0xffffffff),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(0.0),
+                          ),
+                        ),
+                      ),
+                      child: new Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 0, bottom: 0),
+                            child: FlatButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text('删除',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.red),
+                                    textScaleFactor: 1.0),
+                              ),
+                            ),
+                          ),
+                          Divider(
+                            height: 0,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 0, bottom: 0),
+                            child: FlatButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text('添加备注',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.red),
+                                    textScaleFactor: 1.0),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 }

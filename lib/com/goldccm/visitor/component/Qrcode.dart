@@ -38,6 +38,7 @@ class QrcodeState extends State<Qrcode> with SingleTickerProviderStateMixin {
             fontSize: 18.0,
             color: Colors.white,
           ),
+          textScaleFactor: 1.0,
         ),
       ),
       body: new Center(

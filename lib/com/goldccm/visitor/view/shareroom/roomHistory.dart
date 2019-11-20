@@ -205,7 +205,7 @@ class RoomHistoryState extends State<RoomHistory> {
   Widget _roomFuture(BuildContext context, AsyncSnapshot snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
-        return Text('无连接');
+        return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
         return Stack(
@@ -247,7 +247,7 @@ class RoomHistoryState extends State<RoomHistory> {
         return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError) return Text(snapshot.error.toString(),textScaleFactor: 1.0,);
         return _buildRoomList();
         break;
       default:
@@ -267,7 +267,7 @@ class RoomHistoryState extends State<RoomHistory> {
           );
         } else {
           return ListTile(
-            title: Text(_roomLists[index].roomName!=null?_roomLists[index].roomName.toString():""),
+            title: Text(_roomLists[index].roomName!=null?_roomLists[index].roomName.toString():"",textScaleFactor: 1.0,),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

@@ -1,14 +1,14 @@
 class Constant {
   //actual
-    static final String imageServerApiUrl = "http://47.98.205.206:8081/goldccm-imgServer/goldccm/image/gainData";
-    static final String serverUrl = "http://47.96.71.163:8082/visitor/";
-    static final String webSocketServerUrl ="ws://47.96.71.163:8082/visitor/";
-    static final String imageServerUrl = "http://47.98.205.206/imgserver/";
-  //local test
-//  static final String serverUrl = "http://192.168.10.61:8080/api_visitor/";
-//  static final String webSocketServerUrl ="ws://192.168.10.61:8080/api_visitor/";
-//  static final String imageServerApiUrl="http://192.168.10.61:8082/goldccm-imgServer/goldccm/image/gainData";
-//  static final String imageServerUrl = "http://47.99.209.40/imgserver/";
+//    static final String imageServerApiUrl = "http://47.98.205.206:8081/goldccm-imgServer/goldccm/image/gainData";
+//    static final String serverUrl = "http://47.96.71.163:8082/visitor/";
+//    static final String webSocketServerUrl ="ws://47.96.71.163:8082/visitor/";
+//    static final String imageServerUrl = "http://47.98.205.206/imgserver/";
+//  test
+  static final String serverUrl = "http://121.36.45.232:8082/visitor/";
+  static final String webSocketServerUrl ="ws://121.36.45.232:8082/visitor/";
+  static final String imageServerApiUrl = "http://47.98.205.206:8081/goldccm-imgServer/goldccm/image/gainData";
+  static final String imageServerUrl = "http://47.98.205.206/imgserver/";
   //////////////////////////////////////////////
   static final String userUrl = "user/";
   static final String codeUrl = "code/";
@@ -25,6 +25,7 @@ class Constant {
   static final int receiveTimeout = 3000;
   static final double normalFontSize = 16.0;
   static final String USERAGREEMENTAPIURL = "http://xiaosong6.idverify.cn:8082/xieyi.html";
+
   /*
    * 登录
    */

@@ -180,7 +180,7 @@ class SettingPageState extends State<SettingPage> {
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                       fontSize: 18.0,
-                                                      color: Colors.blue),
+                                                      color: Colors.blue),textScaleFactor: 1.0,
                                                 )),
                                           ),
                                         ),
@@ -353,6 +353,10 @@ class SettingPageState extends State<SettingPage> {
   getCacheSize() async {
     CacheUtils cacheUtils = new CacheUtils();
     size = await cacheUtils.loadCache();
-    setState(() {});
+    setState((){
+      if(size==null){
+        size="0.0B";
+      }
+    });
   }
 }

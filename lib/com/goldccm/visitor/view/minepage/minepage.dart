@@ -22,10 +22,8 @@ import 'package:visitor/com/goldccm/visitor/view/minepage/securitypage.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/settingpage.dart';
 import 'package:visitor/com/goldccm/visitor/view/shareroom/roomHistory.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/friendHistory.dart';
-import 'package:visitor/com/goldccm/visitor/view/visitor/inviteHistory.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/inviteList.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/visitList.dart';
-import 'package:visitor/com/goldccm/visitor/view/visitor/visithistory.dart';
 //个人中心界面
 //包含个人信息显示、历史消息记录、公司管理、安全管理、设置
 class MinePage extends StatefulWidget {
@@ -352,7 +350,7 @@ class MinePageState extends State<MinePage> {
   }
   Widget _buildIconTab(String url, String text,String method) {
     return InkWell(
-          onTap: (){
+          onTap: () async {
             if(method=="_meetingRoom"){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory (userInfo: _userInfo,)));
             }else if(method=="_companySetting"){
@@ -362,9 +360,10 @@ class MinePageState extends State<MinePage> {
             }else if(method=="_setting"){
               Navigator.push(context, MaterialPageRoute(builder: (context) => SettingPage()));
             }else if(method=="_verify"){
-              if(_userInfo.isAuth=="T") {
+              UserInfo user=await LocalStorage.load("userInfo");
+              if(user.isAuth=="T"){
                 ToastUtil.showShortClearToast("您已完成实名认证");
-              }else {
+              }else{
                 Navigator.push(context, MaterialPageRoute(
                     builder: (context) => IdentifyPage(userInfo: _userInfo,)));
               }
@@ -400,7 +399,7 @@ class HeadImagePageState extends State<HeadImagePage> {
   File _image;
 
   Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 90,maxHeight: 640,maxWidth: 480);
     setState(() {
       _image = image;
     });
@@ -408,7 +407,9 @@ class HeadImagePageState extends State<HeadImagePage> {
   }
 
   Future getPhoto() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    File image = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 90,maxHeight: 640,maxWidth: 480);
+    print(image.absolute);
+    print(await image.length());
     setState(() {
       _image = image;
     });

@@ -87,7 +87,7 @@ class AddFriendPageState extends State<AddFriendPage>{
               children: <Widget>[
                 Text(
                   '姓名',
-                  style: TextStyle(fontSize:  Constant.normalFontSize),
+                  style: TextStyle(fontSize:  Constant.normalFontSize),textScaleFactor: 1.0,
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width-65,
@@ -105,7 +105,6 @@ class AddFriendPageState extends State<AddFriendPage>{
                       if(value.isEmpty){
                         return '请不要为空';
                       }
-                      return '';
                     },
                   ),
                 ),
@@ -138,7 +137,6 @@ class AddFriendPageState extends State<AddFriendPage>{
                       if(value.isEmpty){
                         return '请不要为空';
                       }
-                      return '';
                     },
                   ),
                 ),

@@ -2,9 +2,9 @@ import 'package:flutter_des/flutter_des.dart';
 
 /*
  * DES加密
- * Author:ody997
+ * Author:ody997<wenkun97@126.com>
  * Email:hwk@growingpine.com
- * 2019/10/16
+ * create_time:2019/10/16
  */
 class DesUtil{
 

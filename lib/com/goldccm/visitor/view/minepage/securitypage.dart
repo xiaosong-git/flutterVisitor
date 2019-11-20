@@ -50,7 +50,7 @@ class SecurityPageState extends State<SecurityPage> {
               children: <Widget>[
                 widget.userInfo.phone != null
                     ? Text(widget.userInfo.phone,
-                        style: TextStyle(fontSize:  Constant.normalFontSize,color: Colors.black54,))
+                        style: TextStyle(fontSize:  Constant.normalFontSize,color: Colors.black54,),textScaleFactor: 1.0,)
                     : Text(""),
                 Image.asset('assets/icons/更多@2x.png', scale: 2.0),
               ],
@@ -348,8 +348,8 @@ class ChangePwdPageState extends State<ChangePwdPage> {
                           ? Text(_phone,
                               style: TextStyle(
                                   color: Colors.red,
-                                  fontSize:14.0))
-                          : Text(""),
+                                  fontSize:14.0),textScaleFactor: 1.0,)
+                          : Text("",textScaleFactor: 1.0,),
                       Text(
                         '设定新的登录密码',
                         style: TextStyle(fontSize: 14.0),textScaleFactor: 1.0
@@ -381,7 +381,6 @@ class ChangePwdPageState extends State<ChangePwdPage> {
                           return '请不要输入空密码';
                         }
                         _oldPassword = value;
-                        return '';
                       },
                       onSaved: (value) {
                         _oldPassword = value;
@@ -418,7 +417,6 @@ class ChangePwdPageState extends State<ChangePwdPage> {
                           return '请不要输入空密码';
                         }
                         _newPassword = value;
-                        return '';
                       },
                       onSaved: (value) {
                         _newPassword = value;
@@ -461,7 +459,6 @@ class ChangePwdPageState extends State<ChangePwdPage> {
                         if (value != _newPassword) {
                           return '两次密码不一致';
                         }
-                        return '';
                       },
                       onSaved: (value) {
                         _confirmPassword = value;
@@ -657,7 +654,7 @@ class UpdateGesturePageState extends State<UpdateGesturePage> {
           Center(
             child: Text(
               '$_noticeStr',
-              style: TextStyle(color: _color, fontSize: 16),
+              style: TextStyle(color: _color, fontSize: 16),textScaleFactor: 1.0,
             ),
           ),
           LayoutBuilder(
@@ -693,7 +690,7 @@ class UpdateGesturePageState extends State<UpdateGesturePage> {
                       startCountdownTimer();
                     }
                     scaffoldState.currentState?.showSnackBar(
-                        SnackBar(content: Text('successCallback:$s')));
+                        SnackBar(content: Text('successCallback:$s',textScaleFactor: 1.0,)));
                     miniGesturePassword.currentState?.setSelected('');
                   },
                   failCallback: () {
@@ -707,7 +704,7 @@ class UpdateGesturePageState extends State<UpdateGesturePage> {
                       startCountdownTimer();
                     }
                     scaffoldState.currentState
-                        ?.showSnackBar(SnackBar(content: Text('failCallback')));
+                        ?.showSnackBar(SnackBar(content: Text('failCallback',textScaleFactor: 1.0,)));
                     miniGesturePassword.currentState?.setSelected('');
                   },
                   selectedCallback: (str) {
@@ -820,7 +817,7 @@ class GesturePageState extends State<GesturePage> {
           Center(
             child: Text(
               '$_noticeStr',
-              style: TextStyle(color: _color, fontSize: 16),
+              style: TextStyle(color: _color, fontSize: 16),textScaleFactor: 1.0,
             ),
           ),
           LayoutBuilder(
@@ -850,7 +847,7 @@ class GesturePageState extends State<GesturePage> {
                       startCountdownTimer();
                     }
                     scaffoldState.currentState?.showSnackBar(
-                        SnackBar(content: Text('successCallback:$s')));
+                        SnackBar(content: Text('successCallback:$s',textScaleFactor: 1.0,)));
                     miniGesturePassword.currentState?.setSelected('');
                   },
                   failCallback: () {
@@ -864,7 +861,7 @@ class GesturePageState extends State<GesturePage> {
                       startCountdownTimer();
                     }
                     scaffoldState.currentState
-                        ?.showSnackBar(SnackBar(content: Text('failCallback')));
+                        ?.showSnackBar(SnackBar(content: Text('failCallback',textScaleFactor: 1.0,)));
                     miniGesturePassword.currentState?.setSelected('');
                   },
                   selectedCallback: (str) {

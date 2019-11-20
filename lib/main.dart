@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:provider/provider.dart';
 import 'com/goldccm/visitor/model/UserModel.dart';
 import 'com/goldccm/visitor/util/UMPushUtils.dart';
@@ -9,6 +10,7 @@ void main() {
   //userModel 全局数据
   Provider.debugCheckInvalidValueType = null;
   final userModel = UserModel();
+  FlutterArcface.active();
   userModel.init(null);
   //umPush 友盟推送
   final UMPush umPush=new UMPush();

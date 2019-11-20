@@ -320,14 +320,14 @@ class VisitListState extends State<VisitList>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('访问与审核'),
+        title: Text('访问与审核',textScaleFactor: 1.0,),
         centerTitle: true,
         bottom: TabBar(
             indicatorColor: Colors.blue,
             controller: _tabController,
             tabs: tabs
                 .map((e) => Tab(
-                      text: e,
+                      child: Text(e,textScaleFactor: 1.0,),
                     ))
                 .toList()),
       ),
@@ -354,7 +354,7 @@ class VisitListState extends State<VisitList>
   Widget _visitFuture(BuildContext context, AsyncSnapshot snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
-        return Text('无连接');
+        return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
         return Stack(
@@ -378,7 +378,7 @@ class VisitListState extends State<VisitList>
                     CircularProgressIndicator(),
                     Text(
                       '加载中',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
                     )
                   ],
                 ),
@@ -388,7 +388,7 @@ class VisitListState extends State<VisitList>
         );
         break;
       case ConnectionState.active:
-        return Text('active');
+        return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
         if (snapshot.hasError) return Text(snapshot.error.toString());
@@ -402,7 +402,7 @@ class VisitListState extends State<VisitList>
   Widget _visitMineFuture(BuildContext context, AsyncSnapshot snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
-        return Text('无连接');
+        return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
         return Stack(
@@ -426,7 +426,7 @@ class VisitListState extends State<VisitList>
                     CircularProgressIndicator(),
                     Text(
                       '加载中',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
                     )
                   ],
                 ),
@@ -436,10 +436,10 @@ class VisitListState extends State<VisitList>
         );
         break;
       case ConnectionState.active:
-        return Text('active');
+        return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError) return Text(snapshot.error.toString(),textScaleFactor: 1.0,);
         return _buildMineList();
         break;
       default:
@@ -448,7 +448,6 @@ class VisitListState extends State<VisitList>
   }
 
   _buildList() {
-    print(_visitMyPeopleLists);
     return ListView.separated(
       itemCount: isPerformingRequest == true
           ? _visitMyPeopleLists.length
@@ -456,7 +455,7 @@ class VisitListState extends State<VisitList>
       itemBuilder: (BuildContext context, int index) {
         if (index == _visitMyPeopleLists.length) {
           return ListTile(
-            title: Text('加载中'),
+            title: Text('加载中',textScaleFactor: 1.0,),
           );
         } else {
           return ListTile(
@@ -471,7 +470,7 @@ class VisitListState extends State<VisitList>
                   style: TextStyle(fontSize: 16,color: Colors.grey),
                 ),
               ],
-            )),
+            ),textScaleFactor: 1.0,),
             subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -484,7 +483,7 @@ class VisitListState extends State<VisitList>
                         style: TextStyle(fontSize: 16,color: Colors.grey),
                       ),
                     ],
-                  )),
+                  ),textScaleFactor: 1.0,),
                   RichText(text: TextSpan(
                     text: '结束时间  ',
                     style: TextStyle(fontSize: 16,color: Colors.black),
@@ -494,7 +493,7 @@ class VisitListState extends State<VisitList>
                         style: TextStyle(fontSize: 16,color: Colors.grey),
                       ),
                     ],
-                  )),
+                  ),textScaleFactor: 1.0,),
                 ]),
             trailing:  _visitMyPeopleLists[index].cstatus != null ?_visitMyPeopleLists[index].cstatus == "applyConfirm"?DateTime.parse(_visitMyPeopleLists[index].endDate).isBefore(DateTime.now())?Text("过期",style: TextStyle(color: Colors.red),):Text("审核",style: TextStyle(),):_visitMyPeopleLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
             onTap: () {
@@ -507,7 +506,7 @@ class VisitListState extends State<VisitList>
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                          title: Text('访问审核'),
+                          title: Text('访问审核',textScaleFactor: 1.0,),
                           content: StatefulBuilder(
                               builder: (context, StateSetter setState) {
                             return Container(
@@ -515,8 +514,8 @@ class VisitListState extends State<VisitList>
                                 child: Column(
                                   children: <Widget>[
                                     ListTile(
-                                      title: Text('访问地址'),
-                                      subtitle: Text(_visitMyPeopleLists[index].companyId == null ? "点击选择访问地址" : _visitMyPeopleLists[index].companyName!=null?_visitMyPeopleLists[index].companyName:""),
+                                      title: Text('访问地址',textScaleFactor: 1.0,),
+                                      subtitle: Text(_visitMyPeopleLists[index].companyId == null ? "点击选择访问地址" : _visitMyPeopleLists[index].companyName!=null?_visitMyPeopleLists[index].companyName:"",textScaleFactor: 1.0,),
                                       onTap: () {
                                         Navigator.push(context, MaterialPageRoute(builder: (context)=>VisitAddress(lists: _addressLists,))).then((value){
                                           selectedCompanyId=_addressLists[value].companyId;
@@ -528,8 +527,8 @@ class VisitListState extends State<VisitList>
                                       },
                                     ),
                                     ListTile(
-                                      title: Text('访问理由'),
-                                      subtitle: Text(_visitMyPeopleLists[index].reason != null ? _visitMyPeopleLists[index].reason : ""),
+                                      title: Text('访问理由',textScaleFactor: 1.0,),
+                                      subtitle: Text(_visitMyPeopleLists[index].reason != null ? _visitMyPeopleLists[index].reason : "",textScaleFactor: 1.0,),
                                     )
                                   ],
                                 ));
@@ -537,7 +536,7 @@ class VisitListState extends State<VisitList>
                           actions: <Widget>[
                             new FlatButton(
                               child: new Text("拒绝",
-                                  style: TextStyle(color: Colors.red)),
+                                  style: TextStyle(color: Colors.red),textScaleFactor: 1.0,),
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 setState(() {
@@ -549,7 +548,7 @@ class VisitListState extends State<VisitList>
                             ),
                             new FlatButton(
                               child: new Text("通过",
-                                  style: TextStyle(color: Colors.blue)),
+                                  style: TextStyle(color: Colors.blue),textScaleFactor: 1.0,),
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 if(selectedCompanyId==null){
@@ -600,7 +599,7 @@ class VisitListState extends State<VisitList>
                   style: TextStyle(fontSize: 16,color: Colors.grey),
                 ),
               ],
-            )),
+            ),textScaleFactor: 1.0,),
             subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -613,7 +612,7 @@ class VisitListState extends State<VisitList>
                         style: TextStyle(fontSize: 16,color: Colors.grey),
                       ),
                     ],
-                  )),
+                  ),textScaleFactor: 1.0,),
                   RichText(text: TextSpan(
                     text: '结束时间  ',
                     style: TextStyle(fontSize: 16,color: Colors.black),
@@ -623,7 +622,7 @@ class VisitListState extends State<VisitList>
                         style: TextStyle(fontSize: 16,color: Colors.grey),
                       ),
                     ],
-                  )),
+                  ),textScaleFactor: 1.0,),
                 ]),
             trailing: _visitLists[index].cstatus != null ?_visitLists[index].cstatus == "applyConfirm"?Text("审核",style: TextStyle(),): _visitLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
             onTap: () {
@@ -648,7 +647,7 @@ class VisitListState extends State<VisitList>
   Widget _visitCompanyFuture(BuildContext context, AsyncSnapshot snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
-        return Text('无连接');
+        return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
         return Stack(
@@ -672,7 +671,7 @@ class VisitListState extends State<VisitList>
                     CircularProgressIndicator(),
                     Text(
                       '加载中',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
                     )
                   ],
                 ),
@@ -682,7 +681,7 @@ class VisitListState extends State<VisitList>
         );
         break;
       case ConnectionState.active:
-        return Text('active');
+        return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
         if (snapshot.hasError) return Text(snapshot.error.toString());
@@ -701,7 +700,7 @@ class VisitListState extends State<VisitList>
       itemBuilder: (BuildContext context, int index) {
         if (index == _visitMyCompanyLists.length) {
           return ListTile(
-            title: Text('加载中'),
+            title: Text('加载中',textScaleFactor: 1.0,),
           );
         } else {
           return ListTile(
@@ -716,7 +715,7 @@ class VisitListState extends State<VisitList>
                   style: TextStyle(fontSize: 16,color: Colors.grey),
                 ),
               ],
-            )),
+            ),textScaleFactor: 1.0,),
             subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -729,7 +728,7 @@ class VisitListState extends State<VisitList>
                         style: TextStyle(fontSize: 16,color: Colors.grey),
                       ),
                     ],
-                  )),
+                  ),textScaleFactor: 1.0,),
                   RichText(text: TextSpan(
                     text: '结束时间  ',
                     style: TextStyle(fontSize: 16,color: Colors.black),
@@ -739,15 +738,15 @@ class VisitListState extends State<VisitList>
                         style: TextStyle(fontSize: 16,color: Colors.grey),
                       ),
                     ],
-                  )),
+                  ),textScaleFactor: 1.0,),
                 ]),
-            trailing: _visitMyCompanyLists[index].cstatus != null ?_visitMyCompanyLists[index].cstatus == "applyConfirm"?Text("审核",style: TextStyle(),): _visitMyCompanyLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
+            trailing: _visitMyCompanyLists[index].cstatus != null ?_visitMyCompanyLists[index].cstatus == "applyConfirm"?Text("审核",style: TextStyle(),textScaleFactor: 1.0,): _visitMyCompanyLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),textScaleFactor: 1.0,):Text("拒绝",style: TextStyle( color: Colors.red),textScaleFactor: 1.0,):Text(""),
             onTap: () {
               if (_visitMyCompanyLists[index].cstatus == "applyConfirm") {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                          title: Text('访问审核'),
+                          title: Text('访问审核',textScaleFactor: 1.0,),
                           content: StatefulBuilder(
                               builder: (context, StateSetter setState) {
                             return Container(
@@ -755,12 +754,12 @@ class VisitListState extends State<VisitList>
                                 child: Column(
                                   children: <Widget>[
                                     ListTile(
-                                      title: Text('访问地址'),
-                                      subtitle: Text(_visitMyCompanyLists[index].companyName != null ? _visitMyCompanyLists[index].companyName : ""),
+                                      title: Text('访问地址',textScaleFactor: 1.0,),
+                                      subtitle: Text(_visitMyCompanyLists[index].companyName != null ? _visitMyCompanyLists[index].companyName : "",textScaleFactor: 1.0,),
                                     ),
                                     ListTile(
-                                      title: Text('访问理由'),
-                                      subtitle: Text(_visitMyCompanyLists[index].reason != null ? _visitMyCompanyLists[index].reason : ""),
+                                      title: Text('访问理由',textScaleFactor: 1.0,),
+                                      subtitle: Text(_visitMyCompanyLists[index].reason != null ? _visitMyCompanyLists[index].reason : "",textScaleFactor: 1.0,),
                                     )
                                   ],
                                 ));
@@ -768,7 +767,7 @@ class VisitListState extends State<VisitList>
                           actions: <Widget>[
                             new FlatButton(
                               child: new Text("拒绝",
-                                  style: TextStyle(color: Colors.red)),
+                                  style: TextStyle(color: Colors.red),textScaleFactor: 1.0,),
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 setState(() {
@@ -781,7 +780,7 @@ class VisitListState extends State<VisitList>
                             ),
                             new FlatButton(
                               child: new Text("通过",
-                                  style: TextStyle(color: Colors.blue)),
+                                  style: TextStyle(color: Colors.blue),textScaleFactor: 1.0,),
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 setState(() {

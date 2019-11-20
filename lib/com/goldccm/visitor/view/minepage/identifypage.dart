@@ -3,19 +3,26 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:city_pickers/city_pickers.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/DesUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 
-///实名验证
+/*
+ * 实名认证
+ * editor:ody997
+ * email:hwk@growingpine.com
+ * create_time:2019/11/12
+ */
 class IdentifyPage extends StatefulWidget {
   IdentifyPage({Key key, this.userInfo}) : super(key: key);
   final UserInfo userInfo;
@@ -24,24 +31,36 @@ class IdentifyPage extends StatefulWidget {
     return IdentifyPageState();
   }
 }
-
+/*
+ * _image 头像图片
+ * realName 真实姓名
+ * idNumber 身份证号码
+ * address 地区
+ * detailAddress 详细地址
+ * _imageServerApiUrl 图片服务器地址
+ */
 class IdentifyPageState extends State<IdentifyPage> {
   File _image;
   final formKey = GlobalKey<FormState>();
   String realName;
   String idNumber;
   String address="";
-  String deatilAddress="";
+  String detailAddress="";
   UserInfo userInfo;
   String _imageServerApiUrl;
   var areaController = new TextEditingController();
+
+  /*
+   * 获取本地拍摄的图片
+   */
   Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera,maxWidth: 480,maxHeight: 640);
+    File image = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 90,maxHeight: 640,maxWidth: 480);
     if(image!=null&&image.path!=null){
       image = await FlutterExifRotation.rotateImage(path: image.path);
       setState(() {
         _image = image;
       });
+      ToastUtil.showShortToast("人像上传成功");
     }
   }
 
@@ -122,7 +141,6 @@ class IdentifyPageState extends State<IdentifyPage> {
                     if (value.isEmpty) {
                       return '请填入您的真实姓名';
                     }
-                    return '';
                   },
                   onSaved: (value) {
                     realName = value;
@@ -146,7 +164,6 @@ class IdentifyPageState extends State<IdentifyPage> {
                     if (value.isEmpty) {
                       return '请输入您的身份证号码';
                     }
-                    return '';
                   },
                   style: TextStyle(
                     fontSize: Constant.normalFontSize,
@@ -219,7 +236,7 @@ class IdentifyPageState extends State<IdentifyPage> {
                     fontSize: Constant.normalFontSize,
                   ),
                   onSaved: (value) {
-                    deatilAddress = value;
+                    detailAddress = value;
                   },
                 ),
               ),
@@ -264,9 +281,15 @@ class IdentifyPageState extends State<IdentifyPage> {
       }
     });
   }
+  /*
+   * 实名认证
+   * 先将头像上传
+   * 然后验证是否已经实名
+   * 是则实名，否返回上一页
+   */
   identify() async {
     if (_image == null) {
-      ToastUtil.showShortClearToast("未检测到头像");
+      ToastUtil.showShortToast("请上传头像");
     } else {
       String preurl = Constant.serverUrl + Constant.isVerifyUrl;
       String url = Constant.serverUrl + Constant.verifyUrl;
@@ -290,7 +313,7 @@ class IdentifyPageState extends State<IdentifyPage> {
         });
         var  headers = Map<String, String>();
         headers['Content-type']="application/x-www-form-urlencoded";
-        var imageres = await Http().postExt(imageurl, data: formData,headers: headers);
+        var imageres = await Http().postExt(imageurl, data: formData,headers: headers,debugMode: true);
         Map imagemap = jsonDecode(imageres);
         String threshold = await CommonUtil.calWorkKey();
         if (imagemap['data']['imageFileName'] != null) {
@@ -302,26 +325,42 @@ class IdentifyPageState extends State<IdentifyPage> {
             "requestVer": CommonUtil.getAppVersion(),
             "realName": realName.trim(),
             "idNO": await DesUtil().decryptHex(idNumber.trim(),userInfo.workKey),
-            "address": address + " " + deatilAddress,
+            "address": address + " " + detailAddress,
             "idHandleImgUrl": imagemap['data']['imageFileName'],
             "idType":0,
           },debugMode: true);
           if(res is String){
             Map map = jsonDecode(res);
             if(map['verify']['sign']=="success"){
-              ToastUtil.showShortClearToast("实名认证成功");
+              ToastUtil.showShortToast("认证成功");
+              await updateAuthStatus();
               Navigator.pop(context);
             }else{
-              ToastUtil.showShortClearToast(map['verify']['desc']);
+              ToastUtil.showShortToast(map['verify']['desc']);
+              Navigator.pop(context);
             }
           }
         } else {
-          ToastUtil.showShortClearToast("头像上传失败，请重新上传！");
+          ToastUtil.showShortToast("头像上传失败");
         }
       } else {
-        ToastUtil.showShortClearToast("已经实名验证过");
+        ToastUtil.showShortToast("您已实名");
+        Navigator.pop(context);
       }
     }
+  }
+  /*
+   * 更新实名状态
+   * LocalStorage.Save 临时存储
+   * updateUserInfo SP
+   */
+  Future updateAuthStatus() async {
+    UserInfo _userInfo = await LocalStorage.load("userInfo");
+    _userInfo.isAuth = "T";
+    LocalStorage.save("userInfo",_userInfo);
+    UserModel userModel = new UserModel();
+    userModel.update(_userInfo);
+    DataUtils.updateUserInfo(_userInfo);
   }
 }
 

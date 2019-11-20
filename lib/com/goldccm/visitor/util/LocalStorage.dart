@@ -10,6 +10,8 @@ class LocalStorage{
   static UserInfo _userInfo;
   static List _privilegeLists;
   static String _phoneStr;
+
+  //读取
   static save(String name,dynamic value){
     if(name=="userInfo"){
       _userInfo=value;
@@ -21,10 +23,13 @@ class LocalStorage{
       _phoneStr=value;
     }
   }
+  //存储
+  //先从sp中读取，存在则替换当前变量并返回，不存在直接返回当前变量
   static load(String name) async {
     if(name=="userInfo"){
       UserInfo userInfo=await DataUtils.getUserInfo();
       if(userInfo!=null&&userInfo.id!=null){
+        _userInfo=userInfo;
         return userInfo;
       }
       return _userInfo;
