@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 
 var _keys = null;
@@ -189,15 +192,19 @@ class CompanyPageState extends State<CompanyPage>{
       "requestVer": CommonUtil.getAppVersion(),
       "companyId":_keys[v]['companyId'],
       "role":_keys[v]['roleType'],
-    });
+    },debugMode: true);
     Map map = jsonDecode(res);
     if(map['verify']['sign']=="success"){
       ToastUtil.showShortClearToast("修改公司成功");
       setState(() {
         groupValue=v;
         userInfo.companyId=_keys[v]['companyId'];
+        userInfo.companyName=_keys[v]['companyName'];
         DataUtils.updateUserInfo(userInfo);
+        Provider.of<UserModel>(context).init(userInfo);
+        LocalStorage.save("userInfo",userInfo);
       });
+      Navigator.pop(context);
     }else{
       ToastUtil.showShortClearToast("修改公司失败");
     }

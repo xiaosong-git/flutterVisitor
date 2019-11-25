@@ -1,12 +1,11 @@
 import 'dart:convert';
-
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
+import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
-import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
-
 import 'CommonUtil.dart';
+import 'MessageUtils.dart';
 
 /*
  * 消息数量提醒及更新
@@ -16,7 +15,8 @@ import 'CommonUtil.dart';
  */
 class BadgeUtil{
   static int _visitConfirmCount=0;
-  static int _messageCount;
+  static int _messageCount=0;
+  static int _newFriendCount=0;
 
   static BadgeUtil _badge;
 
@@ -62,12 +62,41 @@ class BadgeUtil{
     }
     return count;
   }
-  updateVisitConfirmCount(int num){
-    _visitConfirmCount=num;
-  }
-  getVisitConfirmCount(){
-    if(_visitConfirmCount!=null){
-      return _visitConfirmCount;
+  Future<int> requestNewFriendCount() async{
+    String method = "userFriend/beAgreeingFriendList";
+    int count=0;
+    String url = Constant.serverUrl+method;
+    UserInfo userInfo = await LocalStorage.load("userInfo");
+        String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
+        var res = await Http().post(url,queryParameters:({
+          "token": userInfo.token,
+          "factor": CommonUtil.getCurrentTime(),
+          "threshold": threshold,
+          "requestVer": CommonUtil.getAppVersion(),
+          "userId": userInfo.id,
+        }));
+        if(res !=null){
+          if(res is String){
+            Map map = jsonDecode(res);
+            if(map['verify']['sign']=="success"){
+              if(map['data']!=null){
+                count=map['data'].length;
+              }
+            }
+      }
     }
+    return count;
   }
-}
+  Future<int> getMessageCount(UserInfo userInfo) async{
+    _messageCount=0;
+    List<ChatMessage> list = await MessageUtils.getLatestMessage(userInfo.id);
+    if(list!=null){
+      for(var chat in list){
+        if(chat.unreadCount!=null){
+          _messageCount=_messageCount+chat.unreadCount;
+        }
+      }
+    }
+    return _messageCount;
+  }
+ }

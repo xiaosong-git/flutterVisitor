@@ -92,6 +92,7 @@ class ChatDao extends BaseDBProvider {
     }
     return null;
   }
+
   //查询每个好友的最新消息以及未读信息条数
   Future<List<ChatMessage>> getLatestMessageV2(int userId) async {
     Database db = await getDataBase();

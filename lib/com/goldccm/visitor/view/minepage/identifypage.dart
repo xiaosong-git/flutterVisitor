@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -54,7 +54,7 @@ class IdentifyPageState extends State<IdentifyPage> {
    * 获取本地拍摄的图片
    */
   Future getImage() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 90,maxHeight: 640,maxWidth: 480);
+    File image = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 80,maxHeight: 360,maxWidth: 270);
     if(image!=null&&image.path!=null){
       image = await FlutterExifRotation.rotateImage(path: image.path);
       setState(() {
@@ -327,7 +327,7 @@ class IdentifyPageState extends State<IdentifyPage> {
             "idNO": await DesUtil().decryptHex(idNumber.trim(),userInfo.workKey),
             "address": address + " " + detailAddress,
             "idHandleImgUrl": imagemap['data']['imageFileName'],
-            "idType":0,
+            "idType":01,
           },debugMode: true);
           if(res is String){
             Map map = jsonDecode(res);
@@ -351,16 +351,37 @@ class IdentifyPageState extends State<IdentifyPage> {
   }
   /*
    * 更新实名状态
-   * LocalStorage.Save 临时存储
+   * save LocalStorage
    * updateUserInfo SP
+   * update Provider
    */
   Future updateAuthStatus() async {
-    UserInfo _userInfo = await LocalStorage.load("userInfo");
-    _userInfo.isAuth = "T";
-    LocalStorage.save("userInfo",_userInfo);
-    UserModel userModel = new UserModel();
-    userModel.update(_userInfo);
-    DataUtils.updateUserInfo(_userInfo);
+    var userProvider=Provider.of<UserModel>(context);
+    UserInfo userInfo = await LocalStorage.load("userInfo");
+    String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
+    var result = await Http().post(Constant.getUserInfoUrl, queryParameters: {
+      "token": userInfo.token,
+      "factor": CommonUtil.getCurrentTime(),
+      "threshold": threshold,
+      "requestVer": CommonUtil.getAppVersion(),
+      "userId": userInfo.id,
+    },debugMode: true);
+    if(result != null){
+      if(result is String){
+        Map map =jsonDecode(result);
+        if(map['data']!=null){
+          userInfo.realName=map['data']['realName'];
+          userInfo.idType=map['data']['idType'];
+          userInfo.idNO=map['data']['idNo'];
+          userInfo.idHandleImgUrl=map['data']['idHandleImgUrl'];
+          userInfo.isAuth=map['data']['isAuth'];
+          userInfo.addr=map['data']['addr'];
+          LocalStorage.save("userInfo",userInfo);
+          userProvider.init(userInfo);
+          DataUtils.updateUserInfo(userInfo);
+        }
+      }
+    }
   }
 }
 

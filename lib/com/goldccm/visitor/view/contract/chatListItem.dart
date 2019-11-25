@@ -11,6 +11,11 @@ import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/chat.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+/*
+ * 消息中心
+ * author:hwk<hwk@growingpine.com>
+ * create_time:2019/11/22
+ */
 class ChatList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -19,44 +24,9 @@ class ChatList extends StatefulWidget {
 }
 
 class ChatListState extends State<ChatList> {
-  UserInfo _userInfo=new UserInfo();
   WebSocketChannel channel = MessageUtils.getChannel();
   List<ChatMessage> _chatHis = [];
   Timer _timer;
-  countDown() {
-    const oneCall = const Duration(milliseconds: 3000);
-    var callback = (timer) => {getLatestMessage()};
-    _timer = Timer.periodic(oneCall, callback);
-  }
-
-  getLatestMessage() async {
-    List<ChatMessage> list = await MessageUtils.getLatestMessage(_userInfo.id);
-    setState(() {
-      _chatHis = list;
-    });
-  }
-
-  Future refresh() async{
-    getLatestMessage();
-    ToastUtil.showShortClearToast("刷新成功");
-    return null;
-  }
-
-  void dispose() {
-    _timer?.cancel();
-    _timer = null;
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    initData();
-  }
-  initData() async{
-    _userInfo=await LocalStorage.load("userInfo");
-    countDown();
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,10 +50,9 @@ class ChatListState extends State<ChatList> {
       ),
     );
   }
-
+  //构建每个聊天体
   Widget buildMessageListItem(BuildContext context, int index) {
     ChatMessage message = _chatHis[index];
-    print(message);
     return new InkWell(
       onTap: () {
         FriendInfo user = new FriendInfo(
@@ -105,5 +74,49 @@ class ChatListState extends State<ChatList> {
         imageServerUrl: Constant.imageServerUrl,
       ),
     );
+  }
+  //定时刷新聊天栏
+  countDown() {
+    const oneCall = const Duration(milliseconds: 3000);
+    var callback = (timer) => {getLatestMessage()};
+    _timer = Timer.periodic(oneCall, callback);
+  }
+  //读取聊天信息
+  getLatestMessage() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
+    _chatHis.clear();
+    List<ChatMessage> list = await MessageUtils.getLatestMessage(userInfo.id);
+    if(list!=null){
+      for(var chat in list){
+        if(chat.M_FrealName!=null&&chat.M_FriendId!=null){
+          _chatHis.add(chat);
+        }
+      }
+    }
+    setState(() {
+    });
+  }
+  //手动刷新聊天栏
+  Future refresh() async{
+    getLatestMessage();
+    ToastUtil.showShortClearToast("刷新成功");
+    return null;
+  }
+  //关闭
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+  //初始化
+  initData() async{
+    getLatestMessage();
+    countDown();
   }
 }

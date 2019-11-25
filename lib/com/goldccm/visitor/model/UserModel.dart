@@ -6,10 +6,6 @@ class UserModel with ChangeNotifier{
   UserInfo _userInfo = new UserInfo();
   UserInfo get info=> _userInfo;
 
-  void update(UserInfo userInfo){
-    _userInfo=userInfo;
-    notifyListeners();
-  }
   Future init(UserInfo userInfo) async {
     if(userInfo!=null) {
       _userInfo = userInfo;

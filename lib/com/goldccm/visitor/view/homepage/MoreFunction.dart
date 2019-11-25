@@ -27,8 +27,9 @@ class MoreFunction extends StatefulWidget{
 class MoreFunctionState extends State<MoreFunction>{
 
   ScrollController _scrollController = new ScrollController();
-  List<FunctionLists> _lists=[FunctionLists(iconImage:'assets/icons/茶室.png',iconTitle: '茶室',iconType: '_teaRoom'),FunctionLists(iconImage:'assets/icons/考勤打卡.png',iconTitle: '打卡',iconType: '_attendance')];
+  List<FunctionLists> _lists=[FunctionLists(iconImage:'assets/icons/茶室.png',iconTitle:'茶室',iconType: '_teaRoom'),FunctionLists(iconImage:'assets/icons/考勤打卡.png',iconTitle: '打卡',iconType: '_attendance')];
   List<FunctionLists> _activeLists=[];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +95,7 @@ class MoreFunctionState extends State<MoreFunction>{
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
       "requestVer": CommonUtil.getAppVersion(),
-    });
+    },debugMode: true);
     //附加权限
     if(res != null){
       if(res is String){
@@ -103,13 +104,16 @@ class MoreFunctionState extends State<MoreFunction>{
           for(int j=0;j<_lists.length;j++){
             for(int i=0;i<map['data'].length;i++){
               if(_lists[j].iconTitle==map['data'][i]['menu_name']){
-                _activeLists.add(_lists[j]);
+                  _activeLists.add(_lists[j]);
                 break;
               }
             }
           }
         }
       }
+      setState(() {
+
+      });
     }
   }
   _teaRoom() async {
@@ -134,7 +138,6 @@ class MoreFunctionState extends State<MoreFunction>{
   void initState() {
     super.initState();
     init();
-//    _activeLists=_lists;
   }
   void init() async{
     UserInfo userInfo=await LocalStorage.load("userInfo");

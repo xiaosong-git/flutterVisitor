@@ -9,12 +9,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() {
   //userModel 全局数据
   Provider.debugCheckInvalidValueType = null;
-  final userModel = UserModel();
+  final UserModel userModel = UserModel();
   FlutterArcface.active();
   userModel.init(null);
   //umPush 友盟推送
-  final UMPush umPush=new UMPush();
-  umPush.init();
+  UMPush().init();
   runApp(
     MultiProvider(
         providers: [

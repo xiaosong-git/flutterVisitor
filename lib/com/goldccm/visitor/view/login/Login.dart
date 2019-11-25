@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
-import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
@@ -262,7 +261,11 @@ class LoginState extends State<Login> {
                           children: <Widget>[
                             new Expanded(
                               child: new RaisedButton(
-                                onPressed: _loginAction,
+                                onPressed:(){
+                                 _loginAction().then((value){
+//                                   Navigator.pop(context);
+                                 });
+                                },
                                 /*() {
                     Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context){
                       return new MyHomeApp();
@@ -287,21 +290,21 @@ class LoginState extends State<Login> {
                           ],
                         ),
                       ),
-                      new Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
-                        child: new Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            new GestureDetector(
-                              onTap: () {},
-                              child: new Text(
-                                '忘记密码',
-                                style: _labelStyle,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+//                      new Padding(
+//                        padding: const EdgeInsets.only(right: 20.0),
+//                        child: new Row(
+//                          mainAxisAlignment: MainAxisAlignment.end,
+//                          children: <Widget>[
+//                            new GestureDetector(
+//                              onTap: () {},
+//                              child: new Text(
+//                                '忘记密码',
+//                                style: _labelStyle,
+//                              ),
+//                            )
+//                          ],
+//                        ),
+//                      ),
                       new Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.max,
@@ -436,7 +439,7 @@ class LoginState extends State<Login> {
     return checkResult;
   }
 
-  /**
+  /*
    * 手机验证码校验
    */
   bool checkCode() {
@@ -455,6 +458,7 @@ class LoginState extends State<Login> {
   }
 
   Future _loginAction() async {
+    showLoading();
     String deviceToken=await UMPush.getToken();
     //密码登录
     bool userNameCheck = checkLoignUser();
@@ -506,13 +510,55 @@ class LoginState extends State<Login> {
         return false;
       }
     }else{
-      ToastUtil.showShortToast("账号异常");
+      ToastUtil.showShortToast("登录异常");
       return false;
     }
 
   }
-
-
-
-
+  void showLoading(){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return new Material(
+            //创建透明层
+            type: MaterialType.transparency, //透明类型
+            child: Container(
+              //保证控件居中效果
+              alignment: Alignment.center,
+              child: Center(
+                child: Stack(
+                  children: <Widget>[
+                    Opacity(
+                        opacity: 0.1,
+                        child: ModalBarrier(
+                          color: Colors.black,
+                        )),
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(30.0),
+                        decoration: BoxDecoration(
+                            color: Colors.black87,
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                            Text(
+                              '登陆中',
+                              style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ),
+          );
+        });
+  }
 }

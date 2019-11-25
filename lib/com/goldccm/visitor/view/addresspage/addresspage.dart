@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:badges/badges.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
+import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
@@ -40,6 +42,7 @@ class AddressPageState extends State<AddressPage> {
   Presenter _presenter = new Presenter();
   List<FriendInfo> _userLists = new List<FriendInfo>();
   UserModel _userModel;
+  int _friendRequestNum = 0;
   bool initFlag = false;
   var alphabet = [
     '☀',
@@ -86,10 +89,9 @@ class AddressPageState extends State<AddressPage> {
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Consumer(
-            builder: (context, UserModel userModel, widget) => Text(
-                  '通讯录',
-                  style: new TextStyle(fontSize: 18.0, color: Colors.white),textScaleFactor: 1.0
-                ),
+            builder: (context, UserModel userModel, widget) => Text('通讯录',
+                style: new TextStyle(fontSize: 18.0, color: Colors.white),
+                textScaleFactor: 1.0),
           ),
           leading: null,
           backgroundColor: Theme.of(context).appBarTheme.color,
@@ -167,12 +169,12 @@ class AddressPageState extends State<AddressPage> {
                                                               15,
                                                           alignment:
                                                               Alignment.center,
-                                                          child: Text(
-                                                            '添加好友',
-                                                            style: TextStyle(
-                                                              fontSize: 18.0,
-                                                            ),textScaleFactor: 1.0
-                                                          ),
+                                                          child: Text('添加好友',
+                                                              style: TextStyle(
+                                                                fontSize: 18.0,
+                                                              ),
+                                                              textScaleFactor:
+                                                                  1.0),
                                                         ),
                                                         left: 30,
                                                       ),
@@ -240,12 +242,12 @@ class AddressPageState extends State<AddressPage> {
                                                               15,
                                                           alignment:
                                                               Alignment.center,
-                                                          child: Text(
-                                                            '新的朋友',
-                                                            style: TextStyle(
-                                                              fontSize: 18.0,
-                                                            ),textScaleFactor: 1.0
-                                                          ),
+                                                          child: Text('新的朋友',
+                                                              style: TextStyle(
+                                                                fontSize: 18.0,
+                                                              ),
+                                                              textScaleFactor:
+                                                                  1.0),
                                                         ),
                                                         left: 30,
                                                       ),
@@ -324,6 +326,7 @@ class AddressPageState extends State<AddressPage> {
 
   Future _handleRefresh() async {
     await _presenter.loadUserList();
+    _friendRequestNum = await BadgeUtil().requestNewFriendCount();
     setState(() {
       _userLists = _presenter.getUserList();
       initFlag = _presenter.getFlag();
@@ -333,6 +336,7 @@ class AddressPageState extends State<AddressPage> {
 
   Future _initRefresh() async {
     await _presenter.loadUserList();
+    _friendRequestNum= await BadgeUtil().requestNewFriendCount();
     setState(() {
       _userLists = _presenter.getUserList();
       initFlag = _presenter.getFlag();
@@ -410,7 +414,7 @@ class AddressPageState extends State<AddressPage> {
               ),
               Container(
                 child: ListTile(
-                  title: Text('新的朋友',textScaleFactor: 1.0),
+                  title: Text('新的朋友', textScaleFactor: 1.0),
                   leading: Container(
                     width: 40,
                     decoration: BoxDecoration(
@@ -418,10 +422,10 @@ class AddressPageState extends State<AddressPage> {
                       color: Colors.orange,
                     ),
                     child: Image.asset(
-                      "assets/icons/添加新好友@2x.png",
-                      color: Colors.white,
-                      scale: 1.7,
-                    ),
+                            "assets/icons/添加新好友@2x.png",
+                            color: Colors.white,
+                            scale: 1.7,
+                          ),
                   ),
                   trailing: Image.asset('assets/icons/更多@2x.png', scale: 1.7),
                   onTap: () {
@@ -431,7 +435,9 @@ class AddressPageState extends State<AddressPage> {
                           MaterialPageRoute(
                               builder: (context) => NewFriendPage(
                                     userInfo: _userModel.info,
-                                  )));
+                                  ))).then((value){
+                                    _handleRefresh();
+                      });
                     } else {
                       ToastUtil.showShortClearToast("请先实名认证");
                     }
@@ -516,20 +522,40 @@ class AddressPageState extends State<AddressPage> {
                 ),
                 Container(
                   child: ListTile(
-                    title: Text('新的朋友',textScaleFactor: 1.0),
-                    leading: Container(
+                    title: Text('新的朋友', textScaleFactor: 1.0),
+                    leading:_friendRequestNum > 0
+                        ? Badge(
+                      child: Container(
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.orange,
+                        ),
+                        child:  Image.asset(
+                          "assets/icons/添加新好友@2x.png",
+                          color: Colors.white,
+                          scale: 1.7,
+                        ),
+                      ),
+                      badgeContent: Text(
+                        _friendRequestNum.toString(),
+                        style: TextStyle(color: Colors.white),
+                        textScaleFactor: 1.0,
+                      ),
+                      badgeColor: Colors.red,
+                    ) :  Container(
                       width: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.orange,
                       ),
-                      child: Image.asset(
+                      child:  Image.asset(
                         "assets/icons/添加新好友@2x.png",
                         color: Colors.white,
                         scale: 1.7,
                       ),
                     ),
-                    trailing: Image.asset('assets/icons/更多@2x.png', scale: 1.7),
+                    trailing:Image.asset('assets/icons/更多@2x.png', scale: 1.7),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -563,16 +589,17 @@ class AddressPageState extends State<AddressPage> {
                                 Constant.imageServerUrl +
                                     _userLists[index].virtualImageUrl),
                           )
-                        :  _userLists[index].realImageUrl != null &&
-                        _userLists[index].realImageUrl != ""
-                        ? CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          Constant.imageServerUrl +
-                              _userLists[index].realImageUrl),
-                    ):CircleAvatar(
-                            backgroundImage: AssetImage(
-                                "assets/images/visitor_icon_head.png"),
-                          ),
+                        : _userLists[index].realImageUrl != null &&
+                                _userLists[index].realImageUrl != ""
+                            ? CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    Constant.imageServerUrl +
+                                        _userLists[index].realImageUrl),
+                              )
+                            : CircleAvatar(
+                                backgroundImage: AssetImage(
+                                    "assets/images/visitor_icon_head.png"),
+                              ),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -602,22 +629,23 @@ class AddressPageState extends State<AddressPage> {
                   child: ListTile(
                     title: Text(_userLists[index].name),
                     leading: _userLists[index].virtualImageUrl != null &&
-                        _userLists[index].virtualImageUrl != ""
+                            _userLists[index].virtualImageUrl != ""
                         ? CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          Constant.imageServerUrl +
-                              _userLists[index].virtualImageUrl),
-                    )
-                        :  _userLists[index].realImageUrl != null &&
-                        _userLists[index].realImageUrl != ""
-                        ? CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          Constant.imageServerUrl +
-                              _userLists[index].realImageUrl),
-                    ):CircleAvatar(
-                      backgroundImage: AssetImage(
-                          "assets/images/visitor_icon_head.png"),
-                    ),
+                            backgroundImage: NetworkImage(
+                                Constant.imageServerUrl +
+                                    _userLists[index].virtualImageUrl),
+                          )
+                        : _userLists[index].realImageUrl != null &&
+                                _userLists[index].realImageUrl != ""
+                            ? CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    Constant.imageServerUrl +
+                                        _userLists[index].realImageUrl),
+                              )
+                            : CircleAvatar(
+                                backgroundImage: AssetImage(
+                                    "assets/images/visitor_icon_head.png"),
+                              ),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -637,22 +665,22 @@ class AddressPageState extends State<AddressPage> {
               child: ListTile(
                 title: Text(_userLists[index].name),
                 leading: _userLists[index].virtualImageUrl != null &&
-                    _userLists[index].virtualImageUrl != ""
+                        _userLists[index].virtualImageUrl != ""
                     ? CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      Constant.imageServerUrl +
-                          _userLists[index].virtualImageUrl),
-                )
-                    :  _userLists[index].realImageUrl != null &&
-                    _userLists[index].realImageUrl != ""
-                    ? CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      Constant.imageServerUrl +
-                          _userLists[index].realImageUrl),
-                ):CircleAvatar(
-                  backgroundImage: AssetImage(
-                      "assets/images/visitor_icon_head.png"),
-                ),
+                        backgroundImage: NetworkImage(Constant.imageServerUrl +
+                            _userLists[index].virtualImageUrl),
+                      )
+                    : _userLists[index].realImageUrl != null &&
+                            _userLists[index].realImageUrl != ""
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                Constant.imageServerUrl +
+                                    _userLists[index].realImageUrl),
+                          )
+                        : CircleAvatar(
+                            backgroundImage: AssetImage(
+                                "assets/images/visitor_icon_head.png"),
+                          ),
                 onTap: () {
                   Navigator.push(
                       context,
@@ -700,13 +728,15 @@ class Presenter {
     _imageUrl = await DataUtils.getPararInfo("imageServerUrl");
     String threshold = await CommonUtil.calWorkKey(userInfo: user);
     String url = Constant.serverUrl + Constant.findUserFriendUrl;
-    var res = await Http().post(url, queryParameters: {
-      "token": user.token,
-      "userId": user.id,
-      "factor": CommonUtil.getCurrentTime(),
-      "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
-    },debugMode: true);
+    var res = await Http().post(url,
+        queryParameters: {
+          "token": user.token,
+          "userId": user.id,
+          "factor": CommonUtil.getCurrentTime(),
+          "threshold": threshold,
+          "requestVer": CommonUtil.getAppVersion(),
+        },
+        debugMode: true);
     if (res is String) {
       Map map = jsonDecode(res);
       if (map['verify']['sign'] == "success") {
@@ -717,7 +747,7 @@ class Presenter {
             initFlag = true;
           }
           for (var userInfo in userList) {
-            if(userInfo['realName']!=null&&userInfo['phone']!=null){
+            if (userInfo['realName'] != null && userInfo['phone'] != null) {
               FriendInfo user = FriendInfo(
                 name: userInfo['realName'],
                 phone: userInfo['phone'],

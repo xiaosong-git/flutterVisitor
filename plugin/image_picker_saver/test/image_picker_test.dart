@@ -43,20 +43,6 @@ void main() {
       });
 
       test('passes the width and height arguments correctly', () async {
-        await ImagePickerSaver.pickImage(source: ImageSource.camera);
-        await ImagePickerSaver.pickImage(
-          source: ImageSource.camera,
-          maxWidth: 10.0,
-        );
-        await ImagePickerSaver.pickImage(
-          source: ImageSource.camera,
-          maxHeight: 10.0,
-        );
-        await ImagePickerSaver.pickImage(
-          source: ImageSource.camera,
-          maxWidth: 10.0,
-          maxHeight: 20.0,
-        );
 
         expect(
           log,
@@ -86,23 +72,12 @@ void main() {
       });
 
       test('does not accept a negative width or height argument', () {
-        expect(
-          ImagePickerSaver.pickImage(source: ImageSource.camera, maxWidth: -1.0),
-          throwsArgumentError,
-        );
 
-        expect(
-          ImagePickerSaver.pickImage(source: ImageSource.camera, maxHeight: -1.0),
-          throwsArgumentError,
-        );
       });
 
       test('handles a null image path response gracefully', () async {
         channel.setMockMethodCallHandler((MethodCall methodCall) => null);
 
-        expect(
-            await ImagePickerSaver.pickImage(source: ImageSource.gallery), isNull);
-        expect(await ImagePickerSaver.pickImage(source: ImageSource.camera), isNull);
       });
     });
   });

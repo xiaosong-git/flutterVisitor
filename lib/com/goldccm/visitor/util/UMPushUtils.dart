@@ -7,12 +7,25 @@ import 'package:shared_preferences/shared_preferences.dart';
  * 2019/10/16
  */
 class UMPush{
+
+  static UMPush _umPush;
+  factory UMPush() => _umP();
+  UMPush get instance => _umP();
+  UMPush._internal();
+  static UMPush _umP(){
+    if(_umPush==null){
+      _umPush=UMPush._internal();
+    }
+    return _umPush;
+  }
+
   static bool isConnected = false;
   static String registrationId="";
   static List notificationList = [];
   final FlutterUmpush _flutterUmpush = new FlutterUmpush();
 
   static getToken() async {
+    print(notificationList);
     if(registrationId!=""&&registrationId!=null){
       return registrationId;
     }

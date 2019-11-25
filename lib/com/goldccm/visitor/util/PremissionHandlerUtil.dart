@@ -76,9 +76,6 @@ class PermissionHandlerUtil{
         Map<PermissionGroup, PermissionStatus> permissions =
             await PermissionHandler()
             .requestPermissions([PermissionGroup.storage]);
-        if(permissions.entries.elementAt(0).value==PermissionStatus.denied){
-
-        }
       }
     }
     /*

@@ -44,7 +44,7 @@ class Constant {
   /*
    * 验证用户是否已经实名认证
    */
-  static final String  isVerifyUrl= userUrl + "isVerify";
+  static final String  isVerifyUrl=userUrl+"isVerify";
 
   /*
    * 实名认证
@@ -69,7 +69,7 @@ class Constant {
   /*
    * 获取用户的信息
    */
-  static final String  getUserInfoUrl= userUrl + "getUser";
+  static final String  getUserInfoUrl= serverUrl + userUrl + "getUser";
 
   /*
    * 获取公告

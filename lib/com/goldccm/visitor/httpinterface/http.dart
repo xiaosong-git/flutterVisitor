@@ -6,6 +6,8 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 
 /*
  *  Http连接
+ *  author:hwk<hwk@growingpine.com>
+ *  create_time:2019/11/21
  */
 class Http{
   factory Http() =>_getInstance();
@@ -13,12 +15,10 @@ class Http{
   static Http _instance;
   Dio _dio;
   Http._internal() {
-    // 初始化
     _dio = new Dio();
     _dio.options.baseUrl = Constant.serverUrl;
-//    _dio.options.baseUrl = "http://192.168.101.44/visitor/";
     _dio.options.connectTimeout = 5000; //5s
-    _dio.options.receiveTimeout = 3000;
+    _dio.options.receiveTimeout = 5000;
   }
   static Http _getInstance() {
     if (_instance == null) {
@@ -26,9 +26,6 @@ class Http{
     }
     return _instance;
   }
-
-
-
   // get 请求封装 需要token验证
   getWithHeader(url,{ options, cancelToken, queryParameters,debugMode}) async {
     if(debugMode==true){
@@ -60,42 +57,6 @@ class Http{
     }
     return response.data;
   }
-
-  // post请求封装
-  postWithHeader(url,{ options, cancelToken, queryParameters,debugMode}) async {
-    if(debugMode==true){
-      print('get:::url：$url ,body: $queryParameters');
-    }
-    Response response;
-    var headers = Map<String, String>();
-    headers['token'] = DataUtils.getAccessToken().toString();
-    headers['userId'] = DataUtils.getUserId().toString();
-    headers['factor'] = CommonUtil.getCurrentTime();
-//    headers['threshold'] = CommonUtil.calWorkKey();
-    headers['requestVer'] = CommonUtil.getAppVersion();
-    _dio.options.headers.addAll(headers);
-    print(DataUtils.getAccessToken().toString());
-    try{
-      response = await _dio.post(
-          url,
-          queryParameters:queryParameters !=null ? queryParameters : {},
-          cancelToken:cancelToken
-      );
-      if(debugMode==true){
-        print('get:::url：$url ,body: $queryParameters');
-      }
-    }on DioError catch(e){
-      if(CancelToken.isCancel(e)){
-        print('get请求取消! ' + e.message);
-      }else{
-        print('get请求发生错误：$e');
-      }
-    }
-    return response.data;
-  }
-
-
-
   // get 请求封装 需要token验证
   Future<String> get(url,{ options, cancelToken, queryParameters,debugMode}) async {
     if(debugMode==true){
@@ -125,7 +86,7 @@ class Http{
   // post请求封装
   post(url,{ options, cancelToken, queryParameters,data,debugMode}) async {
     if(debugMode==true){
-      print('get:::url：$url ,body: $queryParameters');
+      print('post:::url：$url ,body: $queryParameters');
     }
     Response response=new Response();
     try{
@@ -150,7 +111,7 @@ class Http{
   // post请求封装
   postExt(url,{ options, cancelToken, queryParameters,data,Map<String,dynamic> headers,debugMode}) async {
     if(debugMode==true){
-      print('get:::url：$url ,body: $queryParameters');
+      print('post:::url：$url ,body: $queryParameters');
     }
     Response response;
     _dio.options.headers.addAll(headers);

@@ -51,7 +51,7 @@ class HomePageState extends State<HomePage> {
   List<String> imageList = [];
   List<String> noticeContentList = [];
   String imageServerUrl; //图片服务器地址
-  List<FunctionLists> _addLists=[FunctionLists(iconImage:'assets/icons/门禁卡icon@2x.png',iconTitle: '门禁卡',iconType: '_mineCard'),FunctionLists(iconImage:'assets/icons/会议室icon@2x.png',iconTitle: '会议室',iconType: '_meetingRoom'),FunctionLists(iconImage:'assets/icons/茶室.png',iconTitle: '茶室',iconType: '_teaRoom')];
+  List<FunctionLists> _addLists=[FunctionLists(iconImage:'assets/icons/门禁卡icon@2x.png',iconTitle: '门禁卡',iconType: '_mineCard'),FunctionLists(iconImage:'assets/icons/会议室icon@2x.png',iconTitle: '会议室',iconType: '_meetingRoom')];
   List<FunctionLists> _baseLists=[FunctionLists(iconImage:'assets/icons/发起访问icon@2x.png',iconTitle: '快捷访问',iconType: '_visitReq'),FunctionLists(iconImage:'assets/icons/访客二维码icon@2x.png',iconTitle: '访问二维码',iconType: '_visitorCard'),FunctionLists(iconImage:'assets/icons/全部icon@2x.png',iconTitle: '全部',iconType: '_more')];
   List<FunctionLists> _lists=[];
   SwiperController _swiperController;
@@ -66,7 +66,6 @@ class HomePageState extends State<HomePage> {
   new TextStyle(color: const Color(0xFF999999), fontSize: 14.0);
   TextStyle titleStyle =
   new TextStyle(color: const Color(0xFF757575), fontSize: 14.0);
-  UserInfo  userInfo=new UserInfo();
   final double expandedHight = 200.0;
   @override
   void initState() {
@@ -107,7 +106,6 @@ class HomePageState extends State<HomePage> {
       getPrivilege(user);
       getNewsInfoList();
       setState(() {
-        userInfo=user;
         swiperLoop=true;
       });
   }
@@ -132,6 +130,7 @@ class HomePageState extends State<HomePage> {
   }
   @override
   Widget build(BuildContext context) {
+    var userProvider=Provider.of<UserModel>(context);
     return WillPopScope(
       child: Scaffold(
           backgroundColor: Theme.of(context).backgroundColor,
@@ -158,7 +157,7 @@ class HomePageState extends State<HomePage> {
                       actions: <Widget>[
                         noticeSize>0?Badge(
                           child: new IconButton(icon:Image.asset("assets/images/visitor_icon_message.png",height: 25,),onPressed: (){
-                            if(userInfo.orgId!=null||userInfo.companyId!=null){
+                            if(userProvider.info.orgId!=null||userProvider.info.companyId!=null){
                               Navigator.push(context, MaterialPageRoute(
                                   builder: (context) => NoticePage()));
                             }else {
@@ -168,7 +167,7 @@ class HomePageState extends State<HomePage> {
                           badgeContent: Text('',style: TextStyle(color: Colors.white),),
                           position: BadgePosition(top: 0,right: 5),
                         ):new IconButton(icon:Image.asset("assets/images/visitor_icon_message.png",height: 25,),onPressed: (){
-                          if(userInfo.orgId!=null||userInfo.companyId!=null){
+                          if(userProvider.info.orgId!=null||userProvider.info.companyId!=null){
                             Navigator.push(context, MaterialPageRoute(
                                 builder: (context) => NoticePage()));
                           }else {
@@ -225,7 +224,7 @@ class HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     onPressed: () => print('message press'),
-                    child: _buildSwiperNotice(),
+                    child: _buildSwiperNotice(userProvider),
                   ),
                 ),
               ),
@@ -309,7 +308,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSwiperNotice(){
+  Widget _buildSwiperNotice(var userProvider){
     return Container(
       height: 40.0,
       padding: EdgeInsets.only(left: 25.0, top: 12.0),
@@ -322,11 +321,11 @@ class HomePageState extends State<HomePage> {
         autoplayDelay: 5000,
         itemBuilder: _buildNoticeContent, // 构建
         onTap: (index) {
-          if(userInfo.orgId!=null||userInfo.companyId!=null){
+          if(userProvider.orgId!=null||userProvider.companyId!=null){
             Navigator.push(context, MaterialPageRoute(
                 builder: (context) => NoticePage()));
           }else {
-            ToastUtil.showShortClearToast("公告暂时只针对非访客开放，敬请谅解");
+            ToastUtil.showShortClearToast("公告暂未开放");
           }
         }, // 点击事件 onTap
         scale: 1, // 两张图片之间的间隔
@@ -337,7 +336,7 @@ class HomePageState extends State<HomePage> {
   /*
   * 获取首页图片
   *
-  * */
+  */
 
   Widget _buildIconTab(String imageurl, String text,String iconType) {
     return new InkWell(
@@ -497,7 +496,8 @@ class HomePageState extends State<HomePage> {
       });
   }
   Future<bool> checkAuth() async{
-    if(userInfo!=null&&userInfo.isAuth=='T'){
+    var _user=Provider.of<UserModel>(context);
+    if(_user.info !=null&&_user.info.isAuth=='T'){
       return true;
     }else{
       return false;
@@ -507,6 +507,7 @@ class HomePageState extends State<HomePage> {
   _mineCard() async{
     bool isAuth = await checkAuth();
       if(isAuth){
+        UserInfo userInfo=await LocalStorage.load("userInfo");
         QrcodeMode model = new QrcodeMode(userInfo: userInfo,totalPages: 1,bitMapType: 1);
         List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
         print('$qrMsg[0]');
@@ -520,6 +521,7 @@ class HomePageState extends State<HomePage> {
 
   }
   outLogin() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     String url =Constant.serverUrl+"app/quit";
     String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
     var res = await Http().post(url,queryParameters: {
@@ -548,23 +550,27 @@ class HomePageState extends State<HomePage> {
       }
     }
   }
-  _requestVisitor(){
-    if(userInfo.isAuth=="T"){
+  _requestVisitor() async {
+    bool isAuth = await checkAuth();
+    if(isAuth){
       ToastUtil.showShortToast("暂未开放");
     }else{
       ToastUtil.showShortClearToast("请先实名认证");
     }
   }
-  _visitorCard(){
-    if(userInfo.isAuth=="T") {
+  _visitorCard() async {
+    bool isAuth = await checkAuth();
+    UserInfo userInfo=await LocalStorage.load("userInfo");
+    if(isAuth) {
       Navigator.push(context, MaterialPageRoute(
           builder: (context) => VisitHistory(userInfo: userInfo,)));
     }else{
       ToastUtil.showShortClearToast("请先实名认证");
     }
   }
-  _meetingRoom(){
-    if(userInfo.isAuth=="T") {
+  _meetingRoom() async {
+    bool isAuth = await checkAuth();
+    if(isAuth) {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => RoomList(type: 0,)));
     }else{

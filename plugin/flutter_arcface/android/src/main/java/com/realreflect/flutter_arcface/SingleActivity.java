@@ -221,6 +221,7 @@ public class SingleActivity {
             addNotificationInfo(notificationSpannableStringBuilder, new StyleSpan(Typeface.BOLD), "age of each face:\n");
         }
         for (int i = 0; i < ageInfoList.size(); i++) {
+            faceInfo="{'face':''}";
             addNotificationInfo(notificationSpannableStringBuilder, null, "face[", String.valueOf(i), "]:", String.valueOf(ageInfoList.get(i).getAge()), "\n");
         }
         addNotificationInfo(notificationSpannableStringBuilder, null, "\n");

@@ -6,17 +6,18 @@ import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitAddress.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/visitDetail.dart';
 
 /*
- * 个人中心 审核界面
+ * 个人中心-审核界面
  * 审核访问我的人和帮助公司员工审核
+ * author:hwk<hwk@growingpine.com>
+ * create_time:2019/11/22
  */
 class VisitList extends StatefulWidget {
-  final UserInfo userInfo;
-  VisitList({Key key, this.userInfo}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return VisitListState();
@@ -51,6 +52,7 @@ class VisitListState extends State<VisitList>
   bool visitMyPeopleNotEmpty = true;
   bool visitMyCompanyNotEmpty = true;
   bool visitMyMineNotEmpty = true;
+  UserInfo _userInfo=new UserInfo();
   @override
   void initState() {
     super.initState();
@@ -80,15 +82,16 @@ class VisitListState extends State<VisitList>
     });
   }
   initAsync() async {
-    _addressLists= await getAddressInfo(widget.userInfo.id);
+    _userInfo=await LocalStorage.load("userInfo");
+    _addressLists= await getAddressInfo(_userInfo.id);
   }
   getAddressInfo(int visitorId) async {
     String url = Constant.serverUrl+"companyUser/findVisitComSuc";
     String threshold = await CommonUtil.calWorkKey();
     List<AddressInfo> _list=<AddressInfo>[];
     var res = await Http().post(url,queryParameters: {
-      "token": widget.userInfo.token,
-      "userId": widget.userInfo.id,
+      "token": _userInfo.token,
+      "userId": _userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
       "requestVer": CommonUtil.getAppVersion(),
@@ -118,14 +121,14 @@ class VisitListState extends State<VisitList>
     if (!isPerformingRequest) {
       String url = Constant.serverUrl +
           "visitorRecord/visitMyPeople/$_visitMyPeopleCount/10";
-      String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
+      String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
       var res = await Http().post(url,
           queryParameters: ({
-            "token": widget.userInfo.token,
+            "token":_userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": CommonUtil.getAppVersion(),
-            "userId": widget.userInfo.id,
+            "userId": _userInfo.id,
           }),debugMode: true);
       if (res is String) {
         Map map = jsonDecode(res);
@@ -181,14 +184,14 @@ class VisitListState extends State<VisitList>
     if (!isPerformingCompanyRequest) {
       String url = Constant.serverUrl +
           "visitorRecord/visitMyCompany/$_visitMyCompanyCount/10";
-      String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
+      String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
       var res = await Http().post(url,
           queryParameters: ({
-            "token": widget.userInfo.token,
+            "token": _userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": CommonUtil.getAppVersion(),
-            "userId": widget.userInfo.id,
+            "userId": _userInfo.id,
           }));
       if (res is String) {
         Map map = jsonDecode(res);
@@ -241,21 +244,21 @@ class VisitListState extends State<VisitList>
   visitMine() async {
       String url =
           Constant.serverUrl + "visitorRecord/visitRecord/$_visitMineCount/100";
-      String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
+      String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
       var res = await Http().post(url,
           queryParameters: ({
-            "token": widget.userInfo.token,
+            "token": _userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": CommonUtil.getAppVersion(),
-            "userId": widget.userInfo.id,
+            "userId": _userInfo.id,
           }),
           debugMode: true);
       if (res is String) {
         Map map = jsonDecode(res);
         if (map['verify']['sign'] == "success") {
             for (var data in map['data']['rows']) {
-              if (data['recordType'] == 1 && data['userId'] == widget.userInfo.id ){
+              if (data['recordType'] == 1 && data['userId'] == _userInfo.id ){
                 VisitInfo visitInfo = new VisitInfo(
                   realName: data['realName'],
                   visitDate: data['visitDate'],
@@ -267,7 +270,7 @@ class VisitListState extends State<VisitList>
                   dateType: data['dateType'],
                   endDate: data['endDate'],
                   startDate: data['startDate'],
-                  visitorRealName: widget.userInfo.realName,
+                  visitorRealName: _userInfo.realName,
                   phone: data['phone'],
                   companyName: data['companyName'],
                   id: data['id'].toString(),
@@ -286,11 +289,11 @@ class VisitListState extends State<VisitList>
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: ({
-          "token": widget.userInfo.token,
+          "token": _userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
           "requestVer": CommonUtil.getAppVersion(),
-          "userId": widget.userInfo.id,
+          "userId": _userInfo.id,
           "id": info.id,
           "cstatus": info.cstatus,
           "answerContent": info.answerContent,
@@ -816,14 +819,14 @@ class VisitListState extends State<VisitList>
       ToastUtil.showShortClearToast("请先选择一个访问地址");
     }else{
       String url = Constant.serverUrl + "visitorRecord/modifyCompanyFromId";
-      String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
+      String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
       var res = await Http().post(url,
           queryParameters: ({
-            "token": widget.userInfo.token,
+            "token": _userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": CommonUtil.getAppVersion(),
-            "userId": widget.userInfo.id,
+            "userId": _userInfo.id,
             "id":info.id,
             "cstatus": info.cstatus,
             "answerContent": info.answerContent,

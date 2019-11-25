@@ -14,8 +14,8 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
-import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
+import 'package:visitor/com/goldccm/visitor/view/minepage/HeaderPage.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/companypage.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/identifypage.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/securitypage.dart';
@@ -24,24 +24,24 @@ import 'package:visitor/com/goldccm/visitor/view/shareroom/roomHistory.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/friendHistory.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/inviteList.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/visitList.dart';
-//个人中心界面
-//包含个人信息显示、历史消息记录、公司管理、安全管理、设置
+/*
+   个人中心
+   包括个人信息、历史消息、公司管理、安全管理、设置
+   author:hwk<hwk@growingpine.com>
+   create_time:2019/11/25
+ */
 class MinePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return MinePageState();
   }
 }
-//_userInfo存放用户个人信息
-UserInfo _userInfo=new UserInfo();
-
 class MinePageState extends State<MinePage> {
   List<FunctionLists> _addlist=[FunctionLists(iconImage: 'assets/icons/实名认证V.png',iconTitle: '实名认证',iconType: '_verify'),FunctionLists(iconImage: 'assets/icons/会议室icon@2x.png',iconTitle:'会议室',iconType:'_meetingRoom'),FunctionLists(iconImage: 'assets/icons/公司管理@2x.png',iconTitle:'公司管理',iconType: '_companySetting' ),];
   List<FunctionLists> _baseList=[FunctionLists(iconImage:'assets/icons/安全管理@2x.png',iconTitle:'安全管理',iconType: '_securitySetting' ),FunctionLists(iconImage:'assets/icons/设置@2x.png',iconTitle: '设置',iconType:'_setting' )];
   List<FunctionLists> _list = [];
   BadgeUtil badge=BadgeUtil();
   int visitBadgeNumTotal=0;
-  TimerUtil _timerUtil;
   ScrollController _minescrollController = new ScrollController();
   final double expandedHeight = 65.0;
   double get top {
@@ -69,28 +69,24 @@ class MinePageState extends State<MinePage> {
       }
     });
   }
+  updateNoticeNum() async {
+    visitBadgeNumTotal=await BadgeUtil().requestConfirmCount();
+    setState(() {
+
+    });
+  }
   //数量提醒及用户信息获取
   init() async {
-    UserInfo user=await LocalStorage.load("userInfo");
-    _userInfo=user;
-    //消息数量提醒
-    _timerUtil=TimerUtil(mInterval: 5000);
-    _timerUtil.setOnTimerTickCallback((int tick) async {
-      int num=await BadgeUtil().requestConfirmCount();
-      setState(() {
-        visitBadgeNumTotal=num;
-      });
-    });
-    _timerUtil.startTimer();
+    updateNoticeNum();
   }
   //个人中心角色权限获取
   Future getPrivilege() async {
-    UserInfo user=await LocalStorage.load("userInfo");
+      UserInfo userInfo=await LocalStorage.load("userInfo");
       String url = Constant.serverUrl + "userAppRole/getRoleMenu";
-      String threshold = await CommonUtil.calWorkKey(userInfo: user);
+      String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url, queryParameters: {
-        "token": user.token,
-        "userId": user.id,
+        "token": userInfo.token,
+        "userId": userInfo.id,
         "factor": CommonUtil.getCurrentTime(),
         "threshold": threshold,
         "requestVer": CommonUtil.getAppVersion(),
@@ -124,12 +120,11 @@ class MinePageState extends State<MinePage> {
   @override
   void dispose() {
     _minescrollController.dispose();
-    _timerUtil.cancel();
     super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    var user = Provider.of<UserModel>(context);
+    var userProvider=Provider.of<UserModel>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
@@ -159,7 +154,7 @@ class MinePageState extends State<MinePage> {
                   ),
                   delegate: new SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
-                      return _buildIconTab(_list[index].iconImage,_list[index].iconTitle,_list[index].iconType);
+                      return _buildIconTab(_list[index].iconImage,_list[index].iconTitle,_list[index].iconType,userProvider.info);
                     },
                     childCount: _list.length
                   ),
@@ -186,21 +181,20 @@ class MinePageState extends State<MinePage> {
                           Container(
                             child: GestureDetector(
                               onTap: () {
-                                if(_userInfo.headImgUrl != null||_userInfo.idHandleImgUrl!=null){
+                                if(userProvider.info.headImgUrl != null||userProvider.info.idHandleImgUrl!=null){
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => HeadImagePage())).then((value){
-                                  });
+                                          builder: (context) => HeadImagePage()));
                                 }
                               },
                               child: CircleAvatar(
-                                backgroundImage: _userInfo.headImgUrl != null?NetworkImage(
+                                backgroundImage:userProvider.info.headImgUrl != null?NetworkImage(
                                         Constant.imageServerUrl +
-                                            (_userInfo.headImgUrl ),)
-                                    : _userInfo.idHandleImgUrl!=null?NetworkImage(
+                                            (userProvider.info.headImgUrl ),)
+                                    : userProvider.info.idHandleImgUrl!=null?NetworkImage(
                                   Constant.imageServerUrl +
-                                      (_userInfo.idHandleImgUrl ),):AssetImage('assets/images/visitor_icon_account.png'),
+                                      (userProvider.info.idHandleImgUrl ),):AssetImage('assets/images/visitor_icon_account.png'),
                                 radius: 100,
                               ),
                             ),
@@ -228,8 +222,8 @@ class MinePageState extends State<MinePage> {
                                 builder:
                                     (context, UserModel userModel, widget) =>
                                         Text(
-                                          userModel.info.companyName != null
-                                              ? userModel.info.companyName
+                                            Provider.of<UserModel>(context).info.companyName != null
+                                              ? Provider.of<UserModel>(context).info.companyName
                                               : '暂未获取到数据',
                                           style: TextStyle(
                                             color: Colors.black,
@@ -269,11 +263,10 @@ class MinePageState extends State<MinePage> {
                                     ),
                                   ),
                                   onTap: () {
-                                    if(user.info.isAuth=="T") {
+                                    if(userProvider.info.isAuth=="T") {
                                       Navigator.push(context, MaterialPageRoute(
                                           builder: (context) =>
-                                              VisitList(
-                                                userInfo: user.info,)));
+                                              VisitList())).then((value)=>updateNoticeNum());
                                     }else{
                                       ToastUtil.showShortClearToast("请先实名认证");
                                     }
@@ -297,8 +290,8 @@ class MinePageState extends State<MinePage> {
                                     ),
                                   ),
                                   onTap: () {
-                                    if(user.info.isAuth=="T"){
-                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>InviteList(userInfo:user.info,)));
+                                    if(userProvider.info.isAuth=="T"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>InviteList(userInfo:userProvider.info,)));
                                     }else{
                                       ToastUtil.showShortClearToast("请先实名认证");
                                     }
@@ -322,11 +315,11 @@ class MinePageState extends State<MinePage> {
                                     ),
                                   ),
                                   onTap: () {
-                                    if(user.info.isAuth=="T") {
+                                    if(userProvider.info.isAuth=="T") {
                                       Navigator.push(context, MaterialPageRoute(
                                           builder: (context) =>
                                               FriendHistory(
-                                                userInfo: user.info,)));
+                                                userInfo: userProvider.info,)));
                                     }else{
                                       ToastUtil.showShortClearToast("请先实名认证");
                                     }
@@ -348,24 +341,28 @@ class MinePageState extends State<MinePage> {
       ),
     );
   }
-  Widget _buildIconTab(String url, String text,String method) {
+  Widget _buildIconTab(String url, String text,String method,UserInfo userInfo) {
     return InkWell(
           onTap: () async {
             if(method=="_meetingRoom"){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory (userInfo: _userInfo,)));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory (userInfo: userInfo,)));
             }else if(method=="_companySetting"){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => CompanyPage(userInfo: _userInfo,)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CompanyPage(userInfo: userInfo,))).then((value) async {
+                print(await LocalStorage.load("userInfo"));
+                setState(() {
+
+                });
+              });
             }else if(method=="_securitySetting"){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => SecurityPage(userInfo: _userInfo)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => SecurityPage(userInfo: userInfo)));
             }else if(method=="_setting"){
               Navigator.push(context, MaterialPageRoute(builder: (context) => SettingPage()));
             }else if(method=="_verify"){
-              UserInfo user=await LocalStorage.load("userInfo");
-              if(user.isAuth=="T"){
+              if(userInfo.isAuth=="T"){
                 ToastUtil.showShortClearToast("您已完成实名认证");
               }else{
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => IdentifyPage(userInfo: _userInfo,)));
+                    builder: (context) => IdentifyPage(userInfo: userInfo,)));
               }
             }
           },
@@ -384,135 +381,5 @@ class MinePageState extends State<MinePage> {
             ),
           ),
     );
-  }
 }
-
-//头像修改
-class HeadImagePage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return HeadImagePageState();
-  }
-}
-
-class HeadImagePageState extends State<HeadImagePage> {
-  File _image;
-
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 90,maxHeight: 640,maxWidth: 480);
-    setState(() {
-      _image = image;
-    });
-    _uploadImg();
-  }
-
-  Future getPhoto() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 90,maxHeight: 640,maxWidth: 480);
-    print(image.absolute);
-    print(await image.length());
-    setState(() {
-      _image = image;
-    });
-    _uploadImg();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      child:Scaffold(
-          appBar: AppBar(
-            title: Text('修改头像',textScaleFactor: 1.0),
-            centerTitle: true,
-            backgroundColor: Theme.of(context).appBarTheme.color,
-            leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context,_userInfo.headImgUrl);}),
-          ),
-          body: Column(
-            children: <Widget>[
-              Container(
-                alignment: Alignment.center,
-                height: 300,
-                width: 300,
-                child: ClipOval(
-                  child: _image == null
-                      ? Image.network(
-                    Constant.imageServerUrl +
-                        (_userInfo.headImgUrl != null
-                            ? _userInfo.headImgUrl
-                            : _userInfo.idHandleImgUrl),
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  )
-                      : Image.file(
-                    _image,
-                    fit: BoxFit.cover,
-                    width: 200,
-                    height: 200,
-                  ),
-                ),
-              ),
-              Center(
-                  child:
-                  Container(
-                    color: Colors.white,
-                    margin: EdgeInsets.all(5),
-                    width: MediaQuery.of(context).size.width-40,
-                    height: 50,
-                    child: RaisedButton(child: Text('点击从相册中选取照片',textScaleFactor: 1.0,style: TextStyle(fontSize: 16.0),), onPressed: getImage,elevation: 5.0,color: Colors.white,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),),
-                  )
-              ),
-              Center(
-                child:  Container(
-                  color: Colors.white,
-                  margin: EdgeInsets.all(5),
-                  width: MediaQuery.of(context).size.width-40,
-                  height: 50,
-                  child:RaisedButton(child: Text('点击拍摄照片',textScaleFactor: 1.0,style: TextStyle(fontSize: 16.0),), onPressed: getPhoto,elevation: 5.0,color: Colors.white,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0))),
-                ),
-              ),
-            ],
-          )),
-      onWillPop: (){
-        Navigator.pop(context,_userInfo.headImgUrl);
-      },
-    );
-  }
-
-  ///修改后的头像上传和个人信息内的头像地址的修改
-  _uploadImg() async {
-    String url = Constant.imageServerApiUrl;
-    var name = _image.path.split("/");
-    var filename = name[name.length - 1];
-    FormData formData = FormData.from({
-      "userId": _userInfo.id,
-      "type": "4",
-      "file": new UploadFileInfo(_image, filename),
-    });
-    var res = await Http().post(url, data: formData);
-    Map map = jsonDecode(res);
-    String nickurl = Constant.serverUrl+ Constant.updateNickAndHeadUrl;
-    String threshold = await CommonUtil.calWorkKey();
-    var nickres = await Http().post(nickurl, queryParameters: {
-      "headImgUrl": map['data']['imageFileName'],
-      "token": _userInfo.token,
-      "userId": _userInfo.id,
-      "factor": CommonUtil.getCurrentTime(),
-      "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
-    });
-    setState(() {
-      _userInfo.headImgUrl = map['data']['imageFileName'];
-      DataUtils.updateUserInfo(_userInfo);
-    });
-    if(nickres is String){
-      Map nickmap = jsonDecode(nickres);
-      if(nickmap['verify']['desc']=="success"){
-        ToastUtil.showShortClearToast(nickmap['verify']['desc']);
-        Navigator.pop(context);
-      }else{
-        ToastUtil.showShortClearToast(nickmap['verify']['desc']);
-      }
-    }
-  }
-
 }

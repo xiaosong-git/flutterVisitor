@@ -82,22 +82,24 @@ class MessageUtils {
   static reconnect(){
     debugPrint('Websocket重新连接');
     closeChannel();
-    print(reCount);
-    if(reCount<3){
-      if (_channel == null) {
-        _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl+'chat?userId=$userID&token=$userToken');
-        if(_channel != null){
-          _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
-          _isOpen = true;
-          received = true;
-          detect();
+    Future.delayed(Duration(seconds: 10),(){
+      print(reCount);
+      if(reCount<3){
+        if (_channel == null) {
+          _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl+'chat?userId=$userID&token=$userToken');
+          if(_channel != null){
+            _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
+            _isOpen = true;
+            received = true;
+            detect();
+          }
         }
-      }
-      reCount++;
+        reCount++;
 //      setChannel(userID,userToken);
-    }else{
-      debugPrint('Websocket重连失败');
-    }
+      }else{
+        debugPrint('Websocket重连失败');
+      }
+    });
   }
 
   //关闭

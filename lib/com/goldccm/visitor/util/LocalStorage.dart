@@ -10,7 +10,6 @@ class LocalStorage{
   static UserInfo _userInfo;
   static List _privilegeLists;
   static String _phoneStr;
-
   //读取
   static save(String name,dynamic value){
     if(name=="userInfo"){

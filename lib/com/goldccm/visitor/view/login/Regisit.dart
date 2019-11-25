@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
+import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'dart:async';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -11,7 +11,6 @@ import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
-import 'package:visitor/com/goldccm/visitor/view/homepage/NewsView.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/NewsWebView.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/identifypage.dart';
 import 'package:visitor/home.dart';
@@ -414,12 +413,12 @@ class RegisitState extends State<Regisit> {
     );
   }
 
-  /**
+  /*
    * 注册
    */
   void _register() async {
     var user = Provider.of<UserModel>(context);
-    if (checkLoignUser() && checkCode() && checkPass() && checkConfirmPass()) {
+    if (checkLoginUser() && checkCode() && checkPass() && checkConfirmPass()) {
       if (isAgree) {
         String phone = _userNameController.text.toString();
         String code = _checkCodeController.text.toString();
@@ -535,8 +534,9 @@ class RegisitState extends State<Regisit> {
   /*
   *  用户名校验
    */
-  bool checkLoignUser() {
+  bool checkLoginUser() {
     String _loginName = _userNameController.text.toString();
+    print(_loginName);
     bool checkResult = true;
     if (_loginName == null || _loginName == "") {
       ToastUtil.showShortToast('手机号不能为空');
@@ -544,13 +544,16 @@ class RegisitState extends State<Regisit> {
     } else if (_loginName != '' && _loginName.length != 11) {
       ToastUtil.showShortToast('手机号长度不正确');
       checkResult = false;
-    } else {
+    } else if (!RegExpUtil.instance.verifyPhone(_loginName)){
+      ToastUtil.showShortToast("手机号格式不正确");
+      checkResult = false;
+    }else {
       checkResult = true;
     }
     return checkResult;
   }
 
-  /**
+  /*
    * 密码校验
    */
   bool checkPass() {
@@ -597,11 +600,12 @@ class RegisitState extends State<Regisit> {
     return checkResult;
   }
 
-  /**
+  /*
    * 获取验证码
    */
+
   Future<bool> getCheckCode() async {
-    bool _userNameCheck = checkLoignUser();
+    bool _userNameCheck = checkLoginUser();
     if (_userNameCheck) {
       String url = Constant.serverUrl +
           Constant.sendCodeUrl +

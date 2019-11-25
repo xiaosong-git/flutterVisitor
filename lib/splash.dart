@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'com/goldccm/visitor/util/DataUtils.dart';
 import 'home.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/Login.dart';
@@ -61,7 +58,7 @@ class SplashState extends State<SplashPage> {
       ),
     );
   }
-
+ //检测是否登录
   void checkIsLogin() async {
     isLogin = await DataUtils.isLogin();
   }

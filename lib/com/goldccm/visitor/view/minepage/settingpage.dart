@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -26,10 +27,12 @@ class SettingPage extends StatefulWidget {
 
 class SettingPageState extends State<SettingPage> {
   String size;
+  String version;
   @override
   void initState() {
     super.initState();
     getCacheSize();
+    getVersion();
   }
 
   @override
@@ -58,7 +61,7 @@ class SettingPageState extends State<SettingPage> {
                 new Container(
                   padding: EdgeInsets.all(10.0),
                   child: Center(
-                    child: new Text('版本号 3.2.1',textScaleFactor: 1.0),
+                    child: new Text('$version',textScaleFactor: 1.0),
                   ),
                 ),
               ],
@@ -357,6 +360,12 @@ class SettingPageState extends State<SettingPage> {
       if(size==null){
         size="0.0B";
       }
+    });
+  }
+  Future getVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      version=packageInfo.version;
     });
   }
 }
