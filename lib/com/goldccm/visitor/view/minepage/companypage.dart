@@ -59,7 +59,7 @@ class CompanyPageState extends State<CompanyPage>{
               Stack(
                 children: <Widget>[
                   Container(
-                    height: MediaQuery.of(context).size.height/3.7,
+                    height: 200,
                     width: MediaQuery.of(context).size.width,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,6 +151,7 @@ class CompanyPageState extends State<CompanyPage>{
   }
   ///获取公司信息
   getCompanyInfo() async {
+    _keys=null;
     String url = Constant.serverUrl+Constant.findApplySucUrl;
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {

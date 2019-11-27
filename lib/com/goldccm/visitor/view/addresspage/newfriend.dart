@@ -167,7 +167,7 @@ class NewFriendPageState extends State<NewFriendPage> {
             leading: Container(
               child: CircleAvatar(
                 backgroundImage: _friends[index].imageUrl!=null?NetworkImage(
-                    presenter.getImageUrl() + _friends[index].imageUrl):AssetImage("assets/images/visitor_icon_head.png"),
+                    Constant.imageServerUrl + _friends[index].imageUrl):AssetImage("assets/images/visitor_icon_head.png"),
               ),
               height: 50,
               width: 50,
@@ -202,7 +202,9 @@ class NewFriendPageState extends State<NewFriendPage> {
                     alignment: Alignment.center,
                   )),
             ));
-      }, childCount: _friends.length != null ? _friends.length : 0),
+      }, childCount:
+      _friends.length != null ? _friends.length : 0
+      ),
     );
   }
 
@@ -366,7 +368,9 @@ class Presenter {
                 userId: userInfo['id'],
                 applyType: userInfo['applyType'],
                 nickname: userInfo['nickName']);
-            _friends.add(user);
+            if(user.name!=null&&user.name!=""){
+              _friends.add(user);
+            }
           }
         }
       }
@@ -389,18 +393,19 @@ class Presenter {
       Map map = jsonDecode(res);
       if (map['verify']['sign'] == "success") {
         List userList = map['data'];
-        if (userList == null) {
-          return;
-        }
-        for (var userInfo in userList) {
-          Person user = Person(
-              name: userInfo['realName'],
-              phone: userInfo['phone'],
-              imageUrl: userInfo['idHandleImgUrl'],
-              userId: userInfo['id'],
-              nickname: userInfo['nickName'],
-              applyType: userInfo['applyType']);
-          _request.add(user);
+        if (userList != null) {
+          for (var userInfo in userList) {
+            Person user = Person(
+                name: userInfo['realName'],
+                phone: userInfo['phone'],
+                imageUrl: userInfo['idHandleImgUrl'],
+                userId: userInfo['id'],
+                nickname: userInfo['nickName'],
+                applyType: userInfo['applyType']);
+            if(user.name!=null&&user.name!=""){
+              _request.add(user);
+            }
+          }
         }
       }
     }

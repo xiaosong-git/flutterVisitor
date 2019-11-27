@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'dart:async';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
@@ -11,7 +12,9 @@ import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/NewsWebView.dart';
+import 'package:visitor/com/goldccm/visitor/view/login/Login.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/identifypage.dart';
 import 'package:visitor/home.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -276,7 +279,7 @@ class RegisitState extends State<Regisit> {
                 new Divider(
                   color: Colors.black54,
                 ),
-                buildForm('密码', '请输入密码', false, 35, _passwordController,true),
+                buildForm('密码', '8-16位字母加数字组合', false, 35, _passwordController,true),
                 new Divider(
                   color: Colors.black54,
                 ),
@@ -319,7 +322,17 @@ class RegisitState extends State<Regisit> {
                         child: new RaisedButton(
                           onPressed: () {
                             if (isAgree) {
-                              _register();
+                              LoadingDialog().show(context, "注册中");
+                              _register().then((value){
+                                Navigator.pop(context);
+                                if(value){
+                                  UserInfo userInfo=LocalStorage.load("userInfo");
+                                  Navigator.push(
+                                      context,
+                                      new MaterialPageRoute(builder: (BuildContext context) => isAuth == true ? new IdentifyPage(userInfo: userInfo,) : new MyHomeApp())).then((value){Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
+                                  });
+                                }
+                              });
                             } else {
                               ToastUtil.showShortToast("未同意用户协议");
                             }
@@ -416,8 +429,7 @@ class RegisitState extends State<Regisit> {
   /*
    * 注册
    */
-  void _register() async {
-    var user = Provider.of<UserModel>(context);
+  Future<bool> _register() async {
     if (checkLoginUser() && checkCode() && checkPass() && checkConfirmPass()) {
       if (isAgree) {
         String phone = _userNameController.text.toString();
@@ -446,31 +458,25 @@ class RegisitState extends State<Regisit> {
             DataUtils.saveLoginInfo(userMap);
             DataUtils.saveUserInfo(userMap);
             //DataUtils.saveNoticeInfo(noticeMap);
-            user.init(userInfo);
+            Provider.of<UserModel>(context).init(userInfo);
+            LocalStorage.save("userInfo",userInfo);
             SharedPreferenceUtil.saveUser(userInfo);
-            Navigator.push(
-                context,
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => isAuth == true
-                        ? new IdentifyPage(
-                            userInfo: userInfo,
-                          )
-                        : new MyHomeApp())).then((value){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=>MyHomeApp()));
-            });
+            ToastUtil.showShortToast("注册成功,即将跳转");
+            return true;
           } else {
             ToastUtil.showShortToast(loginResult.desc);
-            return;
+            return false;
           }
         } else {
           ToastUtil.showShortToast(result.desc);
-          return;
+          return false;
         }
       } else {
         ToastUtil.showShortToast('请先同意联客用户协议');
-        return;
+        return false;
       }
     }
+    return false;
   }
 
   Widget _buildCode(String labelText, String hintText, bool autofocus,
@@ -562,10 +568,13 @@ class RegisitState extends State<Regisit> {
     if (_pass == null || _pass == "") {
       ToastUtil.showShortToast('密码不能为空');
       checkResult = false;
-    } else if (_pass != '' && _pass.length < 6 && _pass.length >= 32) {
-      ToastUtil.showShortToast('密码长度不能小于6位大于32位');
+    } else if (_pass.length < 8 || _pass.length >= 16) {
+      ToastUtil.showShortToast('密码长度不能小于8位或大于16位');
       checkResult = false;
-    } else {
+    } else if(!RegExpUtil.instance.verifyPassWord(_pass)){
+      ToastUtil.showShortToast('密码需要是8-16位字母加数字组合');
+      checkResult = false;
+    }else {
       checkResult = true;
     }
     return checkResult;
@@ -582,7 +591,7 @@ class RegisitState extends State<Regisit> {
     }
   }
 
-  /**
+  /*
    * 手机验证码校验
    */
   bool checkCode() {

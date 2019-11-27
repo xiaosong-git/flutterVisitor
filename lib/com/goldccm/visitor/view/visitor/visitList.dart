@@ -23,7 +23,6 @@ class VisitList extends StatefulWidget {
     return VisitListState();
   }
 }
-
 /*
  *
  */
@@ -86,12 +85,13 @@ class VisitListState extends State<VisitList>
     _addressLists= await getAddressInfo(_userInfo.id);
   }
   getAddressInfo(int visitorId) async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     String url = Constant.serverUrl+"companyUser/findVisitComSuc";
     String threshold = await CommonUtil.calWorkKey();
     List<AddressInfo> _list=<AddressInfo>[];
     var res = await Http().post(url,queryParameters: {
-      "token": _userInfo.token,
-      "userId": _userInfo.id,
+      "token": userInfo.token,
+      "userId": userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
       "requestVer": CommonUtil.getAppVersion(),
@@ -118,17 +118,18 @@ class VisitListState extends State<VisitList>
     return _list;
   }
   visitMyPeople() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     if (!isPerformingRequest) {
       String url = Constant.serverUrl +
           "visitorRecord/visitMyPeople/$_visitMyPeopleCount/10";
-      String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
+      String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
-            "token":_userInfo.token,
+            "token":userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": CommonUtil.getAppVersion(),
-            "userId": _userInfo.id,
+            "userId": userInfo.id,
           }),debugMode: true);
       if (res is String) {
         Map map = jsonDecode(res);
@@ -181,17 +182,18 @@ class VisitListState extends State<VisitList>
   }
 
   visitMyCompany() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     if (!isPerformingCompanyRequest) {
       String url = Constant.serverUrl +
           "visitorRecord/visitMyCompany/$_visitMyCompanyCount/10";
-      String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
+      String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
-            "token": _userInfo.token,
+            "token": userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": CommonUtil.getAppVersion(),
-            "userId": _userInfo.id,
+            "userId": userInfo.id,
           }));
       if (res is String) {
         Map map = jsonDecode(res);
@@ -242,23 +244,24 @@ class VisitListState extends State<VisitList>
   }
 
   visitMine() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
       String url =
           Constant.serverUrl + "visitorRecord/visitRecord/$_visitMineCount/100";
-      String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
+      String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
-            "token": _userInfo.token,
+            "token": userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": CommonUtil.getAppVersion(),
-            "userId": _userInfo.id,
+            "userId": userInfo.id,
           }),
           debugMode: true);
       if (res is String) {
         Map map = jsonDecode(res);
         if (map['verify']['sign'] == "success") {
             for (var data in map['data']['rows']) {
-              if (data['recordType'] == 1 && data['userId'] == _userInfo.id ){
+              if (data['recordType'] == 1 && data['userId'] == userInfo.id ){
                 VisitInfo visitInfo = new VisitInfo(
                   realName: data['realName'],
                   visitDate: data['visitDate'],
@@ -270,7 +273,7 @@ class VisitListState extends State<VisitList>
                   dateType: data['dateType'],
                   endDate: data['endDate'],
                   startDate: data['startDate'],
-                  visitorRealName: _userInfo.realName,
+                  visitorRealName: userInfo.realName,
                   phone: data['phone'],
                   companyName: data['companyName'],
                   id: data['id'].toString(),
@@ -285,15 +288,16 @@ class VisitListState extends State<VisitList>
   }
 
   adoptAndReject(VisitInfo info, int index, int type) async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     String url = Constant.serverUrl + "visitorRecord/adoptionAndRejection";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: ({
-          "token": _userInfo.token,
+          "token": userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
           "requestVer": CommonUtil.getAppVersion(),
-          "userId": _userInfo.id,
+          "userId": userInfo.id,
           "id": info.id,
           "cstatus": info.cstatus,
           "answerContent": info.answerContent,
@@ -463,7 +467,7 @@ class VisitListState extends State<VisitList>
         } else {
           return ListTile(
             title: RichText(text: TextSpan(
-              text: '来访人员  ',
+              text: '被访人员  ',
               style: TextStyle(fontSize: 16,color: Colors.black),
               children: <TextSpan>[
                 TextSpan(

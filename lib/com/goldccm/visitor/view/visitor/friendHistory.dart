@@ -26,17 +26,16 @@ class FriendHistoryState extends State<FriendHistory>{
   bool isPerformingRequest = false;
   bool notEmpty=true;
   var _friendBuilderFuture;
-  UserInfo _userInfo;
   @override
   void initState() {
     super.initState();
     _friendBuilderFuture=_getMoreData();
-//    _scrollController.addListener(() {
-//      if (_scrollController.position.pixels ==
-//          _scrollController.position.maxScrollExtent) {
-//        _getMoreData();
-//      }
-//    });
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _getMoreData();
+      }
+    });
   }
   @override
   void dispose() {
@@ -133,7 +132,7 @@ class FriendHistoryState extends State<FriendHistory>{
                   virtualImageUrl: data['idHandleImgUrl'],
                   userId: data['userId']
                 );
-                if(info.userId!=widget.userInfo.id){
+                if(info.userId!=widget.userInfo.id&&data['realName']!=null){
                   _friendLists.add(info);
                 }
               }

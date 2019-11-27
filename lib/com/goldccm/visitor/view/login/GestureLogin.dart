@@ -5,11 +5,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gesture_password/gesture_password.dart';
 import 'package:flutter/material.dart';
 import 'package:gesture_password/gesture_password.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/UMPushUtils.dart';
@@ -139,6 +142,8 @@ class GestureLoginState extends State<GestureLogin> {
         DataUtils.saveLoginInfo(userMap);
         DataUtils.saveUserInfo(userMap);
         SharedPreferenceUtil.saveUser(userInfo);
+        Provider.of<UserModel>(context).init(userInfo);
+        LocalStorage.save("userInfo",userInfo);
         Navigator.of(context).pushAndRemoveUntil(
             new MaterialPageRoute(
                 builder: (BuildContext context) => new MyHomeApp()),

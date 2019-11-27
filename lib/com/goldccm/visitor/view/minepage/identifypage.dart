@@ -16,6 +16,7 @@ import 'package:visitor/com/goldccm/visitor/util/DesUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 
 /*
  * 实名认证
@@ -48,6 +49,7 @@ class IdentifyPageState extends State<IdentifyPage> {
   String detailAddress="";
   UserInfo userInfo;
   String _imageServerApiUrl;
+  Map imageMap;
   var areaController = new TextEditingController();
 
   /*
@@ -253,7 +255,14 @@ class IdentifyPageState extends State<IdentifyPage> {
                     onPressed: () async {
                       if (formKey.currentState.validate()) {
                         formKey.currentState.save();
-                        identify();
+                        //调用identify
+                        LoadingDialog().show(context, "请求认证中");
+                        identify().then((value){
+                          Navigator.pop(context);
+                          if(value){
+                            Navigator.pop(context);
+                          }
+                        });
                       }
                     },
                   ),
@@ -265,7 +274,9 @@ class IdentifyPageState extends State<IdentifyPage> {
       ),
     );
   }
-
+  /*
+   * 获取图片服务器地址
+   */
   getImageServerApiUrl() async {
     String url = Constant.getParamUrl + "imageServerApiUrl";
     var response = await Http.instance
@@ -287,10 +298,11 @@ class IdentifyPageState extends State<IdentifyPage> {
    * 然后验证是否已经实名
    * 是则实名，否返回上一页
    */
-  identify() async {
+  Future<bool> identify() async {
     if (_image == null) {
       ToastUtil.showShortToast("请上传头像");
-    } else {
+      return false;
+    }
       String preurl = Constant.serverUrl + Constant.isVerifyUrl;
       String url = Constant.serverUrl + Constant.verifyUrl;
       String threshold = await CommonUtil.calWorkKey();
@@ -314,9 +326,9 @@ class IdentifyPageState extends State<IdentifyPage> {
         var  headers = Map<String, String>();
         headers['Content-type']="application/x-www-form-urlencoded";
         var imageres = await Http().postExt(imageurl, data: formData,headers: headers,debugMode: true);
-        Map imagemap = jsonDecode(imageres);
+        imageMap = jsonDecode(imageres);
         String threshold = await CommonUtil.calWorkKey();
-        if (imagemap['data']['imageFileName'] != null) {
+        if (imageMap['data']['imageFileName'] != null) {
           var res = await Http().post(url, queryParameters: {
             "token":userInfo.token,
             "userId":userInfo.id,
@@ -326,28 +338,29 @@ class IdentifyPageState extends State<IdentifyPage> {
             "realName": realName.trim(),
             "idNO": await DesUtil().decryptHex(idNumber.trim(),userInfo.workKey),
             "address": address + " " + detailAddress,
-            "idHandleImgUrl": imagemap['data']['imageFileName'],
+            "idHandleImgUrl": imageMap['data']['imageFileName'],
             "idType":01,
           },debugMode: true);
-          if(res is String){
+          if(res is String&&res!=""){
             Map map = jsonDecode(res);
             if(map['verify']['sign']=="success"){
               ToastUtil.showShortToast("认证成功");
               await updateAuthStatus();
-              Navigator.pop(context);
+              return true;
             }else{
               ToastUtil.showShortToast(map['verify']['desc']);
-              Navigator.pop(context);
+             return false;
             }
           }
         } else {
           ToastUtil.showShortToast("头像上传失败");
+          return false;
         }
       } else {
         ToastUtil.showShortToast("您已实名");
-        Navigator.pop(context);
+        return true;
       }
-    }
+      return true;
   }
   /*
    * 更新实名状态
@@ -358,30 +371,15 @@ class IdentifyPageState extends State<IdentifyPage> {
   Future updateAuthStatus() async {
     var userProvider=Provider.of<UserModel>(context);
     UserInfo userInfo = await LocalStorage.load("userInfo");
-    String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
-    var result = await Http().post(Constant.getUserInfoUrl, queryParameters: {
-      "token": userInfo.token,
-      "factor": CommonUtil.getCurrentTime(),
-      "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
-      "userId": userInfo.id,
-    },debugMode: true);
-    if(result != null){
-      if(result is String){
-        Map map =jsonDecode(result);
-        if(map['data']!=null){
-          userInfo.realName=map['data']['realName'];
-          userInfo.idType=map['data']['idType'];
-          userInfo.idNO=map['data']['idNo'];
-          userInfo.idHandleImgUrl=map['data']['idHandleImgUrl'];
-          userInfo.isAuth=map['data']['isAuth'];
-          userInfo.addr=map['data']['addr'];
-          LocalStorage.save("userInfo",userInfo);
-          userProvider.init(userInfo);
-          DataUtils.updateUserInfo(userInfo);
-        }
-      }
-    }
+    userInfo.realName=realName;
+    userInfo.idType="01";
+    userInfo.idNO=await DesUtil().decryptHex(idNumber.trim(),userInfo.workKey);
+    userInfo.idHandleImgUrl=imageMap['data']['imageFileName'];
+    userInfo.isAuth="T";
+    userInfo.addr=address + " " + detailAddress;
+    LocalStorage.save("userInfo",userInfo);
+    userProvider.init(userInfo);
+    DataUtils.updateUserInfo(userInfo);
   }
 }
 

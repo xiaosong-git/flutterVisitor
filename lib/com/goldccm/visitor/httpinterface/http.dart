@@ -1,9 +1,6 @@
 import 'package:dio/dio.dart';
-
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';//用于配置公用常量
-import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
-import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
-
+import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 /*
  *  Http连接
  *  author:hwk<hwk@growingpine.com>
@@ -18,7 +15,7 @@ class Http{
     _dio = new Dio();
     _dio.options.baseUrl = Constant.serverUrl;
     _dio.options.connectTimeout = 5000; //5s
-    _dio.options.receiveTimeout = 5000;
+    _dio.options.receiveTimeout = 3000;
   }
   static Http _getInstance() {
     if (_instance == null) {
@@ -27,38 +24,7 @@ class Http{
     return _instance;
   }
   // get 请求封装 需要token验证
-  getWithHeader(url,{ options, cancelToken, queryParameters,debugMode}) async {
-    if(debugMode==true){
-      print('get:::url：$url ,body: $queryParameters');
-    }
-    Response response;
-    var headers = Map<String, String>();
-    headers['token'] = DataUtils.getAccessToken().toString();
-    headers['userId'] = DataUtils.getUserId().toString();
-    headers['factor'] = CommonUtil.getCurrentTime();
-//    headers['threshold'] = CommonUtil.calWorkKey();
-    headers['requestVer'] = CommonUtil.getAppVersion();
-    _dio.options.headers.addAll(headers);
-    try{
-      response = await _dio.get(
-          url,
-          cancelToken:cancelToken,
-        queryParameters: queryParameters !=null ? queryParameters : {},
-      );
-      if(debugMode==true){
-        print('get:::url：$url ,body: $queryParameters');
-      }
-    }on DioError catch(e){
-      if(CancelToken.isCancel(e)){
-        print('get请求取消! ' + e.message);
-      }else{
-        print('get请求发生错误：$e');
-      }
-    }
-    return response.data;
-  }
-  // get 请求封装 需要token验证
-  Future<String> get(url,{ options, cancelToken, queryParameters,debugMode}) async {
+  Future<String> get(url,{ options, cancelToken, queryParameters,debugMode=true}) async {
     if(debugMode==true){
       print('get:::url：$url ,body: $queryParameters');
     }
@@ -74,17 +40,18 @@ class Http{
         print(response);
       }
     }on DioError catch(e){
+      ToastUtil.showShortToast("网络请求错误");
       if(CancelToken.isCancel(e)){
         print('get请求取消! ' + e.message);
       }else{
         print('get请求发生错误：$e');
       }
     }
-    return response.data;
+    return response.data??"";
   }
 
   // post请求封装
-  post(url,{ options, cancelToken, queryParameters,data,debugMode}) async {
+  post(url,{ options, cancelToken, queryParameters,data,debugMode=true}) async {
     if(debugMode==true){
       print('post:::url：$url ,body: $queryParameters');
     }
@@ -100,16 +67,17 @@ class Http{
         print(response);
       }
     }on DioError catch(e){
+      ToastUtil.showShortToast("网络请求错误");
       if(CancelToken.isCancel(e)){
         print('get请求取消! ' + e.message);
       }else{
         print('get请求发生错误：$e');
       }
     }
-    return response.data;
-  }
+    return response.data??"";
+}
   // post请求封装
-  postExt(url,{ options, cancelToken, queryParameters,data,Map<String,dynamic> headers,debugMode}) async {
+  postExt(url,{ options, cancelToken, queryParameters,data,Map<String,dynamic> headers,debugMode=true}) async {
     if(debugMode==true){
       print('post:::url：$url ,body: $queryParameters');
     }
@@ -126,12 +94,13 @@ class Http{
         print(response);
       }
     }on DioError catch(e){
+      ToastUtil.showShortToast("网络请求错误");
       if(CancelToken.isCancel(e)){
         print('get请求取消! ' + e.message);
       }else{
         print('get请求发生错误：$e');
       }
     }
-    return response.data;
+    return response.data??"";
   }
 }

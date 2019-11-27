@@ -122,11 +122,7 @@ class FriendDetailPageState extends State<FriendDetailPage> {
             child: new RaisedButton(
               color: Colors.blue,
               textColor: Colors.white,
-              child: widget.type == 1
-                  ? Text('访问',
-                      style: TextStyle(fontSize: Constant.normalFontSize),
-                      textScaleFactor: 1.0)
-                  : Text('洽谈',
+              child: Text('洽谈',
                       style: TextStyle(fontSize: Constant.normalFontSize),
                       textScaleFactor: 1.0),
               onPressed: () async {

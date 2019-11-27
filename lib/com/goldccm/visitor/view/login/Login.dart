@@ -9,6 +9,7 @@ import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
@@ -54,10 +55,8 @@ class LoginState extends State<Login> {
   final int _loginCode = 2;
   bool _codeBtnflag = true;
   Timer _timer;
-
   /// 当前倒计时的秒数。
   int _seconds;
-
   /// 当前墨水瓶（`InkWell`）的字体样式。
   Color colorStyle = _availableStyle;
 
@@ -262,15 +261,14 @@ class LoginState extends State<Login> {
                             new Expanded(
                               child: new RaisedButton(
                                 onPressed:(){
-                                 _loginAction().then((value){
-//                                   Navigator.pop(context);
-                                 });
+                                    LoadingDialog().show(context, "登陆中");
+                                    _loginAction().then((value){
+                                      Navigator.pop(context);
+                                      if(value){
+                                        Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
+                                      }
+                                    });
                                 },
-                                /*() {
-                    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context){
-                      return new MyHomeApp();
-                    }));
-                  },*/
                                 //通过控制 Text 的边距来控制控件的高度
                                 child: new Padding(
                                   padding: new EdgeInsets.fromLTRB(
@@ -457,14 +455,15 @@ class LoginState extends State<Login> {
     return checkResult;
   }
 
+  /*
+   * _loginPass 密码登录
+   * _loginCode 验证码登录
+   */
   Future _loginAction() async {
-    showLoading();
     String deviceToken=await UMPush.getToken();
-    //密码登录
     bool userNameCheck = checkLoignUser();
     String _passNum;
     String _codeNum;
-    var user=Provider.of<UserModel>(context);
     var data;
     if (userNameCheck && _loginType == _loginPass) {
       bool passCheck = checkPass();
@@ -477,6 +476,9 @@ class LoginState extends State<Login> {
              "deviceToken":deviceToken,
              "deviceType":_deviceType,
         },debugMode: true);
+      }else{
+        ToastUtil.showShortToast("用户名或密码错误");
+        return false;
       }
     } else if (_loginType == _loginCode) {
       //验证码登录
@@ -489,9 +491,11 @@ class LoginState extends State<Login> {
           "deviceToken":deviceToken,
           "deviceType":_deviceType,
         },debugMode: true);
+      }else{
+        ToastUtil.showShortToast("验证码错误");
+        return false;
       }
     }
-
     if (data != null&&data!="") {
       JsonResult result = JsonResult.fromJson(data);
       if (result.sign == 'success') {
@@ -501,64 +505,16 @@ class LoginState extends State<Login> {
         DataUtils.saveLoginInfo(userMap);
         DataUtils.saveUserInfo(userMap);
         SharedPreferenceUtil.saveUser(userInfo);
-        user.init(userInfo);
+        Provider.of<UserModel>(context).init(userInfo);
         LocalStorage.save("userInfo",userInfo);
-        Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
         return true;
       } else {
-        Fluttertoast.showToast(msg: result.desc);
+        ToastUtil.showShortToast(result.desc);
         return false;
       }
     }else{
       ToastUtil.showShortToast("登录异常");
       return false;
     }
-
-  }
-  void showLoading(){
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return new Material(
-            //创建透明层
-            type: MaterialType.transparency, //透明类型
-            child: Container(
-              //保证控件居中效果
-              alignment: Alignment.center,
-              child: Center(
-                child: Stack(
-                  children: <Widget>[
-                    Opacity(
-                        opacity: 0.1,
-                        child: ModalBarrier(
-                          color: Colors.black,
-                        )),
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(30.0),
-                        decoration: BoxDecoration(
-                            color: Colors.black87,
-                            borderRadius: BorderRadius.circular(10.0)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            CircularProgressIndicator(),
-                            Text(
-                              '登陆中',
-                              style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ),
-          );
-        });
   }
 }

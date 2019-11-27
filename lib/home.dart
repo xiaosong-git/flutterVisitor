@@ -312,9 +312,7 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     _pageList = [
       new HomePage(),
       new ChatList(),
-      new AddressPage(
-        type: widget.type,
-      ),
+      new AddressPage(type: 1,),
       new MinePage(),
     ];
   }

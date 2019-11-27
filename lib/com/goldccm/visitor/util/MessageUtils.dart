@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:visitor/com/goldccm/visitor/db/chatDao.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -79,27 +80,30 @@ class MessageUtils {
   }
 
   //断线重连
-  static reconnect(){
-    debugPrint('Websocket重新连接');
-    closeChannel();
-    Future.delayed(Duration(seconds: 10),(){
-      print(reCount);
-      if(reCount<3){
-        if (_channel == null) {
-          _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl+'chat?userId=$userID&token=$userToken');
-          if(_channel != null){
-            _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
-            _isOpen = true;
-            received = true;
-            detect();
+  static reconnect() async {
+    bool isLogin = await DataUtils.isLogin();
+    if(isLogin){
+      debugPrint('Websocket重新连接');
+      closeChannel();
+      Future.delayed(Duration(seconds: 10),(){
+        print(reCount);
+        if(reCount<3){
+          if (_channel == null) {
+            _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl+'chat?userId=$userID&token=$userToken');
+            if(_channel != null){
+              _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
+              _isOpen = true;
+              received = true;
+              detect();
+            }
           }
-        }
-        reCount++;
+          reCount++;
 //      setChannel(userID,userToken);
-      }else{
-        debugPrint('Websocket重连失败');
-      }
-    });
+        }else{
+          debugPrint('Websocket重连失败');
+        }
+      });
+    }
   }
 
   //关闭
