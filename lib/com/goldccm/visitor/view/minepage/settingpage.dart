@@ -339,8 +339,8 @@ class SettingPageState extends State<SettingPage> {
       "userId": user.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
-    });
+      "requestVer": await CommonUtil.getAppVersion(),
+    },userCall: true);
     if(res != null){
       if(res is String){
         Map map = jsonDecode(res);

@@ -1,17 +1,25 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/db/chatDao.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
+import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
+import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
+
+import 'BadgeUtil.dart';
 
 /*
  * WebSocket消息监听类
@@ -34,7 +42,6 @@ class MessageUtils {
   static int reCount=0;
   static TimerUtil _timerUtil=TimerUtil(mInterval: 30000);
   static bool received=true;
-
   static MessageUtils _messageUtils(){
     if(_message==null){
       _message=MessageUtils._internal();
@@ -143,10 +150,8 @@ class MessageUtils {
     type=3是自己发送的访问邀约消息被通过或拒绝的回馈消息
   */
   static _onData(event) async {
-
     if(event=="pong"){
       received=true;
-      debugPrint("ping receive");
     }else{
       print(event);
       Map map = jsonDecode(event);
@@ -162,8 +167,11 @@ class MessageUtils {
           ToastUtil.showShortClearToast(map['desc']);
         }
       }else {
-        print('接收到一条数据');
+        //播放提示音
         player.play("message.mp3");
+        //更新消息数
+        EventBusUtil().eventBus.fire(MessageCountChangeEvent(0));
+//        EventBusUtil().eventBus.destroy();
         ChatMessage msg;
         ChatDao chatDao = new ChatDao();
         if (map['type'] == 1) {

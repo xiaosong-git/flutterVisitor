@@ -9,6 +9,8 @@ import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitAddress.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/error.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/visitDetail.dart';
 
 /*
@@ -23,11 +25,8 @@ class VisitList extends StatefulWidget {
     return VisitListState();
   }
 }
-/*
- *
- */
-class VisitListState extends State<VisitList>
-    with SingleTickerProviderStateMixin {
+
+class VisitListState extends State<VisitList> with SingleTickerProviderStateMixin {
   TabController _tabController;
   List tabs = ['我的访问', '访问我的人', '帮助审核'];
   List<AddressInfo> _addressLists = <AddressInfo>[];
@@ -35,9 +34,6 @@ class VisitListState extends State<VisitList>
   List _visitMyPeopleLists = [];
   List _visitMyCompanyLists = [];
   int selectedCompanyId;
-  AddressInfo _selectAddress;
-  int _visitMyPeopleCount = 1;
-  int _visitMyCompanyCount = 1;
   int _visitMineCount = 1;
   var _visitBuilderFuture;
   var _visitMineBuilderFuture;
@@ -45,9 +41,6 @@ class VisitListState extends State<VisitList>
   ScrollController _scrollPeopleController = new ScrollController();
   ScrollController _scrollCompanyController = new ScrollController();
   ScrollController _scrollMineController = new ScrollController();
-  bool isPerformingMineRequest = false;
-  bool isPerformingRequest = false;
-  bool isPerformingCompanyRequest = false;
   bool visitMyPeopleNotEmpty = true;
   bool visitMyCompanyNotEmpty = true;
   bool visitMyMineNotEmpty = true;
@@ -61,24 +54,6 @@ class VisitListState extends State<VisitList>
     initAsync();
     _tabController = TabController(length: tabs.length, vsync: this);
     _tabController.addListener(() {});
-    _scrollCompanyController.addListener(() {
-      if (_scrollCompanyController.position.pixels ==
-          _scrollCompanyController.position.maxScrollExtent) {
-        visitMyCompany();
-      }
-    });
-    _scrollPeopleController.addListener(() {
-      if (_scrollPeopleController.position.pixels ==
-          _scrollPeopleController.position.maxScrollExtent) {
-        visitMyPeople();
-      }
-    });
-    _scrollMineController.addListener(() {
-      if (_scrollMineController.position.pixels ==
-          _scrollMineController.position.maxScrollExtent) {
-        visitMine();
-      }
-    });
   }
   initAsync() async {
     _userInfo=await LocalStorage.load("userInfo");
@@ -94,10 +69,10 @@ class VisitListState extends State<VisitList>
       "userId": userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "visitorId":visitorId,
-    });
-    if(res !=null){
+    },userCall: false);
+    if(res !=null&&res !=""){
       if(res is String){
         Map map = jsonDecode(res);
         if(map['verify']['sign']=="success"){
@@ -117,130 +92,88 @@ class VisitListState extends State<VisitList>
     }
     return _list;
   }
+
   visitMyPeople() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-    if (!isPerformingRequest) {
-      String url = Constant.serverUrl +
-          "visitorRecord/visitMyPeople/$_visitMyPeopleCount/10";
+      String url = Constant.serverUrl + "visitorRecord/visitMyPeople/1/100";
       String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
             "token":userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
-            "requestVer": CommonUtil.getAppVersion(),
+            "requestVer": await CommonUtil.getAppVersion(),
             "userId": userInfo.id,
-          }),debugMode: true);
-      if (res is String) {
-        Map map = jsonDecode(res);
-        if (map['verify']['sign'] == "success") {
-          if (map['data']['total'] == 0) {
-            setState(() {
-              isPerformingRequest = true;
-              visitMyPeopleNotEmpty = false;
-            });
-          } else {
-            for (var data in map['data']['rows']) {
-              VisitInfo visitInfo = new VisitInfo(
-                realName: data['realName'],
-                visitDate: data['visitDate'],
-                visitTime: data['visitTime'],
-                userId: data['userId'].toString(),
-                visitorId: data['visitorId'].toString(),
-                reason: data['reason'],
-                cstatus: data['cstatus'],
-                dateType: data['dateType'],
-                endDate: data['endDate'],
-                startDate: data['startDate'],
-                visitorRealName: data['realName'],
-                phone: data['phone'],
-                companyName: data['companyName'],
-                id: data['id'].toString(),
-                companyId: data['companyId'],
-              );
-              _visitMyPeopleLists.add(visitInfo);
-//              _visitMyPeopleLists.sort((a, b) => b.id.compareTo(a.id));
-            }
-            setState(() {
-              _visitMyPeopleCount++;
-              isPerformingRequest = false;
-            });
-            if (map['data']['rows'].length < 10) {
-              setState(() {
-                _visitMyPeopleCount--;
-                isPerformingRequest = true;
-              });
-            }
+          }),userCall: false);
+      if(res !=""&&res!=null){
+        if (res is String) {
+          Map map = jsonDecode(res);
+          if (map['verify']['sign'] == "success") {
+              for (var data in map['data']['rows']) {
+                VisitInfo visitInfo = new VisitInfo(
+                  realName: data['realName'],
+                  visitDate: data['visitDate'],
+                  visitTime: data['visitTime'],
+                  userId: data['userId'].toString(),
+                  visitorId: data['visitorId'].toString(),
+                  reason: data['reason'],
+                  cstatus: data['cstatus'],
+                  dateType: data['dateType'],
+                  endDate: data['endDate'],
+                  startDate: data['startDate'],
+                  visitorRealName: data['realName'],
+                  phone: data['phone'],
+                  companyName: data['companyName'],
+                  id: data['id'].toString(),
+                  companyId: data['companyId'],
+                );
+                _visitMyPeopleLists.add(visitInfo);
+              }
           }
-        } else {
-          ToastUtil.showShortClearToast(map['verify']['desc']);
         }
       }
-    } else {
-      ToastUtil.showShortClearToast("已加载到底");
-    }
   }
 
   visitMyCompany() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-    if (!isPerformingCompanyRequest) {
       String url = Constant.serverUrl +
-          "visitorRecord/visitMyCompany/$_visitMyCompanyCount/10";
+          "visitorRecord/visitMyCompany/1/100";
       String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
             "token": userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
-            "requestVer": CommonUtil.getAppVersion(),
+            "requestVer": await CommonUtil.getAppVersion(),
             "userId": userInfo.id,
-          }));
-      if (res is String) {
-        Map map = jsonDecode(res);
-        if (map['verify']['sign'] == "success") {
-          if (map['data']['total'] == 0) {
-            setState(() {
-              isPerformingCompanyRequest = true;
-              visitMyCompanyNotEmpty = false;
-            });
-          } else {
-            for (var data in map['data']['rows']) {
-              VisitInfo visitInfo = new VisitInfo(
-                realName: data['userRealName'],
-                visitDate: data['visitDate'],
-                visitTime: data['visitTime'],
-                userId: data['userId'].toString(),
-                visitorId: data['visitorId'].toString(),
-                reason: data['reason'],
-                cstatus: data['cstatus'],
-                dateType: data['dateType'],
-                endDate: data['endDate'],
-                startDate: data['startDate'],
-                visitorRealName: data['userRealName'],
-                phone: data['phone'],
-                companyName: data['companyName'],
-                id: data['id'].toString(),
-              );
-              _visitMyCompanyLists.add(visitInfo);
-            }
-            setState(() {
-              _visitMyCompanyCount++;
-              isPerformingCompanyRequest = false;
-            });
-            if (map['data']['rows'].length < 10) {
-              setState(() {
-                _visitMyCompanyCount--;
-                isPerformingCompanyRequest = true;
-              });
-            }
+          }),userCall: false);
+      if(res!=""&&res!=null){
+        if (res is String) {
+          Map map = jsonDecode(res);
+          if (map['verify']['sign'] == "success") {
+              for (var data in map['data']['rows']) {
+                VisitInfo visitInfo = new VisitInfo(
+                  realName: data['userRealName'],
+                  visitDate: data['visitDate'],
+                  visitTime: data['visitTime'],
+                  userId: data['userId'].toString(),
+                  visitorId: data['visitorId'].toString(),
+                  reason: data['reason'],
+                  cstatus: data['cstatus'],
+                  dateType: data['dateType'],
+                  endDate: data['endDate'],
+                  startDate: data['startDate'],
+                  visitorRealName: data['userRealName'],
+                  phone: data['phone'],
+                  companyName: data['companyName'],
+                  id: data['id'].toString(),
+                );
+                _visitMyCompanyLists.add(visitInfo);
+              }
           }
-        } else {
-          ToastUtil.showShortClearToast(map['verify']['desc']);
         }
       }
-    } else {
-      ToastUtil.showShortClearToast("已加载到底");
-    }
+
   }
 
   visitMine() async {
@@ -253,13 +186,14 @@ class VisitListState extends State<VisitList>
             "token": userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
-            "requestVer": CommonUtil.getAppVersion(),
+            "requestVer": await CommonUtil.getAppVersion(),
             "userId": userInfo.id,
           }),
-          debugMode: true);
-      if (res is String) {
-        Map map = jsonDecode(res);
-        if (map['verify']['sign'] == "success") {
+          debugMode: true,userCall: false);
+      if(res !=""&&res!=null){
+        if (res is String) {
+          Map map = jsonDecode(res);
+          if (map['verify']['sign'] == "success") {
             for (var data in map['data']['rows']) {
               if (data['recordType'] == 1 && data['userId'] == userInfo.id ){
                 VisitInfo visitInfo = new VisitInfo(
@@ -281,8 +215,7 @@ class VisitListState extends State<VisitList>
                 _visitLists.add(visitInfo);
               }
             }
-        } else {
-          ToastUtil.showShortClearToast(map['verify']['desc']);
+          }
         }
       }
   }
@@ -296,7 +229,7 @@ class VisitListState extends State<VisitList>
           "token": userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
-          "requestVer": CommonUtil.getAppVersion(),
+          "requestVer": await CommonUtil.getAppVersion(),
           "userId": userInfo.id,
           "id": info.id,
           "cstatus": info.cstatus,
@@ -304,7 +237,7 @@ class VisitListState extends State<VisitList>
           "dataType": info.dateType,
           "startDate": info.startDate,
           "endDate": info.endDate,
-        }));
+        }),userCall: false );
     if (res is String) {
       Map map = jsonDecode(res);
       if (map['verify']['sign'] == "success") {
@@ -364,41 +297,14 @@ class VisitListState extends State<VisitList>
         return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
-        return Stack(
-          children: <Widget>[
-            Opacity(
-                opacity: 0.1,
-                child: ModalBarrier(
-                  color: Colors.black,
-                )),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.all(30.0),
-                decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    CircularProgressIndicator(),
-                    Text(
-                      '加载中',
-                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        return LoadingDialog(text:'加载中');
         break;
       case ConnectionState.active:
         return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError)
+          return ErrorPage();
         return _buildList();
         break;
       default:
@@ -412,41 +318,14 @@ class VisitListState extends State<VisitList>
         return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
-        return Stack(
-          children: <Widget>[
-            Opacity(
-                opacity: 0.1,
-                child: ModalBarrier(
-                  color: Colors.black,
-                )),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.all(30.0),
-                decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    CircularProgressIndicator(),
-                    Text(
-                      '加载中',
-                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        return LoadingDialog(text:'加载中');
         break;
       case ConnectionState.active:
         return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString(),textScaleFactor: 1.0,);
+        if (snapshot.hasError)
+          return ErrorPage();
         return _buildMineList();
         break;
       default:
@@ -456,15 +335,8 @@ class VisitListState extends State<VisitList>
 
   _buildList() {
     return ListView.separated(
-      itemCount: isPerformingRequest == true
-          ? _visitMyPeopleLists.length
-          : _visitMyPeopleLists.length + 1,
+      itemCount: _visitMyPeopleLists.length,
       itemBuilder: (BuildContext context, int index) {
-        if (index == _visitMyPeopleLists.length) {
-          return ListTile(
-            title: Text('加载中',textScaleFactor: 1.0,),
-          );
-        } else {
           return ListTile(
             title: RichText(text: TextSpan(
               text: '被访人员  ',
@@ -576,7 +448,6 @@ class VisitListState extends State<VisitList>
               }
             },
           );
-        }
       },
       separatorBuilder: (BuildContext context, int index) {
         return Container(
@@ -657,41 +528,14 @@ class VisitListState extends State<VisitList>
         return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
-        return Stack(
-          children: <Widget>[
-            Opacity(
-                opacity: 0.1,
-                child: ModalBarrier(
-                  color: Colors.black,
-                )),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.all(30.0),
-                decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    CircularProgressIndicator(),
-                    Text(
-                      '加载中',
-                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        return  LoadingDialog(text:'加载中');
         break;
       case ConnectionState.active:
         return Text('active',textScaleFactor: 1.0,);
         break;
       case ConnectionState.done:
-        if (snapshot.hasError) return Text(snapshot.error.toString());
+        if (snapshot.hasError)
+          return ErrorPage();
         return _buildCompanyList();
         break;
       default:
@@ -701,15 +545,9 @@ class VisitListState extends State<VisitList>
 
   _buildCompanyList() {
     return ListView.separated(
-      itemCount: isPerformingCompanyRequest == true
-          ? _visitMyCompanyLists.length
-          : _visitMyCompanyLists.length + 1,
+      itemCount:  _visitMyCompanyLists.length,
       itemBuilder: (BuildContext context, int index) {
-        if (index == _visitMyCompanyLists.length) {
-          return ListTile(
-            title: Text('加载中',textScaleFactor: 1.0,),
-          );
-        } else {
+
           return ListTile(
             title: RichText(text: TextSpan(
               text: '来访人员  ',
@@ -805,7 +643,6 @@ class VisitListState extends State<VisitList>
               }
             },
           );
-        }
       },
       separatorBuilder: (BuildContext context, int index) {
         return Container(
@@ -829,7 +666,7 @@ class VisitListState extends State<VisitList>
             "token": _userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
-            "requestVer": CommonUtil.getAppVersion(),
+            "requestVer": await CommonUtil.getAppVersion(),
             "userId": _userInfo.id,
             "id":info.id,
             "cstatus": info.cstatus,
@@ -838,7 +675,7 @@ class VisitListState extends State<VisitList>
             "startDate": info.startDate,
             "endDate": info.endDate,
             "companyId":companyId,
-          }),debugMode: true);
+          }),debugMode: true );
       if(res is String){
         Map map = jsonDecode(res);
         if(map['verify']['sign']=="success"){

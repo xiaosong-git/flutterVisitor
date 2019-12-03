@@ -69,6 +69,7 @@ class VisitRequestState extends State<VisitRequest>{
         var send = jsonEncode(object);
         WebSocketChannel channel=MessageUtils.getChannel();
         channel.sink.add(send);
+        ToastUtil.showShortToast("您已拒绝邀约");
       } else {
         ToastUtil.showShortToast("与服务器断开连接");
       }
@@ -95,6 +96,7 @@ class VisitRequestState extends State<VisitRequest>{
         var send = jsonEncode(object);
         WebSocketChannel channel=MessageUtils.getChannel();
         channel.sink.add(send);
+        ToastUtil.showShortToast("您已同意邀约");
       } else {
         ToastUtil.showShortToast("与服务器断开连接");
       }
@@ -119,7 +121,7 @@ class VisitRequestState extends State<VisitRequest>{
       "userId": userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "visitorId":userInfo.id,
     });
     if(res !=null){
@@ -150,10 +152,10 @@ class VisitRequestState extends State<VisitRequest>{
       "token": userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId": userInfo.id,
       "id":widget.id,
-    }),debugMode: true);
+    }),debugMode: true,userCall: false);
     if(res is String){
       Map map = jsonDecode(res);
       VisitInfo visitInfo=new VisitInfo(
@@ -173,7 +175,6 @@ class VisitRequestState extends State<VisitRequest>{
         recordType: map['data']['recordType'].toString(),
         realName: map['data']['realName'],
       );
-      print(visitInfo);
       setState(() {
         _visitInfo=visitInfo;
       });
@@ -196,7 +197,7 @@ class VisitRequestState extends State<VisitRequest>{
             "token": userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
-            "requestVer": CommonUtil.getAppVersion(),
+            "requestVer": await CommonUtil.getAppVersion(),
             "userId": userInfo.id,
             "id":info.id,
             "cstatus": info.cstatus,
@@ -212,7 +213,7 @@ class VisitRequestState extends State<VisitRequest>{
             "token": userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
-            "requestVer": CommonUtil.getAppVersion(),
+            "requestVer": await CommonUtil.getAppVersion(),
             "userId": userInfo.id,
             "id": info.id,
             "cstatus": info.cstatus,
@@ -234,6 +235,23 @@ class VisitRequestState extends State<VisitRequest>{
   }
 
   Widget switchType(UserInfo user){
+    if(_visitInfo==null||_visitInfo.id==null){
+      return Scaffold(
+        appBar: AppBar(
+          title:Text('访问消息',textScaleFactor: 1.0),
+          centerTitle:true,
+          backgroundColor: Theme.of(context).appBarTheme.color,
+          leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context);}),
+        ),
+        body: WillPopScope(child:Container(
+          child: Center(
+            child: Text('努力加载中'),
+          ),
+        ), onWillPop:(){
+          Navigator.pop(context);
+        }),
+      );
+    }
     if(_visitInfo.recordType=="1"){
       return Scaffold(
         appBar: AppBar(
@@ -316,7 +334,6 @@ class VisitRequestState extends State<VisitRequest>{
           ],
         ), onWillPop:(){
           Navigator.pop(context);
-          return null;
         }),
         bottomSheet: _visitInfo.userId==user.id.toString()?Container(height:50,child: Text(_visitInfo.cstatus=="applyConfirm"?"审核中":_visitInfo.cstatus=="applySuccess"?"已通过":"未通过",style: TextStyle(fontSize: 24,color: Colors.green)),alignment: Alignment.center,):_visitInfo.cstatus=="applyConfirm"?Container(
           child: Row(
@@ -434,7 +451,6 @@ class VisitRequestState extends State<VisitRequest>{
           ],
         ), onWillPop: (){
           Navigator.pop(context);
-          return null;
         }),
         bottomSheet:  _visitInfo.visitorId==user.id.toString()?Container(height:50,child: Text(_visitInfo.cstatus=="applyConfirm"?"审核中":_visitInfo.cstatus=="applySuccess"?"已通过":"未通过",style: TextStyle(fontSize: 24,color: Colors.green),textScaleFactor: 1.0),alignment: Alignment.center,):_visitInfo.cstatus=="applyConfirm"?Container(
           child: Row(

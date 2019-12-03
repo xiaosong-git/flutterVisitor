@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gesture_password/gesture_password.dart';
 import 'package:flutter/material.dart';
-import 'package:gesture_password/gesture_password.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -15,9 +13,13 @@ import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/UMPushUtils.dart';
 import 'package:visitor/home.dart';
 
+/*
+ * 手势登录
+ */
 class GestureLogin extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -123,7 +125,6 @@ class GestureLoginState extends State<GestureLogin> {
   verifyGesturePwd(String s) async {
     String phone = await getPhone();
     String url = Constant.serverUrl + Constant.loginUrl;
-    String deviceToken = UMPush.registrationId;
     String _passNum = Md5Util().encryptByMD5ByHex(s);
     var res = await Http().post(url, queryParameters: {
       "phone": phone,
@@ -148,9 +149,10 @@ class GestureLoginState extends State<GestureLogin> {
             new MaterialPageRoute(
                 builder: (BuildContext context) => new MyHomeApp()),
             (Route route) => route == null);
+        ToastUtil.showShortToast(result['verify']['desc']);
         return true;
       } else {
-        Fluttertoast.showToast(msg: '请用账号密码登录');
+        ToastUtil.showShortToast('请重新绘制正确的密码');
         return false;
       }
     }

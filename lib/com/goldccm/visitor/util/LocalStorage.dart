@@ -34,14 +34,10 @@ class LocalStorage{
       return _userInfo;
     }
     if(name=="privilege"){
-      if(_privilegeLists!=null&&_privilegeLists.length>0){
         return _privilegeLists;
-      }
     }
     if(name=="phoneStr"){
-      if(_phoneStr!=null&&_phoneStr.length>0){
-        return _phoneStr;
-      }
+      return _phoneStr;
     }
   }
 }

@@ -94,8 +94,8 @@ class MoreFunctionState extends State<MoreFunction>{
       "userId": user.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
-    },debugMode: true);
+      "requestVer": await CommonUtil.getAppVersion(),
+    },userCall: false);
     //附加权限
     if(res != null){
       if(res is String){

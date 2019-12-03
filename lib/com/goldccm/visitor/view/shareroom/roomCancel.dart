@@ -41,9 +41,9 @@ class RoomBookState extends State<RoomBook> {
       "token": widget.userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId": widget.userInfo.id,
-    }));
+    }),userCall: false );
     if(res is String){
       Map map = jsonDecode(res);
       if(map['verify']['sign']=="success"){

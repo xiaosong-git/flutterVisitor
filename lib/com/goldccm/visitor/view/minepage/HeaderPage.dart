@@ -135,7 +135,7 @@ class HeadImagePageState extends State<HeadImagePage> {
       "userId": _userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
     });
     setState(() {
       _userInfo.headImgUrl = map['data']['imageFileName'];

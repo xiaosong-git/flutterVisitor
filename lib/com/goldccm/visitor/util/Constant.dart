@@ -226,4 +226,6 @@ class Constant {
    * 获取好友历史记录
    */
    static final String friendHistoryUrl = visitorRecodeUrl + "inviteRecord";
+   //快速访问
+   static final String fastVisitUrl  = visitorRecodeUrl + "visit";
 }

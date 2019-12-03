@@ -173,7 +173,7 @@ class RoomDetailState extends State<RoomDetail> {
       "token": _userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId": _userInfo.id,
     },debugMode: true);
     if (res is String) {
@@ -500,30 +500,35 @@ class RoomDetailState extends State<RoomDetail> {
           "token": _userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
-          "requestVer": CommonUtil.getAppVersion(),
-        }));
-    if (res is String) {
-      Map map = jsonDecode(res);
-      if (map['verify']['sign'] == "success") {
-        RoomOrderInfo roomOrderInfo=new RoomOrderInfo(id: int.parse(map['verify']['code']));
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => RoomCheckOut(
-                      userInfo: _userInfo,
-                      roomInfo: widget.roomInfo,
-                      timeLines: timeLines,
-                      startTime: splits[0],
-                      endTime: (double.parse(splits[splits.length - 1]) + 0.5)
-                          .toString(),
-                      day: day,
-                      count: splits.length,
-                      roomOrderInfo: roomOrderInfo,
-                    )));
+          "requestVer": await CommonUtil.getAppVersion(),
+        }),userCall: true);
+    if(res!=""&&res!=null&&res!="isBlocking"){
+      if (res is String) {
+        Map map = jsonDecode(res);
+        if (map['verify']['sign'] == "success") {
+          RoomOrderInfo roomOrderInfo=new RoomOrderInfo(id: int.parse(map['verify']['code']));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => RoomCheckOut(
+                    userInfo: _userInfo,
+                    roomInfo: widget.roomInfo,
+                    timeLines: timeLines,
+                    startTime: splits[0],
+                    endTime: (double.parse(splits[splits.length - 1]) + 0.5)
+                        .toString(),
+                    day: day,
+                    count: splits.length,
+                    roomOrderInfo: roomOrderInfo,
+                  )));
 //      Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory(userInfo:_userInfo,)));
-      } else {
-        ToastUtil.showShortToast(map['verify']['desc']);
+        } else {
+          ToastUtil.showShortToast(map['verify']['desc']);
+        }
       }
+    }else{
+      ToastUtil.showShortToast("预定失败");
+      Navigator.pop(context);
     }
   }
 

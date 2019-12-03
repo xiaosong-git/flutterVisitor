@@ -37,7 +37,7 @@ class RoomListState extends State<RoomList>{
       "token": userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId": userInfo.id,
       "type" : type,
     },debugMode: true);
@@ -97,7 +97,7 @@ class RoomListState extends State<RoomList>{
           "token": userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
-          "requestVer": CommonUtil.getAppVersion(),
+          "requestVer": await CommonUtil.getAppVersion(),
           "userId": userInfo.id,
           "type" : type,
         }));

@@ -108,29 +108,19 @@ class QrcodeHandler {
     String qrContent = '';
     if(userInfo==null){
       qrContent = qrContent+'[]';
-      qrContent = qrContent+'[]';
-      qrContent = qrContent+'[]';
     }else{
       qrContent = (userInfo.realName==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+userInfo.realName+']');
-      qrContent = (userInfo.phone==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+userInfo.phone+']');
-      qrContent = (userInfo.idNO==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+userInfo.idNO+']');
     }
     if(orderInfo==null){
       qrContent = qrContent+'[]';
       qrContent = qrContent+'[]';
       qrContent = qrContent+'[]';
       qrContent = qrContent+'[]';
-      qrContent = qrContent+'[]';
-      qrContent = qrContent+'[]';
-      qrContent = qrContent+'[]';
     }else{
+      qrContent = (orderInfo.id==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.tradeNO+']');
       qrContent = (orderInfo.createTime==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.createTime+']');
       qrContent = (orderInfo.applyStartTime==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.applyStartTime+']');
       qrContent = (orderInfo.applyEndTime==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.applyEndTime+']');
-      qrContent = (orderInfo.roomSize==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.roomSize.toString()+']');
-      qrContent = (orderInfo.roomAddress==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.roomAddress+']');
-      qrContent = (orderInfo.roomName==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.roomName+']');
-      qrContent = (orderInfo.tradeNO==null?qrContent=qrContent+'[]':qrContent=qrContent+'['+orderInfo.tradeNO+']');
     }
     int pageLength = qrContent.length ~/ totalPage;//每页文本内容
     for(var i=0;i<totalPage;i++){

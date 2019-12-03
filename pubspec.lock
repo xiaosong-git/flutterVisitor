@@ -113,6 +113,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.2.2"
+  event_bus:
+    dependency: "direct main"
+    description:
+      name: event_bus
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.0"
   extended_image:
     dependency: "direct main"
     description:
@@ -167,13 +174,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.2.6"
-  flutter_image_compress:
-    dependency: "direct main"
-    description:
-      name: flutter_image_compress
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.6.3"
   flutter_local_notifications:
     dependency: "direct main"
     description:
@@ -218,7 +218,7 @@ packages:
       name: flutter_webview_plugin
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.3.8"
+    version: "0.3.9+1"
   fluttertoast:
     dependency: "direct main"
     description:

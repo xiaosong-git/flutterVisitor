@@ -1,9 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/component/MessageCompent.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
+import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
+import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/MessageUtils.dart';
@@ -24,6 +31,7 @@ class ChatList extends StatefulWidget {
 }
 
 class ChatListState extends State<ChatList> {
+
   WebSocketChannel channel = MessageUtils.getChannel();
   List<ChatMessage> _chatHis = [];
   Timer _timer;
@@ -55,6 +63,7 @@ class ChatListState extends State<ChatList> {
     ChatMessage message = _chatHis[index];
     return new InkWell(
       onTap: () {
+        EventBusUtil().eventBus.fire(MessageCountChangeEvent(1));
         FriendInfo user = new FriendInfo(
             userId: message.M_FriendId,
             name: message.M_FrealName,
@@ -119,4 +128,5 @@ class ChatListState extends State<ChatList> {
     getLatestMessage();
     countDown();
   }
+
 }

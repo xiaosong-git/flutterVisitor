@@ -82,20 +82,20 @@ class FriendDetailPageState extends State<FriendDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(_user.name != null ? _user.name : '昵称',
+                  Text(_user.notice != null ? _user.notice : '备注',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                       ),
                       textScaleFactor: 1.0),
-                  Text("手机号码：" + (_user.phone != null ? _user.phone : '手机号码'),
+                  Text("姓名：" + (_user.name != null ? _user.name : '姓名'),
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 15.0,
                       ),
                       textScaleFactor: 1.0),
-                  Text("备注：" + (_user.notice != null ? _user.notice : '备注为空'),
+                  Text("手机号码：" + (_user.phone != null ? _user.phone : '手机号码'),
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 15.0,
@@ -131,7 +131,7 @@ class FriendDetailPageState extends State<FriendDetailPage> {
                     MaterialPageRoute(
                         builder: (context) => ChatPage(
                               user: widget.user,
-                            )));
+                        )));
               },
             ),
           ),

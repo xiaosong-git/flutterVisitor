@@ -32,9 +32,9 @@ class NoticePageState extends State<NoticePage> {
       "token": userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId": userInfo.id,
-    });
+    },userCall: false );
     if (res is String) {
       Map map = jsonDecode(res);
       if(map['verify']['sign']=="success") {

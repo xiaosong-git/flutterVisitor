@@ -27,6 +27,7 @@ import 'package:visitor/com/goldccm/visitor/view/homepage/NewsView.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/notice.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/Login.dart';
 import 'package:visitor/com/goldccm/visitor/view/shareroom/RoomList.dart';
+import 'package:visitor/com/goldccm/visitor/view/visitor/fastvisitreq.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/visithistory.dart';
 import 'dart:async';
 import '../../../../../home.dart';
@@ -161,7 +162,7 @@ class HomePageState extends State<HomePage> {
                               Navigator.push(context, MaterialPageRoute(
                                   builder: (context) => NoticePage()));
                             }else {
-                              ToastUtil.showShortClearToast("公告暂时只针对非访客开放，敬请谅解");
+                              ToastUtil.showShortClearToast("公告暂时只针对非访客开放");
                             }
                           }),
                           badgeContent: Text('',style: TextStyle(color: Colors.white),),
@@ -171,7 +172,7 @@ class HomePageState extends State<HomePage> {
                             Navigator.push(context, MaterialPageRoute(
                                 builder: (context) => NoticePage()));
                           }else {
-                            ToastUtil.showShortClearToast("公告暂时只针对非访客开放，敬请谅解");
+                            ToastUtil.showShortClearToast("公告暂时只针对非访客开放");
                           }
                         }),
                       ],
@@ -468,8 +469,8 @@ class HomePageState extends State<HomePage> {
         "userId": user.id,
         "factor": CommonUtil.getCurrentTime(),
         "threshold": threshold,
-        "requestVer": CommonUtil.getAppVersion(),
-      });
+        "requestVer": await CommonUtil.getAppVersion(),
+      },userCall: false );
       //附加权限
       if(res != null){
         if(res is String){
@@ -529,8 +530,8 @@ class HomePageState extends State<HomePage> {
       "userId": userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
-    });
+      "requestVer": await CommonUtil.getAppVersion(),
+    },userCall: false );
     if(res != null){
       if(res is String){
         Map map = jsonDecode(res);
@@ -553,7 +554,7 @@ class HomePageState extends State<HomePage> {
   _requestVisitor() async {
     bool isAuth = await checkAuth();
     if(isAuth){
-      ToastUtil.showShortToast("暂未开放");
+      Navigator.push(context,MaterialPageRoute(builder: (context)=>FastVisitReq()));
     }else{
       ToastUtil.showShortClearToast("请先实名认证");
     }

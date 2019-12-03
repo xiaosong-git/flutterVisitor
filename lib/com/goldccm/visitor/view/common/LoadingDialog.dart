@@ -20,7 +20,7 @@ class LoadingDialog extends Dialog {
           height: 120.0,
           child: new Container(
             decoration: ShapeDecoration(
-              color: Color(0xffffffff),
+              color: Colors.black26,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(8.0),
@@ -36,7 +36,7 @@ class LoadingDialog extends Dialog {
                   padding: const EdgeInsets.only(
                     top: 20.0,
                   ),
-                  child: new Text(text),
+                  child: new Text(text,style: TextStyle(color: Colors.white),),
                 ),
               ],
             ),

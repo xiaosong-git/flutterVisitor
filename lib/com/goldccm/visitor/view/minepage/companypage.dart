@@ -24,7 +24,7 @@ class CompanyPage extends StatefulWidget{
 }
 class CompanyPageState extends State<CompanyPage>{
   UserInfo userInfo;
-  int groupValue=0;
+  int groupValue=-1;
   @override
   void initState() {
     super.initState();
@@ -149,7 +149,7 @@ class CompanyPageState extends State<CompanyPage>{
       );
     }
   }
-  ///获取公司信息
+  //获取公司信息
   getCompanyInfo() async {
     _keys=null;
     String url = Constant.serverUrl+Constant.findApplySucUrl;
@@ -159,7 +159,7 @@ class CompanyPageState extends State<CompanyPage>{
       "userId": userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
     });
     if (res != null) {
       Map map = jsonDecode(res);
@@ -172,6 +172,11 @@ class CompanyPageState extends State<CompanyPage>{
           int index = 0;
           for (var data in map['data']) {
             if (data['companyId'] == userInfo.companyId) {
+              userInfo.companyId=data['companyId'];
+              userInfo.companyName=data['companyName'];
+              DataUtils.updateUserInfo(userInfo);
+              Provider.of<UserModel>(context).init(userInfo);
+              LocalStorage.save("userInfo",userInfo);
               groupValue = index;
               break;
             }
@@ -190,10 +195,10 @@ class CompanyPageState extends State<CompanyPage>{
       "userId": userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "companyId":_keys[v]['companyId'],
       "role":_keys[v]['roleType'],
-    },debugMode: true);
+    },debugMode: true,userCall: true);
     Map map = jsonDecode(res);
     if(map['verify']['sign']=="success"){
       ToastUtil.showShortClearToast("修改公司成功");

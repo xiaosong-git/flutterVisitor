@@ -21,15 +21,20 @@
         </meta-data>
         <meta-data android:name="UMENG_CHANNEL" android:value="umpush" />
         <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=100787815" />
-        <meta-data android:name="MZ_APP_ID" android:value="\0120513">
+        <meta-data android:name="MZ_APP_ID" android:value="\ 0120513">
         </meta-data>
         <meta-data android:name="MZ_APP_KEY" android:value="2ef5d921d35542f5a5cbaec251769a86">
         </meta-data>
-
-        <meta-data android:name="XM_APP_ID" android:value="\02882303761518000997">
+        <meta-data android:name="XM_APP_ID" android:value="\ 02882303761518000997">
         </meta-data>
-        <meta-data android:name="XM_APP_KEY" android:value="\05291800098997">
+        <meta-data android:name="XM_APP_KEY" android:value="\ 05291800098997">
         </meta-data>
+        <meta-data android:name="OPPO_APP_KEY" android:value="">
+        </meta-data>
+        <meta-data android:name="OPPO_APP_SECRET" android:value="">
+        </meta-data>
+        <meta-data android:name="com.vivo.push.api_key" android:value=""></meta-data>
+        <meta-data android:name="com.vivo.push.app_id" android:value=""></meta-data>
         <!-- 离线唤醒，使用URL_SCHEME，例如 myproject_url://xxxxxx?order_id=123455554 -->
         <meta-data android:name="URL_SCHEME" android:value="myproject_url">
         </meta-data>

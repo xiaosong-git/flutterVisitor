@@ -323,14 +323,18 @@ class RegisitState extends State<Regisit> {
                           onPressed: () {
                             if (isAgree) {
                               LoadingDialog().show(context, "注册中");
-                              _register().then((value){
+                              _register().then((value) async {
                                 Navigator.pop(context);
-                                if(value){
-                                  UserInfo userInfo=LocalStorage.load("userInfo");
+                                if(value=="true"){
+                                  UserInfo userInfo=await LocalStorage.load("userInfo");
                                   Navigator.push(
                                       context,
                                       new MaterialPageRoute(builder: (BuildContext context) => isAuth == true ? new IdentifyPage(userInfo: userInfo,) : new MyHomeApp())).then((value){Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
                                   });
+                                }
+                                if(value=="loginFail"){
+                                  ToastUtil.showShortToast("注册成功");
+                                  Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new Login(),), (Route route) => route == null);
                                 }
                               });
                             } else {
@@ -429,7 +433,7 @@ class RegisitState extends State<Regisit> {
   /*
    * 注册
    */
-  Future<bool> _register() async {
+  Future<String> _register() async {
     if (checkLoginUser() && checkCode() && checkPass() && checkConfirmPass()) {
       if (isAgree) {
         String phone = _userNameController.text.toString();
@@ -438,7 +442,11 @@ class RegisitState extends State<Regisit> {
             .encryptByMD5ByHex(_passwordController.text.toString());
         var response = await Http.instance.post(
             Constant.serverUrl + Constant.registerUrl,
-            queryParameters: {"phone": phone, "code": code, "sysPwd": sysPwd});
+            queryParameters: {"phone": phone, "code": code, "sysPwd": sysPwd},userCall: true);
+        if(response=="isBlocking"||response==""||response==null){
+          ToastUtil.showShortToast("注册失败");
+          return "false";
+        }
         JsonResult result = JsonResult.fromJson(response);
         if (result.sign == 'success') {
           String _passNum =
@@ -449,7 +457,10 @@ class RegisitState extends State<Regisit> {
                 "phone": phone,
                 "style": "1",
                 "sysPwd": _passNum,
-              });
+              },userCall: true);
+          if(data==""||data==null||data=="isBlocking"){
+            return "loginFail";
+          }
           JsonResult loginResult = JsonResult.fromJson(data);
           if (loginResult.sign == 'success') {
             var userMap = loginResult.data['user'];
@@ -461,22 +472,21 @@ class RegisitState extends State<Regisit> {
             Provider.of<UserModel>(context).init(userInfo);
             LocalStorage.save("userInfo",userInfo);
             SharedPreferenceUtil.saveUser(userInfo);
-            ToastUtil.showShortToast("注册成功,即将跳转");
-            return true;
+            return "true";
           } else {
             ToastUtil.showShortToast(loginResult.desc);
-            return false;
+            return "false";
           }
         } else {
           ToastUtil.showShortToast(result.desc);
-          return false;
+          return "false";
         }
       } else {
         ToastUtil.showShortToast('请先同意联客用户协议');
-        return false;
+        return "false";
       }
     }
-    return false;
+    return "false";
   }
 
   Widget _buildCode(String labelText, String hintText, bool autofocus,
@@ -624,7 +634,7 @@ class RegisitState extends State<Regisit> {
       var data = await Http().get(url, queryParameters: {
         "phone": _userNameController.text.toString(),
         "type": "1"
-      });
+      },userCall: true);
       if (data != null) {
         JsonResult result = JsonResult.fromJson(data);
         if (result.sign == 'success') {

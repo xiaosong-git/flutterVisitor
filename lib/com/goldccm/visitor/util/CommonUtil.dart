@@ -64,16 +64,12 @@ class CommonUtil{
    }
 
    //获取app版本信息
-static String  getAppVersion(){
-    String appVersion="2.0.0";
-    //异步获取
-   PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-     appVersion = packageInfo.version;
-  });
-  return appVersion;
+static Future<String>  getAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  return packageInfo.version;
 }
 
-  /**
+  /*
    * 生成固定几位的随机数
    * type :类型 1-数字  2-字母  3-数字加字母
    * length：生成随机数长度

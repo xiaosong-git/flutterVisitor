@@ -21,21 +21,24 @@ import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'GestureLogin.dart';
 import 'Regisit.dart';
 
+
 final Color _availableStyle = Colors.blue;
-
-/// 墨水瓶（`InkWell`）不可用时使用的样式。
 final Color _unavailableStyle = Colors.grey;
-
 final TextStyle _labelStyle =
     new TextStyle(fontSize: 15.0, color: Colors.blue, fontFamily: '楷体_GB2312');
+/*
+ * 登录
+ * author:ody997<hwk@growingpine.com>
+ * create_time:2019/11/28
+ * countdown 计数器 60s
+ * onTapCallback 回调函数
+ * available 状态
+ */
 
 class Login extends StatefulWidget {
+
   final int countdown;
-
-  /// 用户点击时的回调函数。
   final Function onTapCallback;
-
-  /// 是否可以获取验证码，默认为`false`。
   final bool available;
 
   Login({
@@ -46,21 +49,24 @@ class Login extends StatefulWidget {
 
   @override
   State<Login> createState() => new LoginState();
-}
 
+}
+/*
+ * _codeBtnflag 验证码控制状态
+ * _verifyStr 验证码字符
+ * _seconds 倒计时
+ * _deviceType 1-安卓 2-IOS
+ */
 class LoginState extends State<Login> {
+
   int _deviceType = 1;
   int _loginType = 1;
   final int _loginPass = 1;
   final int _loginCode = 2;
   bool _codeBtnflag = true;
   Timer _timer;
-  /// 当前倒计时的秒数。
   int _seconds;
-  /// 当前墨水瓶（`InkWell`）的字体样式。
   Color colorStyle = _availableStyle;
-
-  /// 当前墨水瓶（`InkWell`）的文本。
   String _verifyStr = '获取验证码';
 
   TextEditingController _userNameController = new TextEditingController();
@@ -69,19 +75,22 @@ class LoginState extends State<Login> {
 
   @override
   void initState() {
+
     super.initState();
+
     if(Platform.isAndroid){
       _deviceType=1;
     }
     if(Platform.isIOS){
       _deviceType=2;
     }
+
     _seconds = widget.countdown;
+
   }
 
-  /// 启动倒计时的计时器。
   void _startTimer() {
-    // 计时器（`Timer`）组件的定期（`periodic`）构造函数，创建一个新的重复计时器。
+
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_seconds == 0) {
         _cancelTimer();
@@ -100,26 +109,27 @@ class LoginState extends State<Login> {
         _verifyStr = '重新发送';
       }
     });
+
   }
 
-  /// 取消倒计时的计时器。
   void _cancelTimer() {
-    // 计时器（`Timer`）组件的取消（`cancel`）方法，取消计时器。
+
     _timer?.cancel();
+
   }
 
   @override
   void dispose() {
+
     _cancelTimer();
     super.dispose();
+
   }
 
   @override
   Widget build(BuildContext context) {
-    var _buttonLogin;
     return WillPopScope(
       child: Scaffold(
-        //color: Colors.white,
           body: new SingleChildScrollView(
               child: new ConstrainedBox(
                   constraints: new BoxConstraints(
@@ -223,18 +233,13 @@ class LoginState extends State<Login> {
                                         child: new RaisedButton(
                                           onPressed: () async {
                                             if (_codeBtnflag) {
-                                              bool res =
-                                              await getCheckCode();
-                                              if (res == true) {
-                                                _startTimer();
-                                              } else {
-                                                return null;
+                                              _startTimer();
+                                              bool res = await getCheckCode();
+                                              if (res != true) {
+                                                _seconds=0;
                                               }
-                                            } else {
-                                              return null;
                                             }
                                           },
-                                          //通过控制 Text 的边距来控制控件的高度
                                           child: new Padding(
                                             padding:
                                             new EdgeInsets.fromLTRB(
@@ -288,6 +293,7 @@ class LoginState extends State<Login> {
                           ],
                         ),
                       ),
+//TODO 忘记密码功能暂时不开放
 //                      new Padding(
 //                        padding: const EdgeInsets.only(right: 20.0),
 //                        child: new Row(
@@ -362,9 +368,9 @@ class LoginState extends State<Login> {
                       ),
                     ]),
                   )))),
-      onWillPop: (){
+                  onWillPop: (){
 
-      },
+                  },
     );
   }
 
@@ -389,7 +395,7 @@ class LoginState extends State<Login> {
       var data = await Http().get(url, queryParameters: {
         "phone": _userNameController.text.toString(),
         "type": "1"
-      });
+      },userCall: true);
       if (data != null) {
         JsonResult result = JsonResult.fromJson(data);
         if (result.sign == 'success') {
@@ -469,13 +475,13 @@ class LoginState extends State<Login> {
       bool passCheck = checkPass();
       if (passCheck) {
            _passNum = Md5Util().encryptByMD5ByHex(_passwordController.text.toString());
-           data = await Http.instance.post(Constant.serverUrl+Constant.loginUrl, queryParameters: {
+           data = await Http().post(Constant.serverUrl+Constant.loginUrl, queryParameters: {
           "phone": _userNameController.text.toString(),
           "style": "1",
           "sysPwd": _passNum,
              "deviceToken":deviceToken,
              "deviceType":_deviceType,
-        },debugMode: true);
+        },userCall: true);
       }else{
         ToastUtil.showShortToast("用户名或密码错误");
         return false;
@@ -484,17 +490,20 @@ class LoginState extends State<Login> {
       //验证码登录
       if (checkCode()) {
         _codeNum = _checkCodeController.text.toString();
-        data = await Http.instance.post(Constant.serverUrl+Constant.loginUrl, queryParameters: {
+        data = await Http().post(Constant.serverUrl+Constant.loginUrl, queryParameters: {
           "phone": _userNameController.text.toString(),
           "style": "1",
           "code": _codeNum,
           "deviceToken":deviceToken,
           "deviceType":_deviceType,
-        },debugMode: true);
+        },userCall: true,);
       }else{
         ToastUtil.showShortToast("验证码错误");
         return false;
       }
+    }
+    if(data=="isBlocking"){
+      return false;
     }
     if (data != null&&data!="") {
       JsonResult result = JsonResult.fromJson(data);

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'CommonUtil.dart';
@@ -14,10 +15,11 @@ import 'MessageUtils.dart';
  * 2019/10/16
  */
 class BadgeUtil{
+
+  static BadgeInfo _badgeInfo=new BadgeInfo();
   static int _visitConfirmCount=0;
   static int _messageCount=0;
   static int _newFriendCount=0;
-
   static BadgeUtil _badge;
 
   factory BadgeUtil()=> _badgeUtil();
@@ -33,6 +35,35 @@ class BadgeUtil{
     return _badge;
   }
 
+  //消息数值初始化
+  //TODO 邀约、公告数量待实现
+  init() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
+    _badgeInfo.newMessageCount=await getMessageCount(userInfo);
+    _badgeInfo.newFriendRequestCount=await requestNewFriendCount();
+    _badgeInfo.newVisitCount=await requestConfirmCount();
+    _badgeInfo.newNoticeCount=0;
+    _badgeInfo.newInviteCount=0;
+    return _badgeInfo;
+  }
+  //更新访问
+  updateVisit() async {
+    _badgeInfo.newVisitCount=await requestConfirmCount();
+    return _badgeInfo;
+  }
+  //更新消息
+  updateMessage() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
+    _badgeInfo.newMessageCount=await getMessageCount(userInfo);
+    return _badgeInfo;
+  }
+  //更新好友
+  updateFriendRequest() async {
+    _badgeInfo.newFriendRequestCount=await requestNewFriendCount();
+    return _badgeInfo;
+  }
+
+  //获取访问数量
   requestConfirmCount() async {
     String method1 = "visitorRecord/visitMyPeople/1/1";
     String method2 = "visitorRecord/visitMyCompany/1/1";
@@ -49,9 +80,9 @@ class BadgeUtil{
       "token": userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId": userInfo.id,
-    }));
+    }),userCall: false );
     if(res !=null){
       if(res is String){
         Map map = jsonDecode(res);
@@ -62,6 +93,8 @@ class BadgeUtil{
     }
     return count;
   }
+
+  //获取新好友数量
   Future<int> requestNewFriendCount() async{
     String method = "userFriend/beAgreeingFriendList";
     int count=0;
@@ -72,9 +105,9 @@ class BadgeUtil{
           "token": userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
-          "requestVer": CommonUtil.getAppVersion(),
+          "requestVer": await CommonUtil.getAppVersion(),
           "userId": userInfo.id,
-        }));
+        }),userCall: false );
         if(res !=null){
           if(res is String){
             Map map = jsonDecode(res);
@@ -87,6 +120,7 @@ class BadgeUtil{
     }
     return count;
   }
+  //获取新消息数量
   Future<int> getMessageCount(UserInfo userInfo) async{
     _messageCount=0;
     List<ChatMessage> list = await MessageUtils.getLatestMessage(userInfo.id);
@@ -97,6 +131,8 @@ class BadgeUtil{
         }
       }
     }
+    print(_messageCount);
     return _messageCount;
   }
+
  }

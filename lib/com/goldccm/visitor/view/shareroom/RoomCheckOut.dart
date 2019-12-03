@@ -214,7 +214,7 @@ class RoomCheckoutState extends State<RoomCheckOut>{
         "token": widget.userInfo.token,
         "factor": CommonUtil.getCurrentTime(),
         "threshold": threshold,
-        "requestVer": CommonUtil.getAppVersion(),
+        "requestVer": await CommonUtil.getAppVersion(),
         "userId": widget.userInfo.id,
         "subject": widget.roomInfo.roomName,
         "body": widget.roomInfo.roomName+","+widget.roomInfo.roomAddress+","+widget.startTime+"-"+widget.endTime,

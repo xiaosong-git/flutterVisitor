@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
@@ -14,6 +18,8 @@ import 'package:visitor/com/goldccm/visitor/view/contract/chatListItem.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/homepage.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/minepage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
 import 'com/goldccm/visitor/httpinterface/http.dart';
 import 'com/goldccm/visitor/util/CommonUtil.dart';
 import 'com/goldccm/visitor/util/Constant.dart';
@@ -40,8 +46,9 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
   int _tabIndex = 0;
   var tabImages;
   var appBarTitles = ['首页', '访客', '通讯录', '我的'];
-  var _pageList;
+  static var _pageList;
   WebSocketChannel channel;
+  StreamSubscription  _messageSubscription;
   int _msgCount = 0;
   /*
    * 根据选择获得对应的normal或是press的icon
@@ -83,8 +90,21 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     checkDevice();
     initWebSocket();
     initData();
+    initBadge();
+    subscribe();
+  }
+  
+  @override
+  void dispose() {
+    _messageSubscription.cancel();
+   super.dispose();
   }
 
+  //初始化各类消息数量
+  initBadge() async {
+    BadgeInfo badgeInfo=await BadgeUtil().init();
+    Provider.of<BadgeModel>(context).set(badgeInfo);
+  }
   //检测当前设备的合法性
   Future checkDevice() async {
     UserInfo userInfo = await DataUtils.getUserInfo();
@@ -96,9 +116,9 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
       "token": userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId": userInfo.id,
-    });
+    },userCall: false);
     if (result != null) {
       if (!(result is String)) {
         if (result['verify']['sign'] == "tokenFail") {
@@ -119,9 +139,8 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     String buildNumber = packageInfo.buildNumber;
     bool isUpToDate = true;
     if (Platform.isAndroid) {
-      String url =
-          Constant.serverUrl + "appVersion/updateAndroid/visitor/$buildNumber";
-      var res = await Http().post(url);
+      String url = Constant.serverUrl + "appVersion/updateAndroid/visitor/$buildNumber";
+      var res = await Http().post(url,userCall:false);
       if (res != null) {
         if (res is String) {
           Map map = jsonDecode(res);
@@ -201,7 +220,7 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
       }
     } else if (Platform.isIOS) {
       String url = Constant.serverUrl + "appVersion/updateIOS";
-      var res = await Http().post(url);
+      var res = await Http().post(url,userCall: false);
       if (res != null) {
         if (res is String) {
           Map map = jsonDecode(res);
@@ -307,7 +326,7 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
       ]
     ];
     /*
-     * 三个子界面
+     * 四个子界面
      */
     _pageList = [
       new HomePage(),
@@ -317,35 +336,60 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     ];
   }
 
+  /* 订阅事件
+   * event传入阅读数，如果有则直接减去
+   * 没有从BadgeUtil中读取最新的数量
+   */
+  subscribe(){
+   _messageSubscription=EventBusUtil().eventBus.on<MessageCountChangeEvent>().listen((event){
+      print(event.messageCount);
+      if(event.messageCount>0){
+        BadgeInfo badgeInfo=Provider.of<BadgeModel>(context).badgeInfo;
+        badgeInfo.newMessageCount=0;
+        Provider.of<BadgeModel>(context).update(badgeInfo);
+      }else{
+        updateMessage();
+      }
+    });
+  }
+  //更新聊天栏数量
+  updateMessage() async {
+    BadgeInfo badgeInfo=await BadgeUtil().updateMessage();
+    print(badgeInfo.newMessageCount);
+    Provider.of<BadgeModel>(context).update(badgeInfo);
+  }
+
   Future initWebSocket() async {
+    print("init");
     UserInfo userInfo = await LocalStorage.load("userInfo");
     _msgCount = await BadgeUtil().getMessageCount(userInfo);
     int userId = userInfo.id;
     String token = userInfo.token;
     MessageUtils.setChannel(userId.toString(), token.toString());
   }
-
   @override
   Widget build(BuildContext context) {
     _onWillPop() async {
       await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
     }
-
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
         child: WillPopScope(
           child: Scaffold(
-              body: _pageList[_tabIndex],
+              body: IndexedStack(
+                index:_tabIndex,
+                children: _pageList,
+              ),
               bottomNavigationBar: new BottomNavigationBar(
                 items: <BottomNavigationBarItem>[
                   new BottomNavigationBarItem(
                       icon: getTabIcon(0), title: getTabTitle(0)),
                   new BottomNavigationBarItem(
-                      icon: _msgCount > 0
+                      icon: Provider.of<BadgeModel>(context).badgeInfo.newMessageCount> 0
                           ? Badge(
                               child: getTabIcon(1),
                               badgeContent: Text(
-                                _msgCount.toString(),
+                                Provider.of<BadgeModel>(context).badgeInfo.newMessageCount.toString(),
                                 style: TextStyle(color: Colors.white),
                                 textScaleFactor: 1.0,
                               ),
@@ -360,22 +404,19 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
                 ],
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Colors.white,
-                //默认选中首页
                 currentIndex: _tabIndex,
                 iconSize: 20.0,
-                //点击事件
                 onTap: (index) {
+                  if(index==1){
+                    EventBusUtil().eventBus.fire(MessageCountChangeEvent(1));
+                  }
                   setState(() {
                     _tabIndex = index;
-                    if(_tabIndex==1){
-                      _msgCount=0;
-                    }
                   });
                 },
               )),
           onWillPop: () {
             _onWillPop();
-            return null;
           },
         ));
   }

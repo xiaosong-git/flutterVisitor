@@ -581,7 +581,7 @@ class AddressPageState extends State<AddressPage> {
                 Container(
                   color: Colors.white,
                   child: ListTile(
-                    title: Text(_userLists[index].name),
+                    title: Text(_userLists[index].notice),
                     leading: _userLists[index].virtualImageUrl != null &&
                             _userLists[index].virtualImageUrl != ""
                         ? CircleAvatar(
@@ -734,9 +734,9 @@ class Presenter {
           "userId": user.id,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
-          "requestVer": CommonUtil.getAppVersion(),
+          "requestVer": await CommonUtil.getAppVersion(),
         },
-        debugMode: true);
+        debugMode: true,userCall: false );
     if (res is String) {
       Map map = jsonDecode(res);
       if (map['verify']['sign'] == "success") {
@@ -776,7 +776,7 @@ class Presenter {
     } else {
       initFlag = true;
       if (res['verify']['sign'] == "tokenFail") {
-        ToastUtil.showShortClearToast("您的账号在另一台设备登录，请退出重新登录");
+        ToastUtil.showShortClearToast("您的账号在另一台设备登录");
       }
     }
   }

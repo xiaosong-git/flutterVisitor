@@ -60,9 +60,9 @@ class RoomHistoryState extends State<RoomHistory> {
               "token": widget.userInfo.token,
               "factor": CommonUtil.getCurrentTime(),
               "threshold": threshold,
-              "requestVer": CommonUtil.getAppVersion(),
+              "requestVer": await CommonUtil.getAppVersion(),
               "userId": widget.userInfo.id,
-            }));
+            }),userCall: false);
         if (res is String) {
           Map map = jsonDecode(res);
             for (var data in map['data']['rows']) {
@@ -152,9 +152,9 @@ class RoomHistoryState extends State<RoomHistory> {
           "token": widget.userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
-          "requestVer": CommonUtil.getAppVersion(),
+          "requestVer": await CommonUtil.getAppVersion(),
           "userId": widget.userInfo.id,
-        }));
+        }),userCall: false );
     if (res is String) {
       Map map = jsonDecode(res);
       if(map['verify']['sign']=="success") {

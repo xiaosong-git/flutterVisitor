@@ -39,22 +39,26 @@ class AddFriendPageState extends State<AddFriendPage>{
       "token": _userInfo.token,
       "factor":CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "userId":_userInfo.id,
       "phone":_phone,
       "realName":_name,
-    });
-    if(res is String){
-      Map map = jsonDecode(res);
-      if(map['verify']['desc']=="success"){
-        ToastUtil.showShortClearToast(map['verify']['desc']);
-        Navigator.pop(context);
-        Navigator.pop(context);
-      }else{
-        ToastUtil.showShortClearToast(map['verify']['desc']);
-        Navigator.pop(context);
-        Navigator.pop(context);
+    },userCall: true);
+    if(res !=null&&res!=""&&res!="isBlocking"){
+      if(res is String){
+        Map map = jsonDecode(res);
+        if(map['verify']['desc']=="success"){
+          ToastUtil.showShortClearToast(map['verify']['desc']);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        }else{
+          ToastUtil.showShortClearToast(map['verify']['desc']);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        }
       }
+    }else{
+      ToastUtil.showShortToast("请求失败");
     }
   }
   @override

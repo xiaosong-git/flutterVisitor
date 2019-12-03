@@ -89,7 +89,7 @@ class MessageCompent extends StatelessWidget {
                               color: Colors.grey,
                               fontSize: 12,),
                           textAlign: TextAlign.left,textScaleFactor: 1.0)),
-                  new Padding(
+                   new Padding(
                     padding: EdgeInsets.only(left: 15),
                     child: new Divider(),
                   )

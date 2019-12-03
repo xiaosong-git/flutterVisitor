@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
@@ -148,9 +150,9 @@ class ChatPageState extends State<ChatPage> {
       "userId": _userInfo.id,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
-      "requestVer": CommonUtil.getAppVersion(),
+      "requestVer": await CommonUtil.getAppVersion(),
       "visitorId":visitorId,
-    });
+    },userCall: false );
     if(res !=null){
       if(res is String){
         Map map = jsonDecode(res);

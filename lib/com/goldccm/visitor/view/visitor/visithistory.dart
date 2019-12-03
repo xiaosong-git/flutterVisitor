@@ -104,9 +104,9 @@ class VisitHistoryState extends State<VisitHistory>{
               "token": widget.userInfo.token,
               "factor": CommonUtil.getCurrentTime(),
               "threshold": threshold,
-              "requestVer": CommonUtil.getAppVersion(),
+              "requestVer": await CommonUtil.getAppVersion(),
               "userId": widget.userInfo.id,
-            }),debugMode: true);
+            }),debugMode: true,userCall: false);
         print(res);
         if (res is String) {
           Map map = jsonDecode(res);

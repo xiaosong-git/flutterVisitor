@@ -311,7 +311,7 @@ class IdentifyPageState extends State<IdentifyPage> {
         "userId": userInfo.id,
         "factor": CommonUtil.getCurrentTime(),
         "threshold": threshold,
-        "requestVer": CommonUtil.getAppVersion(),
+        "requestVer": await CommonUtil.getAppVersion(),
       },debugMode: true);
       Map premap = jsonDecode(preres);
       if (premap['verify']['sign'] == "fail") {
@@ -334,13 +334,13 @@ class IdentifyPageState extends State<IdentifyPage> {
             "userId":userInfo.id,
             "factor":CommonUtil.getCurrentTime(),
             "threshold": threshold,
-            "requestVer": CommonUtil.getAppVersion(),
+            "requestVer": await CommonUtil.getAppVersion(),
             "realName": realName.trim(),
             "idNO": await DesUtil().decryptHex(idNumber.trim(),userInfo.workKey),
             "address": address + " " + detailAddress,
             "idHandleImgUrl": imageMap['data']['imageFileName'],
             "idType":01,
-          },debugMode: true);
+          },debugMode: true,userCall: true);
           if(res is String&&res!=""){
             Map map = jsonDecode(res);
             if(map['verify']['sign']=="success"){
@@ -351,6 +351,8 @@ class IdentifyPageState extends State<IdentifyPage> {
               ToastUtil.showShortToast(map['verify']['desc']);
              return false;
             }
+          }else{
+            ToastUtil.showShortToast("认证失败");
           }
         } else {
           ToastUtil.showShortToast("头像上传失败");

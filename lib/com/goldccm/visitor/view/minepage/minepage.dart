@@ -37,8 +37,8 @@ class MinePage extends StatefulWidget {
   }
 }
 class MinePageState extends State<MinePage> {
-  List<FunctionLists> _addlist=[FunctionLists(iconImage: 'assets/icons/实名认证V.png',iconTitle: '实名认证',iconType: '_verify'),FunctionLists(iconImage: 'assets/icons/会议室icon@2x.png',iconTitle:'会议室',iconType:'_meetingRoom'),FunctionLists(iconImage: 'assets/icons/公司管理@2x.png',iconTitle:'公司管理',iconType: '_companySetting' ),];
-  List<FunctionLists> _baseList=[FunctionLists(iconImage:'assets/icons/安全管理@2x.png',iconTitle:'安全管理',iconType: '_securitySetting' ),FunctionLists(iconImage:'assets/icons/设置@2x.png',iconTitle: '设置',iconType:'_setting' )];
+  List<FunctionLists> _addlist=[FunctionLists(iconImage: 'assets/icons/会议室icon@2x.png',iconTitle:'会议室',iconType:'_meetingRoom'),FunctionLists(iconImage: 'assets/icons/公司管理@2x.png',iconTitle:'公司管理',iconType: '_companySetting' ),];
+  List<FunctionLists> _baseList=[FunctionLists(iconImage: 'assets/icons/实名认证V.png',iconTitle: '实名认证',iconType: '_verify'),FunctionLists(iconImage:'assets/icons/安全管理@2x.png',iconTitle:'安全管理',iconType: '_securitySetting' ),FunctionLists(iconImage:'assets/icons/设置@2x.png',iconTitle: '设置',iconType:'_setting' )];
   List<FunctionLists> _list = [];
   BadgeUtil badge=BadgeUtil();
   int visitBadgeNumTotal=0;
@@ -89,7 +89,7 @@ class MinePageState extends State<MinePage> {
         "userId": userInfo.id,
         "factor": CommonUtil.getCurrentTime(),
         "threshold": threshold,
-        "requestVer": CommonUtil.getAppVersion(),
+        "requestVer": await CommonUtil.getAppVersion(),
       });
       //附加权限
       if (res != null) {
@@ -212,7 +212,7 @@ class MinePageState extends State<MinePage> {
                                           Text(
                                             userModel.info.realName != null
                                                 ? userModel.info.realName
-                                                : '暂未获取到数据',
+                                                : '您还未实名认证',
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 20.0,
@@ -224,7 +224,7 @@ class MinePageState extends State<MinePage> {
                                         Text(
                                             Provider.of<UserModel>(context).info.companyName != null
                                               ? Provider.of<UserModel>(context).info.companyName
-                                              : '暂未获取到数据',
+                                              : '',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontSize: 15.0,
@@ -348,7 +348,6 @@ class MinePageState extends State<MinePage> {
               Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory (userInfo: userInfo,)));
             }else if(method=="_companySetting"){
               Navigator.push(context, MaterialPageRoute(builder: (context) => CompanyPage(userInfo: userInfo,))).then((value) async {
-                print(await LocalStorage.load("userInfo"));
                 setState(() {
 
                 });
