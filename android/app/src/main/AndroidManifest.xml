@@ -11,34 +11,12 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name="com.github.flutterumpush.UmengApplication"
+        android:name="io.flutter.app.FlutterApplication"
         android:label="朋悦比邻"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
-        <meta-data android:name="UMENG_APPKEY" android:value="5cd398f7570df39d0200125f">
-        </meta-data>
-        <meta-data android:name="UMENG_MESSAGE_SECRET" android:value="39e0af1b149f394651a7ee88d382662c">
-        </meta-data>
-        <meta-data android:name="UMENG_CHANNEL" android:value="umpush" />
-        <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=100787815" />
-        <meta-data android:name="MZ_APP_ID" android:value="\ 0120513">
-        </meta-data>
-        <meta-data android:name="MZ_APP_KEY" android:value="2ef5d921d35542f5a5cbaec251769a86">
-        </meta-data>
-        <meta-data android:name="XM_APP_ID" android:value="\ 02882303761518000997">
-        </meta-data>
-        <meta-data android:name="XM_APP_KEY" android:value="\ 05291800098997">
-        </meta-data>
-        <meta-data android:name="OPPO_APP_KEY" android:value="">
-        </meta-data>
-        <meta-data android:name="OPPO_APP_SECRET" android:value="">
-        </meta-data>
-        <meta-data android:name="com.vivo.push.api_key" android:value=""></meta-data>
-        <meta-data android:name="com.vivo.push.app_id" android:value=""></meta-data>
-        <!-- 离线唤醒，使用URL_SCHEME，例如 myproject_url://xxxxxx?order_id=123455554 -->
-        <meta-data android:name="URL_SCHEME" android:value="myproject_url">
-        </meta-data>
         <meta-data android:name="com.amap.api.v2.apikey" android:value="e5c38f34ff4a8f7fdbaae51a19660dd8">
+
         </meta-data>
         <activity
             android:name=".MainActivity"

@@ -29,7 +29,7 @@ class IconCompentState extends State<IconCompent>{
       body: new Column(
         children: <Widget>[
           new Image.asset(widget.image,fit: BoxFit.cover),
-          new Text(widget.text,style: new TextStyle(fontSize: 14.0,fontFamily: '楷体_GB2312'),),
+          new Text(widget.text,style: new TextStyle(fontSize: 14.0),),
           new InkWell(
             onTap: widget.onTap,
           ),

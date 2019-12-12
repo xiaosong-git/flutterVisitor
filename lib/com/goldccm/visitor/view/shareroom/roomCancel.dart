@@ -57,6 +57,7 @@ class RoomBookState extends State<RoomBook> {
   @override
   void initState() {
     super.initState();
+    print(widget.order);
     int length=widget.order.timeInterval.split(",").length;
     RoomInfo roomInfo =new RoomInfo(id: widget.order.roomID,roomAddress: widget.order.roomAddress,roomName: widget.order.roomName,roomPrice: (double.parse(widget.order.price)/length).toString(),roomImage: widget.order.roomImage.split(","));
     setState(() {
@@ -105,7 +106,7 @@ class RoomBookState extends State<RoomBook> {
                 ):switchPassWay(widget.order.gate),
               ),
             ),
-            widget.order.tradeStatus=="2"?widget.order.gate==1?Text('现场扫描人脸即可进出',textScaleFactor: 1.0,):widget.order.gate==2?Text('通过扫描二维码进出',textScaleFactor: 1.0,):Text('通过其他方式进出，请现场查询工作人员',textScaleFactor: 1.0,):Container(
+            widget.order.tradeStatus=="2"?widget.order.gate==1?Text('现场扫描人脸即可进出',textScaleFactor: 1.0,):widget.order.gate==0?Text('通过扫描二维码进出',textScaleFactor: 1.0,):Text('通过其他方式进出，请现场查询工作人员',textScaleFactor: 1.0,):Container(
               padding: EdgeInsets.all(10.0),
               child: new SizedBox(
                 width: MediaQuery.of(context).size.width,
@@ -138,7 +139,7 @@ class RoomBookState extends State<RoomBook> {
         },
       );
     }
-    else if(status==2){
+    else if(status==0){
       return new FlatButton(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
         color: Colors.blue,

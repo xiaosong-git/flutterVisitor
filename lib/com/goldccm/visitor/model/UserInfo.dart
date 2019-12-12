@@ -17,6 +17,7 @@ class UserInfo{
    String city; //市
    String area; //县
    String addr; //地址
+   String role; //公司角色
    String isAuth = "F"; //是否实名 F:未实名 T:实名
    String failReason;
    String authDate; //实名日期 yyyy-MM-dd
@@ -50,7 +51,7 @@ class UserInfo{
        this.userName, this.qrcodeUrl, this.companyId, this.soleCode,
        this.validityDate, this.companyName, this.visitorId, this.lastLoginTime,
        this.isGestureOpened, this.ufId, this.sortLetters,
-       this.hasApplyPermission});
+       this.hasApplyPermission,this.role});
 
    UserInfo.fromJson(var json) {
       id = json['id'];
@@ -91,11 +92,12 @@ class UserInfo{
       ufId= json['ufId'] ;
       sortLetters= json['sortLetters'];
       hasApplyPermission= json['hasApplyPermission'];
+      role=json['role'];
    }
 
    @override
    String toString() {
-      return 'UserInfo{id: $id, orgId: $orgId, relationNo: $relationNo, realName: $realName, nickName: $nickName, loginName: $loginName, idType: $idType, idNO: $idNO, phone: $phone, createDate: $createDate, createTime: $createTime, province: $province, city: $city, area: $area, addr: $addr, isAuth: $isAuth, failReason: $failReason, authDate: $authDate, authTime: $authTime, idFrontImgUrl: $idFrontImgUrl, idOppositeImgUrl: $idOppositeImgUrl, idHandleImgUrl: $idHandleImgUrl, bankCardImgUrl: $bankCardImgUrl, workKey: $workKey, headImgUrl: $headImgUrl, token: $token, userName: $userName, qrcodeUrl: $qrcodeUrl, companyId: $companyId, soleCode: $soleCode, validityDate: $validityDate, companyName: $companyName, visitorId: $visitorId, lastLoginTime: $lastLoginTime, isGestureOpened: $isGestureOpened, ufId: $ufId, sortLetters: $sortLetters, hasApplyPermission: $hasApplyPermission}';
+      return 'UserInfo{id: $id, orgId: $orgId, relationNo: $relationNo, realName: $realName, nickName: $nickName, loginName: $loginName, idType: $idType, idNO: $idNO, phone: $phone, createDate: $createDate, createTime: $createTime, province: $province, city: $city, area: $area, addr: $addr, role: $role, isAuth: $isAuth, failReason: $failReason, authDate: $authDate, authTime: $authTime, idFrontImgUrl: $idFrontImgUrl, idOppositeImgUrl: $idOppositeImgUrl, idHandleImgUrl: $idHandleImgUrl, bankCardImgUrl: $bankCardImgUrl, workKey: $workKey, headImgUrl: $headImgUrl, token: $token, userName: $userName, qrcodeUrl: $qrcodeUrl, companyId: $companyId, soleCode: $soleCode, validityDate: $validityDate, companyName: $companyName, visitorId: $visitorId, lastLoginTime: $lastLoginTime, isGestureOpened: $isGestureOpened, ufId: $ufId, sortLetters: $sortLetters, hasApplyPermission: $hasApplyPermission}';
    }
 
 

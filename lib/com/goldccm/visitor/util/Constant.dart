@@ -1,15 +1,20 @@
+/*
+ * 接口URL地址全部存在放这
+ */
 class Constant {
-  //actual
+  //生存环境
 //    static final String imageServerApiUrl = "http://47.98.205.206:8081/goldccm-imgServer/goldccm/image/gainData";
 //    static final String serverUrl = "http://47.96.71.163:8082/visitor/";
 //    static final String webSocketServerUrl ="ws://47.96.71.163:8082/visitor/";
 //    static final String imageServerUrl = "http://47.98.205.206/imgserver/";
-//  test
+  // 测试环境
   static final String serverUrl = "http://121.36.45.232:8082/visitor/";
-  static final String webSocketServerUrl ="ws://121.36.45.232:8082/visitor/";
+  static final String webSocketServerUrl = "ws://121.36.45.232:8082/visitor/";
   static final String imageServerApiUrl = "http://121.36.45.232:8081/goldccm-imgServer/goldccm/image/gainData";
   static final String imageServerUrl = "http://121.36.45.232:8098/imgserver/";
+
   //////////////////////////////////////////////
+
   static final String userUrl = "user/";
   static final String codeUrl = "code/";
   static final String userFriendUrl = "userFriend/";
@@ -27,94 +32,58 @@ class Constant {
   static final String USERAGREEMENTAPIURL = "http://xiaosong6.idverify.cn:8082/xieyi.html";
 
   /*
-   * 登录
+   * 个人接口 user
+   * login 登录
+   * register 注册
+   * sendCode 发送验证码
+   * isVerify 实名状态
+   * verify 实名
+   * forget/sysPwd 找回密码
+   * update/sysPwd 更新密码
+   * nick 修改昵称头像
+   * getUser 获取用户信息
+   * setGesturePwd 设置手势密码
+   * updateGesturePwd 更新手势密码
+   * updatePhone 修改账号
    */
   static final String loginUrl = userUrl + "login";
-
-  /*
-   * 注册
-   */
-  static final String registerUrl= userUrl + "register";
-
-  /*
-   * 发送验证码
-   */
+  static final String registerUrl = userUrl + "register";
   static final String sendCodeUrl = codeUrl + "sendCode";
-
-  /*
-   * 验证用户是否已经实名认证
-   */
-  static final String  isVerifyUrl=userUrl+"isVerify";
-
-  /*
-   * 实名认证
-   */
+  static final String isVerifyUrl = userUrl + "isVerify";
   static final String verifyUrl = userUrl + "verify";
-
-  /*
-   * 找回密码
-   */
   static final String findPwdUrl = userUrl + "forget/sysPwd";
-
-  /*
-   * 修改密码
-   */
   static final String updatePwdUrl = userUrl + "update/sysPwd";
+  static final String updateNickAndHeadUrl = userUrl + "nick";
+  static final String getUserInfoUrl = userUrl + "getUser";
+  static final String setGesturePwdUrl = userUrl + "setGesturePwd";
+  static final String updateGesturePwdUrl = userUrl + "updateGesturePwd";
+  static final String updatePhoneUrl = userUrl + "updatePhone";
 
   /*
-   * 昵称头像修改
-   */
-  static final String  updateNickAndHeadUrl= userUrl + "nick";
-
-  /*
-   * 获取用户的信息
-   */
-  static final String  getUserInfoUrl= serverUrl + userUrl + "getUser";
-
-  /*
-   * 获取公告
+   * 系统接口
+   * list 公告列表
+   * param 根据参数名获取参数值
+   * banner 首页头图
+   * updateAndroid/{channel}/{versionCode} 检测应用版本 channel 版本号 versionCode
    */
   static final String getNoticeListUrl = noticeUrl + "list";
+  static final String getParamUrl = paramUrl;
 
-  /*
-   * 根据参数名获取参数信息
-   */
-  static final String getParamUrl = paramUrl ;
-
-  /*
-   * 获取首页banner
-   */
   static final String getBannerUrl = "banner/";
+  static final String checkUpdateUrl = appVersionUrl +
+      "updateAndroid/{channel}/{versionCode}";
 
-  /*
-   * 检查更新
-   */
-  static final String checkUpdateUrl = appVersionUrl + "updateAndroid/{channel}/{versionCode}";
-
-  /*
-   * 设置手势密码
-   */
-  static final String setGesturePwdUrl= userUrl + "setGesturePwd";
-
-  /*
-   * 更新手势密码
-   */
-  static final String updateGesturePwdUrl= userUrl + "updateGesturePwd";
-
-  /*
-   * 修改登录账号
-   */
-  static final String updatePhoneUrl = userUrl + "updatePhone";
 
   /*
    * 查询员工人员访客
    */
-  static final String  findVisitorIdUrl = userUrl + "findVisitorId";
+  static final String findVisitorIdUrl = userUrl + "findVisitorId";
 
   /*
    * "manage"用户查询员工
    */
-  static final String fincCompanyIdUrl =userUrl + "findCompanyId/{pageNum}/{pageSize}";
+  static final String fincCompanyIdUrl = userUrl +
+      "findCompanyId/{pageNum}/{pageSize}";
 
   /*
    * 添加员工
@@ -129,22 +98,22 @@ class Constant {
   /*
    * 查询通讯录
    */
-  static final String  findUserFriendUrl = userFriendUrl + "findUserFriend";
+  static final String findUserFriendUrl = userFriendUrl + "findUserFriend";
 
   /*
    * 通过手机号查找用户
    */
-  static final String  findFriendByPhoneUrl = userFriendUrl + "findPhone";
+  static final String findFriendByPhoneUrl = userFriendUrl + "findPhone";
 
   /*
    * 通过真实姓名查找用户
    */
-  static final String findFriendByRealNameUrl= userFriendUrl + "findRealName";
+  static final String findFriendByRealNameUrl = userFriendUrl + "findRealName";
 
   /*
    * 添加好友
    */
-  static final String addUserFriendUrl= userFriendUrl + "addUserFriend";
+  static final String addUserFriendUrl = userFriendUrl + "addUserFriend";
 
   /*
    * 删除好友
@@ -154,27 +123,32 @@ class Constant {
   /*
    * 访问我的人
    */
-  static final String visitMyPeopleUrl = visitorRecodeUrl + "visitMyPeople/{pageNum}/{pageSize}";
+  static final String visitMyPeopleUrl = visitorRecodeUrl +
+      "visitMyPeople/{pageNum}/{pageSize}";
 
   /*
    * 正在申请访问的：1。通过 2.拒绝：添加拒绝理由
    */
-  static final String adoptionAndRejectionUrl = visitorRecodeUrl + "adoptionAndRejection";
+  static final String adoptionAndRejectionUrl = visitorRecodeUrl +
+      "adoptionAndRejection";
 
   /*
    * 查询我访问的人
    */
-  static final String peopleIInterviewedUrl = visitorRecodeUrl + "peopleIInterviewed/{pageNum}/{pageSize}";
+  static final String peopleIInterviewedUrl = visitorRecodeUrl +
+      "peopleIInterviewed/{pageNum}/{pageSize}";
 
   /*
    * 查询我访问的人(通过状态)
    */
-  static final String peopleIInterviewedRecordUrl = visitorRecodeUrl + "peopleIInterviewedRecord/{pageNum}/{pageSize}";
+  static final String peopleIInterviewedRecordUrl = visitorRecodeUrl +
+      "peopleIInterviewedRecord/{pageNum}/{pageSize}";
 
   /*
    * 查询和我同一公司员工的信息
    */
-  static final String visitMyCompanyUrl = visitorRecodeUrl + "visitMyCompany/{pageNum}/{pageSize}";
+  static final String visitMyCompanyUrl = visitorRecodeUrl +
+      "visitMyCompany/{pageNum}/{pageSize}";
 
   /*
    * 发起访问请求（包括地址，大厦，公司，真实姓名，访问时间，访问理由）
@@ -209,23 +183,31 @@ class Constant {
   /*
    * 用户的公司（状态为确认）
    */
-   static final String findApplySucUrl = companyUserUrl + "findApplySuc";
+  static final String findApplySucUrl = companyUserUrl + "findApplySuc";
+
   /*
    * 切换默认公司
    */
-   static final String updateCompanyIdAndRoleUrl = userUrl + "updateCompanyIdAndRole";
+  static final String updateCompanyIdAndRoleUrl = userUrl +
+      "updateCompanyIdAndRole";
+
   /*
    * 获取访问历史记录
    */
-   static final String visitHistoryUrl = visitorRecodeUrl + "inviteRecord";
+  static final String visitHistoryUrl = visitorRecodeUrl + "inviteRecord";
+
   /*
    * 获取邀约历史记录
    */
-   static final String inviteHistoryUrl = visitorRecodeUrl + "inviteRecord";
+  static final String inviteHistoryUrl = visitorRecodeUrl + "inviteRecord";
+
   /*
    * 获取好友历史记录
    */
-   static final String friendHistoryUrl = visitorRecodeUrl + "inviteRecord";
-   //快速访问
-   static final String fastVisitUrl  = visitorRecodeUrl + "visit";
+  static final String friendHistoryUrl = visitorRecodeUrl + "inviteRecord";
+
+  /*
+   * 快速访问
+   */
+  static final String fastVisitUrl = visitorRecodeUrl + "visit";
 }

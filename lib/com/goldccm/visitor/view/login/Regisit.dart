@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'dart:async';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
@@ -59,7 +62,7 @@ class RegisitState extends State<Regisit> {
   bool isAuth = false;
   bool isAgree = false;
   bool _codeBtnflag = true;
-
+  int _deviceType=1;
   Timer _timer;
 
   /// 当前倒计时的秒数。
@@ -74,6 +77,13 @@ class RegisitState extends State<Regisit> {
   @override
   void initState() {
     super.initState();
+    if(Platform.isAndroid){
+      _deviceType=1;
+    }
+    if(Platform.isIOS){
+      _deviceType=2;
+    }
+
     _seconds = widget.countdown;
     SchedulerBinding.instance.addPostFrameCallback((_) =>  askPermission(context));
   }
@@ -457,6 +467,8 @@ class RegisitState extends State<Regisit> {
                 "phone": phone,
                 "style": "1",
                 "sysPwd": _passNum,
+                "deviceToken":NPush.clientId??"",
+                "deviceType":_deviceType,
               },userCall: true);
           if(data==""||data==null||data=="isBlocking"){
             return "loginFail";

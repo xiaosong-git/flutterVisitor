@@ -17,6 +17,7 @@ import 'package:visitor/com/goldccm/visitor/util/MessageUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/chat.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 /*
  * 消息中心
@@ -31,10 +32,12 @@ class ChatList extends StatefulWidget {
 }
 
 class ChatListState extends State<ChatList> {
-
-  WebSocketChannel channel = MessageUtils.getChannel();
   List<ChatMessage> _chatHis = [];
+  final SlidableController slidableController = SlidableController();
   Timer _timer;
+  final List<String> actions = [
+    '删除',
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,74 +46,105 @@ class ChatListState extends State<ChatList> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: null,
-        title: new Text(
-          "访客",
-          textAlign: TextAlign.center,
-          style: new TextStyle(fontSize: 18.0, color: Colors.white),textScaleFactor: 1.0
-        ),
+        title: new Text("访客",
+            textAlign: TextAlign.center,
+            style: new TextStyle(fontSize: 18.0, color: Colors.white),
+            textScaleFactor: 1.0),
       ),
       body: RefreshIndicator(
           child: ListView.builder(
             itemCount: _chatHis != null ? _chatHis.length : 0,
             itemBuilder: buildMessageListItem,
           ),
-          onRefresh:refresh
-      ),
+          onRefresh: refresh),
     );
   }
+
   //构建每个聊天体
   Widget buildMessageListItem(BuildContext context, int index) {
     ChatMessage message = _chatHis[index];
-    return new InkWell(
-      onTap: () {
-        EventBusUtil().eventBus.fire(MessageCountChangeEvent(1));
-        FriendInfo user = new FriendInfo(
-            userId: message.M_FriendId,
-            name: message.M_FrealName,
-            virtualImageUrl: message.M_FheadImgUrl=="null"?null:message.M_FheadImgUrl,
-            imageServerUrl: Constant.imageServerUrl,
-            orgId: message.M_orgId.toString());
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ChatPage(user: user)));
-      },
-      child: MessageCompent(
-        headImgUrl: message.M_FheadImgUrl=="null"?null:message.M_FheadImgUrl,
-        realName: message.M_FrealName,
-        latestTime: message.M_Time,
-        latestMsg: message.M_MessageContent,
-        isSend: message.M_IsSend,
-        unreadCount: message.unreadCount,
-        imageServerUrl: Constant.imageServerUrl,
-      ),
+    return new Slidable(
+      controller:slidableController,
+        child:InkWell(
+          splashColor: Colors.transparent,
+          onTap: () {
+            EventBusUtil().eventBus.fire(MessageCountChangeEvent(1));
+            FriendInfo user = new FriendInfo(
+                userId: message.M_FriendId,
+                name: message.M_FrealName,
+                virtualImageUrl: message.M_FheadImgUrl == "null"
+                    ? null
+                    : message.M_FheadImgUrl,
+                imageServerUrl: Constant.imageServerUrl,
+                orgId: message.M_orgId.toString());
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ChatPage(user: user)));
+          },
+          child:MessageCompent(
+                headImgUrl:
+                message.M_FheadImgUrl == "null" ? null : message.M_FheadImgUrl,
+                realName: message.M_FrealName ?? "",
+                latestTime: message.M_Time,
+                latestMsg: message.M_MessageContent ?? "",
+                isSend: message.M_IsSend,
+                unreadCount: message.unreadCount,
+                imageServerUrl: Constant.imageServerUrl,
+          ),
+        ),
+      actionPane: SlidableScrollActionPane(),
+      actionExtentRatio: 0.25,
+      secondaryActions: <Widget>[
+        SlideAction(
+          color: Colors.red,
+          child: Center(
+            child: Text(
+              '删除',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          onTap: () {
+            deleteSingle(message.M_FriendId);
+          },
+        ),
+      ],
     );
   }
+
   //定时刷新聊天栏
   countDown() {
     const oneCall = const Duration(milliseconds: 3000);
     var callback = (timer) => {getLatestMessage()};
     _timer = Timer.periodic(oneCall, callback);
   }
+  Future deleteSingle(int id) async {
+     int count=await MessageUtils.removeLastestMessage(id);
+     if(count>0){
+       refresh();
+     }else{
+       ToastUtil.showShortClearToast("删除失败");
+     }
+  }
   //读取聊天信息
   getLatestMessage() async {
-    UserInfo userInfo=await LocalStorage.load("userInfo");
+    UserInfo userInfo = await LocalStorage.load("userInfo");
     _chatHis.clear();
     List<ChatMessage> list = await MessageUtils.getLatestMessage(userInfo.id);
-    if(list!=null){
-      for(var chat in list){
-        if(chat.M_FrealName!=null&&chat.M_FriendId!=null){
+    if (list != null) {
+      for (var chat in list) {
+        if (chat.M_isDeleted!=1) {
           _chatHis.add(chat);
         }
       }
     }
-    setState(() {
-    });
+    setState(() {});
   }
+
   //手动刷新聊天栏
-  Future refresh() async{
+  Future refresh() async {
     getLatestMessage();
-    ToastUtil.showShortClearToast("刷新成功");
     return null;
   }
+
   //关闭
   void dispose() {
     _timer?.cancel();
@@ -123,10 +157,10 @@ class ChatListState extends State<ChatList> {
     super.initState();
     initData();
   }
+
   //初始化
-  initData() async{
+  initData() async {
     getLatestMessage();
     countDown();
   }
-
 }

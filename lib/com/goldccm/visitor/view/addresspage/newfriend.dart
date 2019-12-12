@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
+import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
+import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
@@ -91,7 +95,9 @@ class NewFriendPageState extends State<NewFriendPage> {
 
   Future init() async {
     String str = await loadContacts();
-    print(str);
+    BadgeInfo badgeInfo = await BadgeUtil().updateFriendRequest();
+    badgeInfo.newFriendRequestCount=0;
+    Provider.of<BadgeModel>(context).update(badgeInfo);
     await loadFriend(_userInfo, str);
     await loadRequest(_userInfo);
     return null;
@@ -370,29 +376,6 @@ class remarkFriendPage extends StatelessWidget {
   remarkFriendPage({Key key, this.userId, this.userInfo}) : super(key: key);
   static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String remark = "";
-  Future<bool> agreeRequest(int friendId, String remark, UserInfo user) async {
-    String url = Constant.serverUrl + "userFriend/agreeFriend";
-    String threshold = await CommonUtil.calWorkKey();
-    var res = await Http().post(url, queryParameters: {
-      "token": user.token,
-      "factor": CommonUtil.getCurrentTime(),
-      "threshold": threshold,
-      "requestVer": await CommonUtil.getAppVersion(),
-      "userId": user.id,
-      "friendId": friendId,
-      "type": "1",
-      "remark": remark,
-    });
-    if (res is String) {
-      Map map = jsonDecode(res);
-      ToastUtil.showShortClearToast(map['verify']['desc']);
-      if (map['verify']['sign'] == "success") {
-        return true;
-      }
-      ToastUtil.showShortClearToast(map['verify']['desc']);
-    }
-    return false;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -412,12 +395,10 @@ class remarkFriendPage extends StatelessWidget {
                         style: TextStyle(fontSize: Constant.normalFontSize),
                         textScaleFactor: 1.0),
                     onPressed: () async {
-                      if (formKey.currentState.validate()) {
                         formKey.currentState.save();
-                        var result = agreeRequest(userId, remark, userInfo);
+                        agreeRequest(userId, remark, userInfo);
                         Navigator.pop(context);
                         Navigator.pop(context);
-                      }
                     },
                   ),
                 ),
@@ -450,15 +431,35 @@ class remarkFriendPage extends StatelessWidget {
                       onSaved: (value) {
                         remark = value;
                       },
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return '输入不能为空';
-                        }
-                      },
                     ),
                   ),
                 ],
               ),
             ))));
   }
+
+  Future<bool> agreeRequest(int friendId, String remark, UserInfo user) async {
+    String url = Constant.serverUrl + "userFriend/agreeFriend";
+    String threshold = await CommonUtil.calWorkKey();
+    var res = await Http().post(url, queryParameters: {
+      "token": user.token,
+      "factor": CommonUtil.getCurrentTime(),
+      "threshold": threshold,
+      "requestVer": await CommonUtil.getAppVersion(),
+      "userId": user.id,
+      "friendId": friendId,
+      "type": "1",
+      "remark": remark,
+    });
+    if (res is String) {
+      Map map = jsonDecode(res);
+      ToastUtil.showShortClearToast(map['verify']['desc']);
+      if (map['verify']['sign'] == "success") {
+        return true;
+      }
+      ToastUtil.showShortClearToast(map['verify']['desc']);
+    }
+    return false;
+  }
+
 }

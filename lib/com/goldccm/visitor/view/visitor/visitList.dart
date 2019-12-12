@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
+import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
@@ -20,6 +24,8 @@ import 'package:visitor/com/goldccm/visitor/view/visitor/visitDetail.dart';
  * create_time:2019/11/22
  */
 class VisitList extends StatefulWidget {
+  int currentRole;
+  VisitList({Key key,this.currentRole}):super(key:key);
   @override
   State<StatefulWidget> createState() {
     return VisitListState();
@@ -29,12 +35,14 @@ class VisitList extends StatefulWidget {
 class VisitListState extends State<VisitList> with SingleTickerProviderStateMixin {
   TabController _tabController;
   List tabs = ['我的访问', '访问我的人', '帮助审核'];
+  List activeTabs = ['我的访问'];
   List<AddressInfo> _addressLists = <AddressInfo>[];
   List<VisitInfo> _visitLists = <VisitInfo>[];
   List _visitMyPeopleLists = [];
   List _visitMyCompanyLists = [];
   int selectedCompanyId;
   int _visitMineCount = 1;
+  String currentRole="staff";
   var _visitBuilderFuture;
   var _visitMineBuilderFuture;
   var _visitCompanyBuilderFuture;
@@ -48,11 +56,15 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
+    initAsync();
     _visitBuilderFuture = visitMyPeople();
     _visitCompanyBuilderFuture = visitMyCompany();
     _visitMineBuilderFuture = visitMine();
-    initAsync();
-    _tabController = TabController(length: tabs.length, vsync: this);
+    if(widget.currentRole==1){
+      _tabController = TabController(length: tabs.length, vsync: this);
+    }else{
+      _tabController = TabController(length: activeTabs.length, vsync: this);
+    }
     _tabController.addListener(() {});
   }
   initAsync() async {
@@ -212,6 +224,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
                   companyName: data['companyName'],
                   id: data['id'].toString(),
                 );
+                print(visitInfo.toString());
                 _visitLists.add(visitInfo);
               }
             }
@@ -258,7 +271,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return widget.currentRole==1?Scaffold(
       appBar: AppBar(
         title: Text('访问与审核',textScaleFactor: 1.0,),
         centerTitle: true,
@@ -278,16 +291,38 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
             builder: _visitMineFuture,
             future: _visitMineBuilderFuture,
           ),
-          FutureBuilder(
-            builder: _visitFuture,
-            future: _visitBuilderFuture,
-          ),
-          FutureBuilder(
-            builder: _visitCompanyFuture,
-            future: _visitCompanyBuilderFuture,
-          ),
+            FutureBuilder(
+              builder: _visitFuture,
+              future: _visitBuilderFuture,
+            ),
+            FutureBuilder(
+              builder: _visitCompanyFuture,
+              future: _visitCompanyBuilderFuture,
+            ),
         ],
-      ),
+      )
+    ):Scaffold(
+        appBar: AppBar(
+          title: Text('访问与审核',textScaleFactor: 1.0,),
+          centerTitle: true,
+          bottom: TabBar(
+              indicatorColor: Colors.blue,
+              controller: _tabController,
+              tabs: activeTabs
+                  .map((e) => Tab(
+                child: Text(e,textScaleFactor: 1.0,),
+              ))
+                  .toList()),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: <Widget>[
+            FutureBuilder(
+              builder: _visitMineFuture,
+              future: _visitMineBuilderFuture,
+            ),
+          ],
+        )
     );
   }
 
@@ -339,7 +374,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
       itemBuilder: (BuildContext context, int index) {
           return ListTile(
             title: RichText(text: TextSpan(
-              text: '被访人员  ',
+              text: '来访人员  ',
               style: TextStyle(fontSize: 16,color: Colors.black),
               children: <TextSpan>[
                 TextSpan(
@@ -502,11 +537,15 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
                     ],
                   ),textScaleFactor: 1.0,),
                 ]),
-            trailing: _visitLists[index].cstatus != null ?_visitLists[index].cstatus == "applyConfirm"?Text("审核",style: TextStyle(),): _visitLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
+            trailing: _visitLists[index].cstatus != null ?_visitLists[index].cstatus == "applyConfirm"?DateTime.parse(_visitLists[index].endDate).isBefore(DateTime.now())?Text("过期",style: TextStyle( color: Colors.red),):Text("审核",style: TextStyle(),): _visitLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (context) => VisitDetail(visitInfo: _visitLists[index],)));
+              if(DateTime.parse(_visitLists[index].endDate).isBefore(DateTime.now())){
+                ToastUtil.showShortClearToast("访问已过期");
+              }else{
+                Navigator.push(context,
+                    MaterialPageRoute(
+                        builder: (context) => VisitDetail(visitInfo: _visitLists[index],)));
+              }
             },
           );
       },
@@ -585,9 +624,12 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
                     ],
                   ),textScaleFactor: 1.0,),
                 ]),
-            trailing: _visitMyCompanyLists[index].cstatus != null ?_visitMyCompanyLists[index].cstatus == "applyConfirm"?Text("审核",style: TextStyle(),textScaleFactor: 1.0,): _visitMyCompanyLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),textScaleFactor: 1.0,):Text("拒绝",style: TextStyle( color: Colors.red),textScaleFactor: 1.0,):Text(""),
+            trailing: _visitMyCompanyLists[index].cstatus != null ?_visitMyCompanyLists[index].cstatus == "applyConfirm"?DateTime.parse(_visitMyCompanyLists[index].endDate).isBefore(DateTime.now())?Text("过期",style: TextStyle( color: Colors.red),):Text("审核",style: TextStyle(),textScaleFactor: 1.0,): _visitMyCompanyLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),textScaleFactor: 1.0,):Text("拒绝",style: TextStyle( color: Colors.red),textScaleFactor: 1.0,):Text(""),
             onTap: () {
-              if (_visitMyCompanyLists[index].cstatus == "applyConfirm") {
+              if(DateTime.parse(_visitMyCompanyLists[index].endDate).isBefore(DateTime.now())){
+                ToastUtil.showShortClearToast("访问记录已过期");
+              }
+              else if (_visitMyCompanyLists[index].cstatus == "applyConfirm") {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -656,9 +698,6 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
     );
   }
   changeVisitCompany(VisitInfo info,int companyId,int index) async {
-    if(companyId==null){
-      ToastUtil.showShortClearToast("请先选择一个访问地址");
-    }else{
       String url = Constant.serverUrl + "visitorRecord/modifyCompanyFromId";
       String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
       var res = await Http().post(url,
@@ -676,16 +715,15 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
             "endDate": info.endDate,
             "companyId":companyId,
           }),debugMode: true );
-      if(res is String){
+      if(res is String) {
         Map map = jsonDecode(res);
-        if(map['verify']['sign']=="success"){
+        if (map['verify']['sign'] == "success") {
           ToastUtil.showShortClearToast(map['verify']['desc']);
-        }else{
+        } else {
           ToastUtil.showShortClearToast(map['verify']['desc']);
           _visitMyPeopleLists[index].cstatus = "applyConfirm";
         }
       }
-    }
   }
   @override
   void dispose() {

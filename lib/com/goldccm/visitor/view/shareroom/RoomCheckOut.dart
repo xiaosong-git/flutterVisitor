@@ -50,7 +50,7 @@ class RoomCheckoutState extends State<RoomCheckOut>{
   }
   calculate(){
     RoomInfo roomInfo=widget.roomInfo;
-    print(widget.timeLines);
+    print(roomInfo.toString());
     setState(() {
       amount=(double.parse(roomInfo.roomPrice)*widget.count).toString();
       description=roomInfo.roomName+roomInfo.roomAddress;

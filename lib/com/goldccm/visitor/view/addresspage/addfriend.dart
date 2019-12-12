@@ -5,6 +5,7 @@ import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 
 /*
@@ -33,6 +34,14 @@ class AddFriendPageState extends State<AddFriendPage>{
     _userInfo=widget.userInfo;
   }
   addFriend() async {
+    if(_name==""&&_name==null){
+      ToastUtil.showShortClearToast("姓名不能为空");
+      return ;
+    }
+    if(!RegExpUtil().verifyPhone(_phone)){
+      ToastUtil.showShortClearToast("手机号码不正确");
+      return ;
+    }
     String url = Constant.serverUrl+"userFriend/addFriendByPhoneAndUser";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
@@ -105,11 +114,6 @@ class AddFriendPageState extends State<AddFriendPage>{
                     onSaved: (value){
                       _name=value;
                     },
-                    validator: (value){
-                      if(value.isEmpty){
-                        return '请不要为空';
-                      }
-                    },
                   ),
                 ),
               ],
@@ -137,11 +141,6 @@ class AddFriendPageState extends State<AddFriendPage>{
                     onSaved: (value){
                       _phone=value;
                     },
-                    validator: (value){
-                      if(value.isEmpty){
-                        return '请不要为空';
-                      }
-                    },
                   ),
                 ),
               ],
@@ -161,10 +160,8 @@ class AddFriendPageState extends State<AddFriendPage>{
                   style: TextStyle(fontSize:  Constant.normalFontSize),textScaleFactor: 1.0
                 ),
                 onPressed: () async {
-                  if(formKey.currentState.validate()){
                     formKey.currentState.save();
                     addFriend();
-                  }
                 },
               ),
             ),

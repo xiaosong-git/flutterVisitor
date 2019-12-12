@@ -15,6 +15,7 @@ import 'package:visitor/com/goldccm/visitor/util/MessageUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitAddress.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitRequest.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -34,7 +35,6 @@ class ChatPage extends StatefulWidget {
 }
 class ChatPageState extends State<ChatPage> {
   List<ChatMessageWidget> _message = <ChatMessageWidget>[];
-  WebSocketChannel _channel = MessageUtils.getChannel();
   List<AddressInfo> _mineAddress=<AddressInfo>[];
   final TextEditingController _textController = new TextEditingController();
   var _messageBuilderFuture;
@@ -178,10 +178,12 @@ class ChatPageState extends State<ChatPage> {
     super.initState();
     countDown();
     init();
+    print(widget.user.toString());
     _messageBuilderFuture = getMessage();
   }
   init() async {
     UserInfo user=await LocalStorage.load("userInfo");
+    print(user);
     setState(() {
       _userInfo=user;
     });
@@ -415,6 +417,11 @@ class ChatPageState extends State<ChatPage> {
                                         M_MessageType: "2",
                                         M_recordType: "2",
                                         M_isSended: 0,
+                                        M_MessageContent: '邀约信息',
+                                        M_FrealName: widget.user.name,
+                                        M_FnickName: widget.user.nickname,
+                                        M_FheadImgUrl: widget.user.virtualImageUrl,
+                                        M_orgId: widget.user.orgId,
                                       );
                                       commitVisit(chatMessage,selectedMineAddress);
                                     }
@@ -543,6 +550,11 @@ class ChatPageState extends State<ChatPage> {
                                         M_MessageType: "2",
                                         M_recordType:  "1",
                                         M_isSended: 0,
+                                        M_MessageContent: '访问信息',
+                                        M_FrealName: widget.user.name,
+                                        M_FnickName: widget.user.nickname,
+                                        M_FheadImgUrl: widget.user.virtualImageUrl,
+                                        M_orgId: widget.user.orgId,
                                       );
                                       commitVisit(chatMessage,null);
                                     }
@@ -651,12 +663,28 @@ class ChatPageState extends State<ChatPage> {
       ),
     );
   }
-
+  /*
+   * 断线重连
+   */
+  reconnect() async {
+    LoadingDialog().show(context, '重新连接中');
+    await MessageUtils.chatReconnect();
+    Future.delayed(Duration(seconds: 5)).then((value){
+      if(MessageUtils.isOpen()){
+        Navigator.pop(context);
+        ToastUtil.showShortClearToast("重连成功");
+      }else{
+        Navigator.pop(context);
+        ToastUtil.showShortClearToast("与聊天服务器断开了连接");
+        Navigator.pop(context);
+      }
+    });
+  }
   /*
     * 发送访问消息
     */
-  commitVisit(ChatMessage message,AddressInfo addr){
-    print(message);
+  commitVisit(ChatMessage message,AddressInfo addr) async {
+    WebSocketChannel channel=MessageUtils.getChannel();
     //检测webSocket服务器连接
     if(MessageUtils.isOpen()){
       var object = {
@@ -680,17 +708,18 @@ class ChatPageState extends State<ChatPage> {
       }
       //发送到服务器
       var send = jsonEncode(object);
-      _channel.sink.add(send);
+     channel.sink.add(send);
       //保存到本地数据库
       MessageUtils.insertSingleMessage(message);
     }else{
-      ToastUtil.showShortClearToast("与服务器断开连接，请从设置中退出，然后重新登录");
+      reconnect();
     }
   }
   /*
     * 发送普通聊天消息
     */
-  void _handleSubmmited(String text) {
+  Future _handleSubmmited(String text) async {
+    WebSocketChannel channel=MessageUtils.getChannel();
     _textController.clear();
     if (MessageUtils.isOpen()) {
       //向WebSocket服务器发送json消息体
@@ -700,7 +729,7 @@ class ChatPageState extends State<ChatPage> {
         "type": 1,
       };
       var send = jsonEncode(object);
-      _channel.sink.add(send);
+      channel.sink.add(send);
       //将这条消息保存至本地数据库
       String time = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
       ChatMessage chat = new ChatMessage(
@@ -722,7 +751,7 @@ class ChatPageState extends State<ChatPage> {
         _isComposing = false;
       });
     } else {
-      ToastUtil.showShortClearToast("与服务器断开连接，请从设置中退出，然后重新登录");
+      reconnect();
     }
   }
 }

@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
-import 'package:permission_handler/permission_handler.dart';
+//import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 
 void main() => runApp(MyApp());
@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-     await FlutterArcface.active();
+//     await FlutterArcface.platformVersion;
 //    String platformVersion;
 //    // Platform messages may fail, so we use a try/catch PlatformException.
 //    try {

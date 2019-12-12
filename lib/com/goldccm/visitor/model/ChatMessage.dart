@@ -27,6 +27,7 @@ class ChatMessage {
   String M_answerContent;
   int unreadCount;
   int M_isSended;
+  int M_isDeleted;
   ChatMessage(
       {this.M_ID,
       this.M_MessageContent,
@@ -51,7 +52,8 @@ class ChatMessage {
       this.M_visitId,
       this.M_answerContent,
       this.M_recordType,
-      this.M_isSended});
+      this.M_isSended,
+      this.M_isDeleted});
 
   ChatMessage.fromJson(Map map) {
     this.M_ID = map['M_ID'];
@@ -78,11 +80,13 @@ class ChatMessage {
     this.M_answerContent = map['M_answerContent'];
     this.M_recordType = map['M_recordType'];
     this.M_isSended = map['M_isSended'];
+    M_isDeleted=map['M_isDeleted'];
   }
 
   @override
   String toString() {
-    return 'ChatMessage{M_ID: $M_ID, M_MessageContent: $M_MessageContent, M_Status: $M_Status, M_Time: $M_Time, M_MessageType: $M_MessageType, M_IsSend: $M_IsSend, M_userId: $M_userId, M_FriendId: $M_FriendId, M_FnickName: $M_FnickName, M_FrealName: $M_FrealName, M_FheadImgUrl: $M_FheadImgUrl, M_visitId: $M_visitId, M_orgId: $M_orgId, M_StartDate: $M_StartDate, M_EndDate: $M_EndDate, M_orgName: $M_orgName, M_companyName: $M_companyName, M_province: $M_province, M_city: $M_city, M_cStatus: $M_cStatus, M_recordType: $M_recordType, M_answerContent: $M_answerContent, unreadCount: $unreadCount, M_isSended: $M_isSended}';
+    return 'ChatMessage{M_ID: $M_ID, M_MessageContent: $M_MessageContent, M_Status: $M_Status, M_Time: $M_Time, M_MessageType: $M_MessageType, M_IsSend: $M_IsSend, M_userId: $M_userId, M_FriendId: $M_FriendId, M_FnickName: $M_FnickName, M_FrealName: $M_FrealName, M_FheadImgUrl: $M_FheadImgUrl, M_visitId: $M_visitId, M_orgId: $M_orgId, M_StartDate: $M_StartDate, M_EndDate: $M_EndDate, M_orgName: $M_orgName, M_companyName: $M_companyName, M_province: $M_province, M_city: $M_city, M_cStatus: $M_cStatus, M_recordType: $M_recordType, M_answerContent: $M_answerContent, unreadCount: $unreadCount, M_isSended: $M_isSended, M_isDeleted: $M_isDeleted}';
   }
+
 
 }

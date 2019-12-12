@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:provider/provider.dart';
+import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'com/goldccm/visitor/model/BadgeModel.dart';
 import 'com/goldccm/visitor/model/UserModel.dart';
-import 'com/goldccm/visitor/util/UMPushUtils.dart';
 import 'splash.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 /*
@@ -20,7 +20,7 @@ void main() {
   FlutterArcface.active();
   userModel.init(null);
   badgeModel.init();
-  UMPush().init();
+  NPush().init();
   runApp(
     MultiProvider(
         providers: [

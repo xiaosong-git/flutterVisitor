@@ -48,8 +48,7 @@ class NewsView extends StatelessWidget {
                                 style: new TextStyle(
                                     fontSize: 15.0,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                    fontFamily: '楷体_GB2312')),
+                                    color: Colors.black,)),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis, textScaleFactor: 1.0
                           )
@@ -68,8 +67,8 @@ class NewsView extends StatelessWidget {
                                   text: newsInfo.newsDetail,
                                   style: new TextStyle(
                                       fontSize: 12.0,
-                                      color: Colors.black,
-                                      fontFamily: '楷体_GB2312')),
+                                      color: Colors.grey,
+                                  )),
                               maxLines: 4,
                               overflow: TextOverflow.ellipsis, textScaleFactor: 1.0
                             )))),
@@ -81,9 +80,9 @@ class NewsView extends StatelessWidget {
                           ),
                           child: new Text(newsInfo.newsDate,
                               style: new TextStyle(
-                                  fontSize: 14.0,
-                                  color: Colors.black,
-                                  fontFamily: '楷体_GB2312'),textScaleFactor: 1.0))
+                                  fontSize: 12.0,
+                                  color: Colors.grey,
+                              ),textScaleFactor: 1.0))
                     ])
                   ])),
         ],

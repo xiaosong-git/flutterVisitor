@@ -15,7 +15,7 @@ import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/UMPushUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'package:visitor/home.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'GestureLogin.dart';
@@ -25,7 +25,7 @@ import 'Regisit.dart';
 final Color _availableStyle = Colors.blue;
 final Color _unavailableStyle = Colors.grey;
 final TextStyle _labelStyle =
-    new TextStyle(fontSize: 15.0, color: Colors.blue, fontFamily: '楷体_GB2312');
+    new TextStyle(fontSize: 15.0, color: Colors.blue,);
 /*
  * 登录
  * author:ody997<hwk@growingpine.com>
@@ -218,7 +218,7 @@ class LoginState extends State<Login> {
                                           prefixIcon: Icon(Icons.lock),
                                           hintText: '请输入验证码',
                                           hintStyle: new TextStyle(
-                                            fontFamily: '楷体_GB2312',
+
                                           ),
                                           fillColor: Colors.black12,
                                           filled: true),
@@ -249,7 +249,6 @@ class LoginState extends State<Login> {
                                               style: new TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12,
-                                                fontFamily: '楷体_GB2312',
                                               ),
                                             ),
                                           ),
@@ -283,7 +282,6 @@ class LoginState extends State<Login> {
                                     style: new TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
-                                      fontFamily: '楷体_GB2312',
                                     ),
                                   ),
                                 ),
@@ -466,7 +464,6 @@ class LoginState extends State<Login> {
    * _loginCode 验证码登录
    */
   Future _loginAction() async {
-    String deviceToken=await UMPush.getToken();
     bool userNameCheck = checkLoignUser();
     String _passNum;
     String _codeNum;
@@ -479,7 +476,7 @@ class LoginState extends State<Login> {
           "phone": _userNameController.text.toString(),
           "style": "1",
           "sysPwd": _passNum,
-             "deviceToken":deviceToken,
+             "deviceToken":NPush.clientId??"",
              "deviceType":_deviceType,
         },userCall: true);
       }else{
@@ -494,11 +491,10 @@ class LoginState extends State<Login> {
           "phone": _userNameController.text.toString(),
           "style": "1",
           "code": _codeNum,
-          "deviceToken":deviceToken,
+          "deviceToken":NPush.clientId??"",
           "deviceType":_deviceType,
         },userCall: true,);
       }else{
-        ToastUtil.showShortToast("验证码错误");
         return false;
       }
     }

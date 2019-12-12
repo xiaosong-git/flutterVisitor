@@ -14,8 +14,14 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
+  s.static_framework = true
   s.dependency 'Flutter'
-
   s.ios.deployment_target = '8.0'
+  s.swift_version = '4.0'
+
+  s.preserve_paths = 'ArcSoftFaceEngine.framework'
+  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework ArcSoftFaceEngine' }
+  s.vendored_frameworks = 'ArcSoftFaceEngine.framework'
+
 end
 

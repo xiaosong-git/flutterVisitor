@@ -4,14 +4,13 @@ import 'dart:io';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/db/chatDao.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/FriendCountChangeEvent.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
-import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
-import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
@@ -28,7 +27,6 @@ import 'BadgeUtil.dart';
  * create_time:2019/11/13
  */
 class MessageUtils {
-
   //单例
   static MessageUtils _message;
   static MessageUtils get instance => _messageUtils();
@@ -39,12 +37,12 @@ class MessageUtils {
   static bool _isOpen = false;
   static String userID;
   static String userToken;
-  static int reCount=0;
-  static TimerUtil _timerUtil=TimerUtil(mInterval: 30000);
-  static bool received=true;
-  static MessageUtils _messageUtils(){
-    if(_message==null){
-      _message=MessageUtils._internal();
+  static int reCount = 0;
+  static TimerUtil _timerUtil = TimerUtil(mInterval: 30000);
+  static bool received = true;
+  static MessageUtils _messageUtils() {
+    if (_message == null) {
+      _message = MessageUtils._internal();
     }
     return _message;
   }
@@ -58,13 +56,14 @@ class MessageUtils {
   //init
   //userID 用户id
   //userToken 用户密钥
-  static setChannel(String id,String token) {
+  static setChannel(String id, String token) {
     debugPrint('userId${id}token${token}Websocket连接');
     if (_channel == null) {
-      userID=id;
-      userToken=token;
-      _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl+'chat?userId=$id&token=$token');
-      if(_channel != null){
+      userID = id;
+      userToken = token;
+      _channel = IOWebSocketChannel.connect(
+          Constant.webSocketServerUrl + 'chat?userId=$id&token=$token');
+      if (_channel != null) {
         _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
         _isOpen = true;
         reCount = 0;
@@ -73,32 +72,34 @@ class MessageUtils {
       }
     }
   }
+
   //检测心跳
-  static detect(){
+  static detect() {
     _timerUtil.setOnTimerTickCallback((int tick) async {
-      if(received==true){
+      if (received == true) {
         _channel?.sink?.add("ping");
-        received=false;
-      }else{
+        received = false;
+      } else {
         closeChannel();
       }
     });
     _timerUtil.startTimer();
   }
 
-  //断线重连
+  //自动检测断线重连
   static reconnect() async {
     bool isLogin = await DataUtils.isLogin();
-    if(isLogin){
+    if (isLogin) {
       debugPrint('Websocket重新连接');
       closeChannel();
-      Future.delayed(Duration(seconds: 10),(){
-        print(reCount);
-        if(reCount<3){
+      Future.delayed(Duration(seconds: 10), () {
+        if (reCount < 3) {
           if (_channel == null) {
-            _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl+'chat?userId=$userID&token=$userToken');
-            if(_channel != null){
-              _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
+            _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl +
+                'chat?userId=$userID&token=$userToken');
+            if (_channel != null) {
+              _channel.stream
+                  .listen(_onData, onError: _onError, onDone: _onDone);
               _isOpen = true;
               received = true;
               detect();
@@ -106,23 +107,43 @@ class MessageUtils {
           }
           reCount++;
 //      setChannel(userID,userToken);
-        }else{
+        } else {
           debugPrint('Websocket重连失败');
         }
       });
     }
   }
 
+  //聊天主动重连
+  static chatReconnect() async {
+    bool isLogin = await DataUtils.isLogin();
+    if (isLogin) {
+      closeChannel();
+      if (_channel == null) {
+        _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl +
+            'chat?userId=$userID&token=$userToken');
+        if (_channel != null) {
+          _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
+          _isOpen = true;
+          received = true;
+          detect();
+        }
+      }
+    }
+  }
+
   //关闭
-  static closeChannel(){
+  static closeChannel() {
     _timerUtil.cancel();
     _channel?.sink?.close();
-    _channel=null;
+    _channel = null;
+    _isOpen=false;
   }
 
   static isOpen() {
     return _isOpen;
   }
+
   static getChannel() {
     return _channel;
   }
@@ -130,7 +151,7 @@ class MessageUtils {
   //关闭
   static _onDone() async {
     debugPrint("Websocket关闭");
-    _isOpen=false;
+    _isOpen = false;
     reconnect();
   }
 
@@ -139,7 +160,7 @@ class MessageUtils {
     debugPrint(err.runtimeType.toString());
     WebSocketChannelException ex = err;
     debugPrint(ex.message);
-    _isOpen=false;
+    _isOpen = false;
     reconnect();
   }
 
@@ -150,28 +171,29 @@ class MessageUtils {
     type=3是自己发送的访问邀约消息被通过或拒绝的回馈消息
   */
   static _onData(event) async {
-    if(event=="pong"){
-      received=true;
-    }else{
+    if (event == "pong") {
+      received = true;
+    } else {
       print(event);
       Map map = jsonDecode(event);
-      if(map['code']!=null){
-        if(map['code']=="200"){
-          if(map['type']==1){
+      if (map['code'] != null) {
+        if (map['code'] == "200") {
+          if (map['type'] == 1) {
             await updateLastMessage();
           }
-          if(map['type']==2){
+          if (map['type'] == 2) {
             await updateMessageVisitId(map['id']);
           }
-        }else{
+        } else {
           ToastUtil.showShortClearToast(map['desc']);
         }
-      }else {
+      } else {
         //播放提示音
         player.play("message.mp3");
         //更新消息数
-        EventBusUtil().eventBus.fire(MessageCountChangeEvent(0));
-//        EventBusUtil().eventBus.destroy();
+        if (map['type'] == 1 || map['type'] == 2 || map['type'] == 3) {
+          EventBusUtil().eventBus.fire(MessageCountChangeEvent(0));
+        }
         ChatMessage msg;
         ChatDao chatDao = new ChatDao();
         if (map['type'] == 1) {
@@ -202,14 +224,17 @@ class MessageUtils {
             M_StartDate: map['startDate'].toString(),
             M_visitId: int.parse(map['id'].toString()),
             M_EndDate: map['endDate'].toString(),
-            M_FheadImgUrl: map['idHandleImgUrl'].toString(),
+            M_FheadImgUrl: map['headImgUrl'] != null
+                ? map['idHandleImgUrl'].toString()
+                : map['idHandleImgUrl'].toString(),
             M_FnickName: map['nickName'].toString(),
             M_FrealName: map['realName'].toString(),
             M_companyName: map['companyName'].toString(),
             M_recordType: map['recordType'].toString(),
             M_answerContent: map['answerContent'].toString(),
-            M_MessageContent:map['recordType']==1?'访问消息':'邀约消息',
+            M_MessageContent: map['recordType'] == "1" ? '访问消息' : '邀约消息',
             M_isSended: 1,
+            M_orgId: map['orgId'].toString(),
           );
           chatDao.insertNewMessage(msg);
         } else if (map['type'] == 3) {
@@ -224,34 +249,41 @@ class MessageUtils {
             M_StartDate: map['startDate'].toString(),
             M_EndDate: map['endDate'].toString(),
             M_companyName: map['companyName'].toString(),
+            M_FheadImgUrl: map['headImgUrl'] != null
+                ? map['idHandleImgUrl'].toString()
+                : map['idHandleImgUrl'].toString(),
+            M_FnickName: map['nickName'].toString(),
+            M_FrealName: map['realName'].toString(),
             M_MessageType: "2",
             M_recordType: map['recordType'].toString(),
             M_answerContent: map['answerContent'].toString(),
+            M_MessageContent: map['recordType'] == "1" ? '访问消息' : '邀约消息',
             M_isSended: 1,
+            M_orgId: map['orgId'].toString(),
           );
           chatDao.updateMessage(msg);
-          chatDao.insertNewMessage(msg);
-          ChatMessage notice=new ChatMessage(
-            M_FriendId: int.parse(map['fromUserId'].toString()),
-            M_userId: int.parse(map['toUserId'].toString()),
-            M_Status: "0",
-            M_IsSend: "1",
-            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-            M_cStatus: map['cstatus'].toString(),
-            M_visitId: int.parse(map['id'].toString()),
-            M_StartDate: map['startDate'].toString(),
-            M_EndDate: map['endDate'].toString(),
-            M_companyName: map['companyName'].toString(),
-            M_MessageType: "notice",
-            M_recordType: map['recordType'].toString(),
-            M_answerContent: map['answerContent'].toString(),
-            M_isSended: 1,
-            M_MessageContent: "您有一条信息已审核",
-          );
-          chatDao.insertNewMessage(notice);
-        } else {
-
-        }
+//          chatDao.insertNewMessage(msg);
+//          ChatMessage notice = new ChatMessage(
+//            M_FriendId: int.parse(map['fromUserId'].toString()),
+//            M_userId: int.parse(map['toUserId'].toString()),
+//            M_Status: "0",
+//            M_IsSend: "1",
+//            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now().add(Duration(seconds: 1))),
+//            M_cStatus: map['cstatus'].toString(),
+//            M_visitId: int.parse(map['id'].toString()),
+//            M_StartDate: map['startDate'].toString(),
+//            M_EndDate: map['endDate'].toString(),
+//            M_companyName: map['companyName'].toString(),
+//            M_MessageType: "notice",
+//            M_recordType: map['recordType'].toString(),
+//            M_answerContent: map['answerContent'].toString(),
+//            M_isSended: 1,
+//            M_MessageContent: "您有一条信息已审核",
+//          );
+//          chatDao.insertNewMessage(notice);
+        } else if (map['type'] == 4) {
+          EventBusUtil().eventBus.fire(FriendCountChangeEvent(map['count']));
+        } else {}
         if (msg == null) {
           debugPrint('插入数据库失败');
         }
@@ -278,7 +310,11 @@ class MessageUtils {
     List<ChatMessage> list = await chatDao.getLatestMessage(userId);
     return list;
   }
-
+  static removeLastestMessage(int friendID) async {
+    ChatDao chatDao=new ChatDao();
+    int count = await chatDao.removeLatestMessage(friendID);
+    return count;
+  }
   //通过FriendID获取未读消息列表
   static getUnreadMessageList(int id) async {
     ChatDao chatDao = new ChatDao();
@@ -289,7 +325,7 @@ class MessageUtils {
   //移除最后一条消息
   static removeLastMessage() async {
     ChatDao chatDao = new ChatDao();
-    int count= await chatDao.removeLastMessage();
+    int count = await chatDao.removeLastMessage();
     return count;
   }
 
@@ -308,18 +344,17 @@ class MessageUtils {
   }
 
   //更新visitID
-  static updateMessageVisitId(int visitID) async{
+  static updateMessageVisitId(int visitID) async {
     ChatDao chatDao = new ChatDao();
-    int count1= await chatDao.updateLastMessageStatus();
-    int count2= await chatDao.updateLastMessageVisitID(visitID);
-    return count1+count2;
+    int count1 = await chatDao.updateLastMessageStatus();
+    int count2 = await chatDao.updateLastMessageVisitID(visitID);
+    return count1 + count2;
   }
 
   //更新最后一条信息的状态为发送成功
   static updateLastMessage() async {
     ChatDao chatDao = new ChatDao();
-    int count= await chatDao.updateLastMessageStatus();
+    int count = await chatDao.updateLastMessageStatus();
     return count;
   }
-
 }

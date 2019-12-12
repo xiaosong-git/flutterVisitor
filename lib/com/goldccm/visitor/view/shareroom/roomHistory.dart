@@ -85,7 +85,7 @@ class RoomHistoryState extends State<RoomHistory> {
                   roomImage: data['room_image'],
                   roomSize: data['room_size'],
                   roomType: data['room_type'],
-                  gate: data['mode'],
+                  gate: data['room_mode'],
                   price: data['price'].toString());
               _roomLists.add(roomOrderInfo);
             }
@@ -188,7 +188,7 @@ class RoomHistoryState extends State<RoomHistory> {
                 tradeNO: data['trade_no'],
                 tradeStatus: data['trade_status'],
                 roomType: data['room_type'],
-                gate: data['mode'],
+                gate: data['room_mode'],
                 price: data['price'].toString());
             _roomLists.add(roomOrderInfo);
           }

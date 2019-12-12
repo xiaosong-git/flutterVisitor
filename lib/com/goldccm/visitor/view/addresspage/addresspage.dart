@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:badges/badges.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
+import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
@@ -30,6 +34,7 @@ import 'package:lpinyin/lpinyin.dart';
 class AddressPage extends StatefulWidget {
   final int type;
   AddressPage({Key key, this.type}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return AddressPageState();
@@ -40,9 +45,9 @@ class AddressPage extends StatefulWidget {
 ///_userModel是Provider管理的变量类
 class AddressPageState extends State<AddressPage> {
   Presenter _presenter = new Presenter();
+  StreamSubscription _friendListSub;
   List<FriendInfo> _userLists = new List<FriendInfo>();
   UserModel _userModel;
-  int _friendRequestNum = 0;
   bool initFlag = false;
   var alphabet = [
     '☀',
@@ -77,7 +82,17 @@ class AddressPageState extends State<AddressPage> {
   @override
   void initState() {
     super.initState();
-    _initRefresh();
+    _handleRefresh();
+    _friendListSub =
+        EventBusUtil().eventBus.on<FriendListEvent>().listen((event) {
+           _handleRefresh();
+        });
+  }
+
+  @override
+  void dispose() {
+    _friendListSub.cancel();
+    super.dispose();
   }
 
   @override
@@ -326,17 +341,6 @@ class AddressPageState extends State<AddressPage> {
 
   Future _handleRefresh() async {
     await _presenter.loadUserList();
-    _friendRequestNum = await BadgeUtil().requestNewFriendCount();
-    setState(() {
-      _userLists = _presenter.getUserList();
-      initFlag = _presenter.getFlag();
-    });
-    return null;
-  }
-
-  Future _initRefresh() async {
-    await _presenter.loadUserList();
-    _friendRequestNum= await BadgeUtil().requestNewFriendCount();
     setState(() {
       _userLists = _presenter.getUserList();
       initFlag = _presenter.getFlag();
@@ -415,32 +419,55 @@ class AddressPageState extends State<AddressPage> {
               Container(
                 child: ListTile(
                   title: Text('新的朋友', textScaleFactor: 1.0),
-                  leading: Container(
+                  leading: Provider.of<BadgeModel>(context)
+                      .badgeInfo
+                      .newFriendRequestCount >
+                      0
+                      ? Badge(
+                    child: Container(
+                      width: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.orange,
+                      ),
+                      child: Image.asset(
+                        "assets/icons/添加新好友@2x.png",
+                        color: Colors.white,
+                        scale: 1.7,
+                      ),
+                    ),
+                    badgeContent: Text(
+                      Provider.of<BadgeModel>(context)
+                          .badgeInfo
+                          .newFriendRequestCount
+                          .toString(),
+                      style: TextStyle(color: Colors.white),
+                      textScaleFactor: 1.0,
+                    ),
+                    badgeColor: Colors.red,
+                  )
+                      : Container(
                     width: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.orange,
                     ),
                     child: Image.asset(
-                            "assets/icons/添加新好友@2x.png",
-                            color: Colors.white,
-                            scale: 1.7,
-                          ),
+                      "assets/icons/添加新好友@2x.png",
+                      color: Colors.white,
+                      scale: 1.7,
+                    ),
                   ),
                   trailing: Image.asset('assets/icons/更多@2x.png', scale: 1.7),
                   onTap: () {
-                    if (_userModel.info.isAuth == "T") {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NewFriendPage(
-                                    userInfo: _userModel.info,
-                                  ))).then((value){
-                                    _handleRefresh();
-                      });
-                    } else {
-                      ToastUtil.showShortClearToast("请先实名认证");
-                    }
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NewFriendPage(
+                              userInfo: _userModel.info,
+                            ))).then((val) {
+                      _handleRefresh();
+                    });
                   },
                 ),
               ),
@@ -463,7 +490,7 @@ class AddressPageState extends State<AddressPage> {
           );
         },
         itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
+          if (index==0) {
             return Column(
               children: <Widget>[
                 Container(
@@ -523,39 +550,46 @@ class AddressPageState extends State<AddressPage> {
                 Container(
                   child: ListTile(
                     title: Text('新的朋友', textScaleFactor: 1.0),
-                    leading:_friendRequestNum > 0
+                    leading: Provider.of<BadgeModel>(context)
+                                .badgeInfo
+                                .newFriendRequestCount >
+                            0
                         ? Badge(
-                      child: Container(
-                        width: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.orange,
-                        ),
-                        child:  Image.asset(
-                          "assets/icons/添加新好友@2x.png",
-                          color: Colors.white,
-                          scale: 1.7,
-                        ),
-                      ),
-                      badgeContent: Text(
-                        _friendRequestNum.toString(),
-                        style: TextStyle(color: Colors.white),
-                        textScaleFactor: 1.0,
-                      ),
-                      badgeColor: Colors.red,
-                    ) :  Container(
-                      width: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.orange,
-                      ),
-                      child:  Image.asset(
-                        "assets/icons/添加新好友@2x.png",
-                        color: Colors.white,
-                        scale: 1.7,
-                      ),
-                    ),
-                    trailing:Image.asset('assets/icons/更多@2x.png', scale: 1.7),
+                            child: Container(
+                              width: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.orange,
+                              ),
+                              child: Image.asset(
+                                "assets/icons/添加新好友@2x.png",
+                                color: Colors.white,
+                                scale: 1.7,
+                              ),
+                            ),
+                            badgeContent: Text(
+                              Provider.of<BadgeModel>(context)
+                                  .badgeInfo
+                                  .newFriendRequestCount
+                                  .toString(),
+                              style: TextStyle(color: Colors.white),
+                              textScaleFactor: 1.0,
+                            ),
+                            badgeColor: Colors.red,
+                          )
+                        : Container(
+                            width: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.orange,
+                            ),
+                            child: Image.asset(
+                              "assets/icons/添加新好友@2x.png",
+                              color: Colors.white,
+                              scale: 1.7,
+                            ),
+                          ),
+                    trailing: Image.asset('assets/icons/更多@2x.png', scale: 1.7),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -581,7 +615,10 @@ class AddressPageState extends State<AddressPage> {
                 Container(
                   color: Colors.white,
                   child: ListTile(
-                    title: Text(_userLists[index].notice),
+                    title: Text(_userLists[index].notice != null &&
+                            _userLists[index].notice != ""
+                        ? _userLists[index].notice
+                        : _userLists[index].name),
                     leading: _userLists[index].virtualImageUrl != null &&
                             _userLists[index].virtualImageUrl != ""
                         ? CircleAvatar(
@@ -627,7 +664,10 @@ class AddressPageState extends State<AddressPage> {
                 Container(
                   color: Colors.white,
                   child: ListTile(
-                    title: Text(_userLists[index].name),
+                    title: Text(_userLists[index].notice != null &&
+                        _userLists[index].notice != ""
+                        ? _userLists[index].notice
+                        : _userLists[index].name),
                     leading: _userLists[index].virtualImageUrl != null &&
                             _userLists[index].virtualImageUrl != ""
                         ? CircleAvatar(
@@ -663,7 +703,10 @@ class AddressPageState extends State<AddressPage> {
             return Container(
               color: Colors.white,
               child: ListTile(
-                title: Text(_userLists[index].name),
+                title: Text(_userLists[index].notice != null &&
+                    _userLists[index].notice != ""
+                    ? _userLists[index].notice
+                    : _userLists[index].name),
                 leading: _userLists[index].virtualImageUrl != null &&
                         _userLists[index].virtualImageUrl != ""
                     ? CircleAvatar(
@@ -736,7 +779,8 @@ class Presenter {
           "threshold": threshold,
           "requestVer": await CommonUtil.getAppVersion(),
         },
-        debugMode: true,userCall: false );
+        debugMode: true,
+        userCall: false);
     if (res is String) {
       Map map = jsonDecode(res);
       if (map['verify']['sign'] == "success") {
@@ -758,12 +802,15 @@ class Presenter {
                 notice: userInfo['remark'],
                 orgId: userInfo['orgId'].toString(),
                 imageServerUrl: _imageUrl,
-                firstZiMu: PinyinHelper.getFirstWordPinyin(userInfo['realName'])
+                firstZiMu: userInfo['realName']!=null?PinyinHelper.getFirstWordPinyin(userInfo['realName'])
                     .substring(0, 1)
-                    .toUpperCase(),
+                    .toUpperCase():"",
               );
               _userlists.add(user);
             }
+          }
+          if(_userlists.length==0){
+            initFlag=true;
           }
           _userlists.sort((a, b) => PinyinHelper.getFirstWordPinyin(a.name)
               .substring(0, 1)

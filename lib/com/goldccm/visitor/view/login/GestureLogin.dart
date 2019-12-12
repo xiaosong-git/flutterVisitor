@@ -14,7 +14,7 @@ import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/UMPushUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'package:visitor/home.dart';
 
 /*
@@ -130,7 +130,7 @@ class GestureLoginState extends State<GestureLogin> {
       "phone": phone,
       "style": "2",
       "sysPwd": _passNum,
-      "deviceToken": await UMPush.getToken(),
+      "deviceToken": await NPush().getClientId(),
       "deviceType": Platform.isAndroid ? 1 : Platform.isIOS ? 2 : 3,
     });
     if (res != null) {
@@ -149,10 +149,10 @@ class GestureLoginState extends State<GestureLogin> {
             new MaterialPageRoute(
                 builder: (BuildContext context) => new MyHomeApp()),
             (Route route) => route == null);
-        ToastUtil.showShortToast(result['verify']['desc']);
+        ToastUtil.showShortToast('登录成功');
         return true;
       } else {
-        ToastUtil.showShortToast('请重新绘制正确的密码');
+        ToastUtil.showShortToast(result['verify']['desc']);
         return false;
       }
     }

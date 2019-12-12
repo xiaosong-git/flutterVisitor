@@ -28,4 +28,10 @@ class FriendInfo{
         this.notice,
         this.companyName,
         this.userId});
+
+  @override
+  String toString() {
+    return 'FriendInfo{name: $name, nickname: $nickname, phone: $phone, realImageUrl: $realImageUrl, virtualImageUrl: $virtualImageUrl, companyName: $companyName, notice: $notice, firstZiMu: $firstZiMu, orgId: $orgId, imageServerUrl: $imageServerUrl, applyType: $applyType, userId: $userId}';
+  }
+
 }

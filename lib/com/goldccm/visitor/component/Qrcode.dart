@@ -22,7 +22,7 @@ class QrcodeState extends State<Qrcode> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     _timer();
     return new Scaffold(
-      backgroundColor: Theme.of(context).appBarTheme.color,
+      backgroundColor: Colors.white,
       appBar: new AppBar(
         elevation: 0,
         centerTitle: true,

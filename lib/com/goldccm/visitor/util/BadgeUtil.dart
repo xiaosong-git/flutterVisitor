@@ -40,7 +40,7 @@ class BadgeUtil{
   init() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
     _badgeInfo.newMessageCount=await getMessageCount(userInfo);
-    _badgeInfo.newFriendRequestCount=await requestNewFriendCount();
+    _badgeInfo.newFriendRequestCount=0;
     _badgeInfo.newVisitCount=await requestConfirmCount();
     _badgeInfo.newNoticeCount=0;
     _badgeInfo.newInviteCount=0;
@@ -122,17 +122,20 @@ class BadgeUtil{
   }
   //获取新消息数量
   Future<int> getMessageCount(UserInfo userInfo) async{
-    _messageCount=0;
+   int  messageCount=0;
     List<ChatMessage> list = await MessageUtils.getLatestMessage(userInfo.id);
     if(list!=null){
       for(var chat in list){
+        print(chat.toString());
         if(chat.unreadCount!=null){
-          _messageCount=_messageCount+chat.unreadCount;
+          if(chat.M_FrealName!=null&&chat.M_FriendId!=null) {
+            messageCount = messageCount + chat.unreadCount;
+          }
         }
       }
     }
-    print(_messageCount);
-    return _messageCount;
+    print(messageCount);
+    return messageCount;
   }
 
  }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:core';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -362,7 +363,7 @@ class HomePageState extends State<HomePage> {
             new Padding(padding: EdgeInsets.only(top: 0.0),child: new Image.asset(imageurl, width: 49, height: 49,)),
             new Padding(
               padding: EdgeInsets.only(top: 4.0),
-              child: new Text(text,textScaleFactor: 1.0, style: new TextStyle(fontSize: 14, fontFamily: '楷体_GB2312',fontWeight: FontWeight.bold),
+              child: new Text(text,textScaleFactor: 1.0, style: new TextStyle(fontSize: 12),
               ),
             ),
           ],
@@ -382,7 +383,7 @@ class HomePageState extends State<HomePage> {
     return new Text(
       noticeContentList[index],textScaleFactor: 1.0,
       style: new TextStyle(
-          fontSize: 14.0, fontFamily: '楷体_GB2312', color: Colors.black,fontWeight: FontWeight.w500),
+          fontSize: 14.0, color: Colors.black,fontWeight: FontWeight.w500),
     );
   }
   getBanner() async {

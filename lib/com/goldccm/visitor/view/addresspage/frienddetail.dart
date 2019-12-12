@@ -1,6 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
+import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/addresspage.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/chat.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -28,7 +38,31 @@ class FriendDetailPageState extends State<FriendDetailPage> {
     super.initState();
     _user = widget.user;
   }
-
+  deleteSingleFriend() async {
+    UserInfo userInfo = await  LocalStorage.load("userInfo");
+    String threshold = await CommonUtil.calWorkKey();
+    var response=await Http().post(Constant.deleteUserFriendUrl,queryParameters: {
+      "token":userInfo.token,
+      "userId":userInfo.id,
+      "factor":CommonUtil.getCurrentTime(),
+      "threshold": threshold,
+      "requestVer": await CommonUtil.getAppVersion(),
+      "friendId":_user.userId,
+    },userCall: true);
+    if(response!=""&&response!=null){
+      if(response is String){
+        Map responseMap = jsonDecode(response);
+        if(responseMap['verify']['sign']=="success"){
+          ToastUtil.showShortClearToast("好友已删除");
+          Navigator.pop(context);
+          Navigator.pop(context);
+          EventBusUtil().eventBus.fire(FriendListEvent(1));
+        }else{
+          ToastUtil.showShortClearToast("删除好友失败");
+        }
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,70 +180,72 @@ class FriendDetailPageState extends State<FriendDetailPage> {
         barrierDismissible: false,
         builder: (context) {
           return new Material(
-            //创建透明层
-            type: MaterialType.transparency, //透明类型
-            child: Container(
-              //保证控件居中效果
-              alignment: Alignment.bottomCenter,
-//              margin: EdgeInsets.all(15.0),
-              child: new SizedBox(
-                height: 120,
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      decoration: ShapeDecoration(
-                        color: Color(0xffffffff),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(0.0),
+            type: MaterialType.transparency,
+            child: Stack(
+              children: <Widget>[
+                GestureDetector(onTap: (){Navigator.pop(context);},),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: new SizedBox(
+                    height: 120,
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          decoration: ShapeDecoration(
+                            color: Color(0xffffffff),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(0.0),
+                              ),
+                            ),
+                          ),
+                          child: new Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 0, bottom: 0),
+                                child: FlatButton(
+                                  onPressed: () async {
+                                    deleteSingleFriend();
+                                  },
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Text('删除',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 18.0, color: Colors.red),
+                                        textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 0,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 0, bottom: 0),
+                                child: FlatButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Text('添加备注',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 18.0, color: Colors.red),
+                                        textScaleFactor: 1.0),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      child: new Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(top: 0, bottom: 0),
-                            child: FlatButton(
-                              onPressed: () async {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                child: Text('删除',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 18.0, color: Colors.red),
-                                    textScaleFactor: 1.0),
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            height: 0,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 0, bottom: 0),
-                            child: FlatButton(
-                              onPressed: () async {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                child: Text('添加备注',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 18.0, color: Colors.red),
-                                    textScaleFactor: 1.0),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              ],
+            )
           );
         });
   }

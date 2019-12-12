@@ -42,10 +42,28 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk {
-            moduleName "app"
             //设置支持的SO库架构
+            //AS调试的时候，使用的是JIT编译模式，需要点击运行下拉菜单中的Edit Configuration...，增加一个参数：--target-platform android-arm，强行指定armeabi-v7a，否则是不能启动的。
+            //flutter build apk时，由于是AOT版本，所以肯定是armeabi-v7a
             abiFilters 'armeabi-v7a'//,'armeabi','arm64-v8a'
         }
+
+        manifestPlaceholders = [
+                GETUI_APP_ID    : "VAnoRfQ8kk69vx2rrR9tS4",
+                GETUI_APP_KEY   : "6oDzNCRD1PAvAE293LLaY9",
+                GETUI_APP_SECRET: "dnYA43YSz16",
+                // 下面是多厂商配置，如需要开通使用请联系技术支持
+                // 如果不需要使用，预留空字段即可
+                XIAOMI_APP_ID   : "2882303761518000997",
+                XIAOMI_APP_KEY  : "5291800098997",
+                MEIZU_APP_ID    : "120513",
+                MEIZU_APP_KEY   : "06e98e15129341508f59fb7523ca60f4",
+                HUAWEI_APP_ID   : "100993753",
+                OPPO_APP_KEY   :  "4b672513adf84c72a08671e3d7820937",
+                OPPO_APP_SECRET  : "89f2c5c6fce04a73aa5a19887b10845a",
+                VIVO_APP_ID   : "",
+                VIVO_APP_KEY  : ""
+        ]
     }
     signingConfigs{
         release{

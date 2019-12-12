@@ -1,3 +1,5 @@
+package example.android.app
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -33,16 +35,15 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.realreflect.flutter_arcface_example"
+        applicationId "com.mycompany.myproject"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
+            moduleName "app"
             //设置支持的SO库架构
-            //AS调试的时候，使用的是JIT编译模式，需要点击运行下拉菜单中的Edit Configuration...，增加一个参数：--target-platform android-arm，强行指定armeabi-v7a，否则是不能启动的。
-            //flutter build apk时，由于是AOT版本，所以肯定是armeabi-v7a
             abiFilters 'armeabi-v7a'//,'armeabi','arm64-v8a'
         }
     }
@@ -62,6 +63,6 @@ flutter {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

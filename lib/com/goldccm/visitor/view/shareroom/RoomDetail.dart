@@ -147,7 +147,6 @@ class RoomDetailState extends State<RoomDetail> {
     }
   }
   removeUnused() async {
-    print("remove");
     RoomInfo roomInfo = widget.roomInfo;
     for(int j = 0;j<_stateList.length;j++){
       for (int i = 0; i < _stateList[j].getList().length; i++) {
@@ -210,6 +209,7 @@ class RoomDetailState extends State<RoomDetail> {
     super.initState();
     getUserInfo();
     getRoomStatus();
+    print(widget.roomInfo);
     _stateList.add(_listState1);
     _stateList.add(_listState2);
     _stateList.add(_listState3);
@@ -507,6 +507,8 @@ class RoomDetailState extends State<RoomDetail> {
         Map map = jsonDecode(res);
         if (map['verify']['sign'] == "success") {
           RoomOrderInfo roomOrderInfo=new RoomOrderInfo(id: int.parse(map['verify']['code']));
+          RoomInfo roomInfo=widget.roomInfo;
+          roomInfo.roomPrice=(double.parse(roomInfo.roomPrice)/2).toString();
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -688,7 +690,6 @@ class RoomDetailState extends State<RoomDetail> {
                 setState(() {
                   bookDate = date;
                   _index = date.difference(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day)).inDays;
-                  print(_index);
                 });
               }, currentTime: DateTime.now(), locale: LocaleType.zh);
             },

@@ -193,6 +193,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.3"
+  flutter_slidable:
+    dependency: "direct main"
+    description:
+      name: flutter_slidable
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.5.4"
   flutter_swiper:
     dependency: "direct main"
     description:
@@ -205,13 +212,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_umpush:
-    dependency: "direct main"
-    description:
-      path: "plugin\\flutter_umpush"
-      relative: true
-    source: path
-    version: "0.0.3"
   flutter_webview_plugin:
     dependency: "direct main"
     description:
@@ -240,6 +240,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.6"
+  getuiflut:
+    dependency: "direct main"
+    description:
+      name: getuiflut
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.7"
   http:
     dependency: transitive
     description:

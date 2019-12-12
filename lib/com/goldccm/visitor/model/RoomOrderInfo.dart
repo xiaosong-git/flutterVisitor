@@ -36,4 +36,9 @@ class RoomOrderInfo<T>{
     this.createTime=json['create_time'];
     this.cancelTime=json['cancle_time'];
   }
+
+  @override
+  String toString() {
+    return 'RoomOrderInfo{id: $id, roomID: $roomID, applyUserID: $applyUserID, applyDate: $applyDate, applyStartTime: $applyStartTime, applyEndTime: $applyEndTime, timeInterval: $timeInterval, recordStatus: $recordStatus, createTime: $createTime, cancelTime: $cancelTime, roomName: $roomName, roomType: $roomType, roomSize: $roomSize, roomIntro: $roomIntro, roomAddress: $roomAddress, roomImage: $roomImage, price: $price, tradeNO: $tradeNO, tradeStatus: $tradeStatus, gate: $gate}';
+  }
 }

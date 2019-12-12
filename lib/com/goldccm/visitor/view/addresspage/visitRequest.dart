@@ -335,7 +335,7 @@ class VisitRequestState extends State<VisitRequest>{
         ), onWillPop:(){
           Navigator.pop(context);
         }),
-        bottomSheet: _visitInfo.userId==user.id.toString()?Container(height:50,child: Text(_visitInfo.cstatus=="applyConfirm"?"审核中":_visitInfo.cstatus=="applySuccess"?"已通过":"未通过",style: TextStyle(fontSize: 24,color: Colors.green)),alignment: Alignment.center,):_visitInfo.cstatus=="applyConfirm"?Container(
+        bottomSheet: _visitInfo.userId==user.id.toString()?Container(height:50,child: Text(_visitInfo.cstatus=="applyConfirm"?DateTime.parse(_visitInfo.endDate).isBefore(DateTime.now())?"已过期":"审核中":_visitInfo.cstatus=="applySuccess"?"已通过":"未通过",style: TextStyle(fontSize: 24,color: Colors.green)),alignment: Alignment.center,):_visitInfo.cstatus=="applyConfirm"?Container(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -452,7 +452,7 @@ class VisitRequestState extends State<VisitRequest>{
         ), onWillPop: (){
           Navigator.pop(context);
         }),
-        bottomSheet:  _visitInfo.visitorId==user.id.toString()?Container(height:50,child: Text(_visitInfo.cstatus=="applyConfirm"?"审核中":_visitInfo.cstatus=="applySuccess"?"已通过":"未通过",style: TextStyle(fontSize: 24,color: Colors.green),textScaleFactor: 1.0),alignment: Alignment.center,):_visitInfo.cstatus=="applyConfirm"?Container(
+        bottomSheet:  _visitInfo.visitorId==user.id.toString()?Container(height:50,child: Text(_visitInfo.cstatus=="applyConfirm"?DateTime.parse(_visitInfo.endDate).isBefore(DateTime.now())?"已过期":"审核中":_visitInfo.cstatus=="applySuccess"?"已通过":"未通过",style: TextStyle(fontSize: 24,color: Colors.green),textScaleFactor: 1.0),alignment: Alignment.center,):_visitInfo.cstatus=="applyConfirm"?Container(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[

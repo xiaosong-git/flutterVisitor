@@ -144,7 +144,7 @@ class InviteListState extends State<InviteList>
 
   //审核邀约
   adoptAndReject(VisitInfo info, int index) async {
-    String url = Constant.serverUrl + "visitorRecord/adoptionAndRejection";
+    String url = Constant.serverUrl + "visitorRecord/visitReply";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: ({
@@ -351,13 +351,14 @@ class InviteListState extends State<InviteList>
             if (DateTime.parse(_mineInviteLists[index].endDate)
                 .isBefore(DateTime.now())) {
               ToastUtil.showShortClearToast("访问记录已过期");
+            }else{
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => VisitDetail(
+                        visitInfo: _mineInviteLists[index],
+                      )));
             }
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => VisitDetail(
-                          visitInfo: _mineInviteLists[index],
-                        )));
           },
         );
       },
@@ -475,13 +476,13 @@ class InviteListState extends State<InviteList>
           onTap: () {
             if (DateTime.parse(_whoInviteMeLists[index].endDate)
                 .isBefore(DateTime.now())) {
-              ToastUtil.showShortClearToast("访问记录已过期");
+              ToastUtil.showShortClearToast("邀约记录已过期");
             } else if (_whoInviteMeLists[index].cstatus == "applyConfirm") {
               showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
                         title: Text(
-                          '访问审核',
+                          '邀约审核',
                           textScaleFactor: 1.0,
                         ),
                         content: StatefulBuilder(
@@ -492,7 +493,7 @@ class InviteListState extends State<InviteList>
                                 children: <Widget>[
                                   ListTile(
                                     title: Text(
-                                      '访问地址',
+                                      '邀约地址',
                                       textScaleFactor: 1.0,
                                     ),
                                     subtitle: Text(
@@ -505,7 +506,7 @@ class InviteListState extends State<InviteList>
                                   ),
                                   ListTile(
                                     title: Text(
-                                      '访问理由',
+                                      '邀约理由',
                                       textScaleFactor: 1.0,
                                     ),
                                     subtitle: Text(

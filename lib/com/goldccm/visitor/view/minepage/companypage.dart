@@ -174,6 +174,7 @@ class CompanyPageState extends State<CompanyPage>{
             if (data['companyId'] == userInfo.companyId) {
               userInfo.companyId=data['companyId'];
               userInfo.companyName=data['companyName'];
+              userInfo.role=data['roleType'];
               DataUtils.updateUserInfo(userInfo);
               Provider.of<UserModel>(context).init(userInfo);
               LocalStorage.save("userInfo",userInfo);
@@ -206,6 +207,7 @@ class CompanyPageState extends State<CompanyPage>{
         groupValue=v;
         userInfo.companyId=_keys[v]['companyId'];
         userInfo.companyName=_keys[v]['companyName'];
+        userInfo.role=_keys[v]['roleType'];
         DataUtils.updateUserInfo(userInfo);
         Provider.of<UserModel>(context).init(userInfo);
         LocalStorage.save("userInfo",userInfo);

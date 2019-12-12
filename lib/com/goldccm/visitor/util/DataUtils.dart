@@ -14,6 +14,7 @@ class DataUtils {
   static final String SP_IDTYPE = "IDTYPE";
   static final String SP_IDNO = "IDNO";
   static final String SP_PHONE = "PHONE";
+  static final String SP_ROLE = "ROLE";
   static final String SP_ISAUTH = "ISAUTH";
   static final String SP_TOKEN = "TOKEN";
   static final String SP_ISSETTRANSPWD = "ISSETTRANSPWD";
@@ -92,6 +93,7 @@ class DataUtils {
       await sp.setString(SP_ISSETTRANSPWD, isSetTransPwd);
       await sp.setInt(SP_COMPANYID, companyId);
       await sp.setInt(SP_ID, id);
+      await sp.setString(SP_ROLE, role);
       await sp.setString(SP_WORKKEY, workKey);
       await sp.setString(SP_COMPANYNAME, companyName);
       await sp.setString(SP_IDHANDLEIMGURL, idHandleImgUrl);
