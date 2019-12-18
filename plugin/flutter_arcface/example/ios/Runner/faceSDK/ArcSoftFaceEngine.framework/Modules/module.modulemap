@@ -1,6 +1,0 @@
-framework module ArcSoftFaceEngine {
-  umbrella header "ArcSoftFaceEngine.h"
-
-  export *
-  module * { export * }
-}
