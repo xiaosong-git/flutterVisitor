@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -457,8 +458,12 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget _buildItemImage(BuildContext context, int index) {
-    return Image.network(
-      Constant.imageServerUrl + imageList[index],
+    return CachedNetworkImage(
+      imageUrl: Constant.imageServerUrl + imageList[index],
+      placeholder: (context, url) =>
+          CircularProgressIndicator(),
+      errorWidget: (context, url, error) =>
+          Icon(Icons.error),
       fit: BoxFit.cover,
     );
   }

@@ -60,6 +60,7 @@ dependencies:
   flutter_slidable: ^0.5.4
   getuiflut: ^0.1.7
   cached_network_image: ^2.0.0-rc
+  transparent_image: ^1.0.0
 
   permission_handler:
     path: plugin/flutter_permission_handler

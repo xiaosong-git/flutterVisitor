@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/db/friendDao.dart';
@@ -83,19 +84,22 @@ class AddressPageState extends State<AddressPage> {
     super.initState();
     initAddress();
     _handleRefresh();
-    _friendListSub = EventBusUtil().eventBus.on<FriendListEvent>().listen((event) {
-           _handleRefresh();
-        });
+    _friendListSub =
+        EventBusUtil().eventBus.on<FriendListEvent>().listen((event) {
+      _handleRefresh();
+    });
   }
+
   initAddress() async {
-    FriendDao friendDao=FriendDao();
-    List<FriendInfo> lists=await friendDao.getFriendInfo();
-    if(lists.length>0){
+    FriendDao friendDao = FriendDao();
+    List<FriendInfo> lists = await friendDao.getFriendInfo();
+    if (lists.length > 0) {
       setState(() {
-        _userLists=lists;
+        _userLists = lists;
       });
     }
   }
+
   @override
   void dispose() {
     _friendListSub.cancel();
@@ -427,52 +431,53 @@ class AddressPageState extends State<AddressPage> {
                 child: ListTile(
                   title: Text('新的朋友', textScaleFactor: 1.0),
                   leading: Provider.of<BadgeModel>(context)
-                      .badgeInfo
-                      .newFriendRequestCount >
-                      0
+                              .badgeInfo
+                              .newFriendRequestCount >
+                          0
                       ? Badge(
-                    child: Container(
-                      width: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.orange,
-                      ),
-                      child: Image.asset(
-                        "assets/icons/user_addfriend.png",
-                        color: Colors.white,
-                        scale: 1.7,
-                      ),
-                    ),
-                    badgeContent: Text(
-                      Provider.of<BadgeModel>(context)
-                          .badgeInfo
-                          .newFriendRequestCount
-                          .toString(),
-                      style: TextStyle(color: Colors.white),
-                      textScaleFactor: 1.0,
-                    ),
-                    badgeColor: Colors.red,
-                  )
+                          child: Container(
+                            width: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.orange,
+                            ),
+                            child: Image.asset(
+                              "assets/icons/user_addfriend.png",
+                              color: Colors.white,
+                              scale: 1.7,
+                            ),
+                          ),
+                          badgeContent: Text(
+                            Provider.of<BadgeModel>(context)
+                                .badgeInfo
+                                .newFriendRequestCount
+                                .toString(),
+                            style: TextStyle(color: Colors.white),
+                            textScaleFactor: 1.0,
+                          ),
+                          badgeColor: Colors.red,
+                        )
                       : Container(
-                    width: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.orange,
-                    ),
-                    child: Image.asset(
-                      "assets/icons/user_addfriend.png",
-                      color: Colors.white,
-                      scale: 1.7,
-                    ),
-                  ),
-                  trailing: Image.asset('assets/icons/app_more.png', scale: 1.7),
+                          width: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.orange,
+                          ),
+                          child: Image.asset(
+                            "assets/icons/user_addfriend.png",
+                            color: Colors.white,
+                            scale: 1.7,
+                          ),
+                        ),
+                  trailing:
+                      Image.asset('assets/icons/app_more.png', scale: 1.7),
                   onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => NewFriendPage(
-                              userInfo: _userModel.info,
-                            ))).then((val) {
+                                  userInfo: _userModel.info,
+                                ))).then((val) {
                       _handleRefresh();
                     });
                   },
@@ -497,7 +502,7 @@ class AddressPageState extends State<AddressPage> {
           );
         },
         itemBuilder: (BuildContext context, int index) {
-          if (index==0) {
+          if (index == 0) {
             return Column(
               children: <Widget>[
                 Container(
@@ -596,7 +601,8 @@ class AddressPageState extends State<AddressPage> {
                               scale: 1.7,
                             ),
                           ),
-                    trailing: Image.asset('assets/icons/app_more.png', scale: 1.7),
+                    trailing:
+                        Image.asset('assets/icons/app_more.png', scale: 1.7),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -612,6 +618,66 @@ class AddressPageState extends State<AddressPage> {
                 Divider(
                   height: 0,
                 ),
+                Container(
+                  color: Colors.white,
+                  height: 40,
+                  child: ListTile(
+                    title: Text(_userLists[index].firstZiMu),
+                  ),
+                ),
+                Container(
+                  color: Colors.white,
+                  child: ListTile(
+                    title: Text(_userLists[index].notice != null &&
+                            _userLists[index].notice != ""
+                        ? _userLists[index].notice
+                        : _userLists[index].name),
+                    leading: _userLists[index].virtualImageUrl != null &&
+                            _userLists[index].virtualImageUrl != ""
+                        ? CachedNetworkImage(
+                            imageUrl: Constant.imageServerUrl +
+                                _userLists[index].virtualImageUrl,
+                            imageBuilder: (context, imageProvider) =>
+                                CircleAvatar(backgroundImage: imageProvider),
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          )
+                        : _userLists[index].realImageUrl != null &&
+                                _userLists[index].realImageUrl != ""
+                            ? CachedNetworkImage(
+                                imageUrl: Constant.imageServerUrl +
+                                    _userLists[index].realImageUrl,
+                                imageBuilder: (context, imageProvider) =>
+                                    CircleAvatar(
+                                        backgroundImage: imageProvider),
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              )
+                            : CircleAvatar(
+                                backgroundImage: AssetImage(
+                                    "assets/images/visitor_icon_head.png"),
+                              ),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FriendDetailPage(
+                                    user: _userLists[index],
+                                    type: widget.type,
+                                  )));
+                    },
+                  ),
+                )
+              ],
+            );
+          } else if (_userLists[index].firstZiMu !=
+              _userLists[index - 1].firstZiMu) {
+            return Column(
+              children: <Widget>[
                 Container(
                   color: Colors.white,
                   height: 40,
@@ -657,61 +723,12 @@ class AddressPageState extends State<AddressPage> {
                 )
               ],
             );
-          } else if (_userLists[index].firstZiMu !=
-              _userLists[index - 1].firstZiMu) {
-            return Column(
-              children: <Widget>[
-                Container(
-                  color: Colors.white,
-                  height: 40,
-                  child: ListTile(
-                    title: Text(_userLists[index].firstZiMu),
-                  ),
-                ),
-                Container(
-                  color: Colors.white,
-                  child: ListTile(
-                    title: Text(_userLists[index].notice != null &&
-                        _userLists[index].notice != ""
-                        ? _userLists[index].notice
-                        : _userLists[index].name),
-                    leading: _userLists[index].virtualImageUrl != null &&
-                            _userLists[index].virtualImageUrl != ""
-                        ? CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                Constant.imageServerUrl +
-                                    _userLists[index].virtualImageUrl),
-                          )
-                        : _userLists[index].realImageUrl != null &&
-                                _userLists[index].realImageUrl != ""
-                            ? CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    Constant.imageServerUrl +
-                                        _userLists[index].realImageUrl),
-                              )
-                            : CircleAvatar(
-                                backgroundImage: AssetImage(
-                                    "assets/images/visitor_icon_head.png"),
-                              ),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => FriendDetailPage(
-                                    user: _userLists[index],
-                                    type: widget.type,
-                                  )));
-                    },
-                  ),
-                )
-              ],
-            );
           } else {
             return Container(
               color: Colors.white,
               child: ListTile(
                 title: Text(_userLists[index].notice != null &&
-                    _userLists[index].notice != ""
+                        _userLists[index].notice != ""
                     ? _userLists[index].notice
                     : _userLists[index].name),
                 leading: _userLists[index].virtualImageUrl != null &&
@@ -765,9 +782,8 @@ class Presenter {
     return _imageUrl;
   }
 
-
   loadUserList() async {
-    FriendDao friendDao=FriendDao();
+    FriendDao friendDao = FriendDao();
     userlists.clear();
     UserInfo user = await LocalStorage.load("userInfo");
     _imageUrl = await DataUtils.getPararInfo("imageServerUrl");
@@ -805,21 +821,23 @@ class Presenter {
                 userId: userInfo['id'],
                 orgId: userInfo['orgId'].toString(),
                 imageServerUrl: _imageUrl,
-                firstZiMu: userInfo['realName']!=null?PinyinHelper.getFirstWordPinyin(userInfo['realName'])
-                    .substring(0, 1)
-                    .toUpperCase():"",
+                firstZiMu: userInfo['realName'] != null
+                    ? PinyinHelper.getFirstWordPinyin(userInfo['realName'])
+                        .substring(0, 1)
+                        .toUpperCase()
+                    : "",
                 applyType: userInfo['applyType'],
                 lastMessageId: null,
               );
               userlists.add(user);
-              bool isExist=await friendDao.isExist(user.userId);
-              if(!isExist){
+              bool isExist = await friendDao.isExist(user.userId);
+              if (!isExist) {
                 friendDao.insertFriendInfo(user);
               }
             }
           }
-          if(userlists.length==0){
-            initFlag=true;
+          if (userlists.length == 0) {
+            initFlag = true;
           }
           userlists.sort((a, b) => PinyinHelper.getFirstWordPinyin(a.name)
               .substring(0, 1)

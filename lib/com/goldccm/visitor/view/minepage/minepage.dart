@@ -314,18 +314,19 @@ class MinePageState extends State<MinePage> {
                                                 HeadImagePage()));
                                   }
                                 },
-                                child: CircleAvatar(
-                                  backgroundImage: userProvider
-                                              .info.headImgUrl !=
-                                          null
-                                      ? NetworkImage(
-                                          Constant.imageServerUrl +
-                                              (userProvider.info.headImgUrl),
-                                        )
-                                      : AssetImage(
-                                          'assets/images/visitor_icon_account.png'),
-                                  radius: 100,
-                                ),
+                                child:
+                                  CachedNetworkImage(
+                                          imageUrl: Constant.imageServerUrl +
+                                              userProvider.info.headImgUrl,
+                                          placeholder: (context, url) =>
+                                              CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
+                                          imageBuilder: (context,imageProvider)=>CircleAvatar(
+                                            backgroundImage: imageProvider,
+                                            radius: 100,
+                                          ),
+                                  )
                               ),
                               width: 60.0,
                               margin: EdgeInsets.all(20),

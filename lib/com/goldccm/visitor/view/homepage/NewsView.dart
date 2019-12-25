@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/model/NewsInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
@@ -24,10 +25,19 @@ class NewsView extends StatelessWidget {
             child: new Container(
               height: 120,
               padding: EdgeInsets.all(10),
-              child: new Image.network(
-                Constant.imageServerUrl + newsInfo.newsImageUrl,
+              child:CachedNetworkImage(
+                imageUrl: Constant.imageServerUrl + newsInfo.newsImageUrl,
+                placeholder: (context, url) =>Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  width: 10,
+                  height: 10,
+                  alignment: Alignment.center,
+                ),
+
+                errorWidget: (context, url, error) =>
+                    Icon(Icons.error),
                 fit: BoxFit.cover,
-              ),
+              )
             ),
           ),
           new Expanded(
