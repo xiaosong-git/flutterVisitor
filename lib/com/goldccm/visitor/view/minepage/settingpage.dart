@@ -332,7 +332,7 @@ class SettingPageState extends State<SettingPage> {
   }
   outLogin() async {
     UserInfo user=await LocalStorage.load("userInfo");
-    String url =Constant.serverUrl+"app/quit";
+    String url ="app/quit";
     String threshold = await CommonUtil.calWorkKey(userInfo: user);
     var res = await Http().post(url,queryParameters: {
       "token": user.token,

@@ -1,22 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
-import 'package:visitor/com/goldccm/visitor/model/QrcodeMode.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
-import 'package:visitor/com/goldccm/visitor/util/DesUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/QrcodeHandler.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/visitDetail.dart';
 
 /*
  * 个人中心 邀约界面
  * 查看邀约我的人和我要邀约的人
- * creator:ody997
- * email:hwk@growingpine.com
  * create_time:2019/10/23
     */
 class InviteList extends StatefulWidget {
@@ -56,7 +49,7 @@ class InviteListState extends State<InviteList>
 
   //获取我的邀约列表
   getSentInviteLists() async {
-    String url = Constant.serverUrl + "visitorRecord/inviteRecord/1/100";
+    String url =  "visitorRecord/inviteRecord/1/100";
     String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
     var res = await Http().post(url,
         queryParameters: ({
@@ -100,7 +93,7 @@ class InviteListState extends State<InviteList>
 
   //获取审核邀约列表
   getReceivedInviteLists() async {
-    String url = Constant.serverUrl + "visitorRecord/inviteRecord/1/100";
+    String url = "visitorRecord/inviteMine/1/100";
     String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
     var res = await Http().post(url,
         queryParameters: ({
@@ -131,9 +124,7 @@ class InviteListState extends State<InviteList>
             companyName: data['companyName'],
             id: data['id'].toString(),
           );
-          if (data['userId'] == widget.userInfo.id) {
             _whoInviteMeLists.add(visitInfo);
-          }
         }
         setState(() {});
       } else {
@@ -144,7 +135,7 @@ class InviteListState extends State<InviteList>
 
   //审核邀约
   adoptAndReject(VisitInfo info, int index) async {
-    String url = Constant.serverUrl + "visitorRecord/visitReply";
+    String url ="visitorRecord/visitReply";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: ({

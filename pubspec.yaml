@@ -10,7 +10,7 @@ description: 朋悦比邻
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.2.7+19
+version: 3.2.8+20
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -23,26 +23,28 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  shared_preferences: ^0.5.3+1
+  shared_preferences: ^0.5.5
   dio: ^2.1.0
-  crypto: ^2.0.6
-  package_info: ^0.4.0+2
-  gesture_password: ^0.0.4
+  crypto: ^2.1.3
+  package_info: ^0.4.0+13
+  gesture_password: ^0.0.6
   fluttertoast: ^3.1.0
   flutter_swiper: ^1.1.6
-  qr_flutter: ^2.1.0+55
-  url_launcher: ^5.1.3
-  flutter_webview_plugin: ^0.3.9+1
-  flutter_datetime_picker: ^1.2.4
+  qr_flutter: ^3.1.0
+  url_launcher: ^5.4.1
+  flutter_webview_plugin: ^0.3.10
+  flutter_datetime_picker: ^1.3.1
   flutter_cupertino_date_picker: ^1.0.3
-  sqflite: ^1.1.6+1
-  web_socket_channel: ^1.0.14
-  flutter_local_notifications: ^0.7.1+3
+  sqflite: ^1.2.0
+  web_socket_channel: ^1.1.0
+  flutter_local_notifications: ^0.9.0+1
   path_provider: ^1.1.2
   provider: ^3.0.0+1
-  city_pickers: ^0.1.23
+  city_pickers:
+    git:
+      url: https://github.com/hanxu317317/city_pickers.git
   contacts_service: ^0.2.9
-  intl: ^0.15.8
+  intl: ^0.16.0
   audioplayers: ^0.13.2
   badges: ^1.1.0
   date_range_picker: ^1.0.5
@@ -51,17 +53,18 @@ dependencies:
   flutter_exif_rotation: ^0.2.4
   flutter_des: ^1.1.0
   table_calendar: ^2.1.0
-  amap_location_fluttify: ^0.2.6+10e2842
-  extended_image: ^0.6.5
-  image_picker: ^0.6.1+11
+  amap_location_fluttify: ^0.6.0+acdcd89
+  extended_image: ^0.6.8
+  image_picker: ^0.6.2+3
   event_bus: ^1.1.0
   flutter_slidable: ^0.5.4
-  getuiflut: ^0.1.6
+  getuiflut: ^0.1.7
+  cached_network_image: ^2.0.0-rc
 
   permission_handler:
     path: plugin/flutter_permission_handler
-  flutter_arcface:
-    path: plugin/flutter_arcface
+#  flutter_arcface:
+#    path: plugin/flutter_arcface
   image_picker_saver:
     path: plugin/image_picker_saver
 
@@ -84,34 +87,34 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/audio/message.mp3
-    - assets/icons/门禁卡icon@2x.png
-    - assets/icons/会议室icon@2x.png
-    - assets/icons/发起访问icon@2x.png
-    - assets/icons/访客二维码icon@2x.png
-    - assets/icons/实名认证V.png
-    - assets/icons/全部icon@2x.png
-    - assets/icons/消息@2x.png
-    - assets/icons/安全管理@2x.png
-    - assets/icons/设置@2x.png
+    - assets/icons/visitor_person_card.png
+    - assets/icons/shareroom_meetingroom.png
+    - assets/icons/visit_fastvisit.png
+    - assets/icons/visit_qrcode.png
+    - assets/icons/user_verify.png
+    - assets/icons/more_function.png
+    - assets/icons/notice_message.png
+    - assets/icons/user_safe_setting.png
+    - assets/icons/user_setting.png
     - assets/icons/gengduo@2x.png
-    - assets/icons/添加新好友@2x.png
-    - assets/icons/更多@2x.png
-    - assets/icons/公司管理@2x.png
-    - assets/icons/手势密码用户@2x.png
-    - assets/icons/预定成功@2x.png
-    - assets/icons/大楼.png
-    - assets/icons/茶室.png
-    - assets/icons/添加@2x.png
-    - assets/icons/新的好友@2x.png
-    - assets/icons/启动图片.png
-    - assets/icons/跳转图片.png
-    - assets/icons/支付宝logo.png
-    - assets/icons/Logo跳转图片.png
-    - assets/icons/好友.png
-    - assets/icons/邀约.png
-    - assets/icons/访问.png
-    - assets/icons/审核.png
-    - assets/icons/考勤打卡.png
+    - assets/icons/user_addfriend.png
+    - assets/icons/app_more.png
+    - assets/icons/user_company_setting.png
+    - assets/icons/user_gesture.png
+    - assets/icons/shareroom_booking_success.png
+    - assets/icons/building.png
+    - assets/icons/shareroom_tearoom.png
+    - assets/icons/app_add.png
+    - assets/icons/app_newfriend.png
+    - assets/icons/app_splash.png
+    - assets/icons/visit_invite.png
+    - assets/icons/app_alipay_logo.png
+    - assets/icons/logo_splash.png
+    - assets/icons/app_friend.png
+    - assets/icons/app_invite.png
+    - assets/icons/app_visit.png
+    - assets/icons/app_view.png
+    - assets/icons/app_attend.png
     - assets/icons/attendance_rule_verify.png
     - assets/icons/attendance_check.png
     - assets/icons/attendance_check_verify.png

@@ -39,19 +39,16 @@ class SharedPreferenceUtil {
     int num = sp.getInt(ACCOUNT_NUMBER) ?? 0;
     for (int i = 0; i < num; i++) {
       String username = sp.getString("$USERNAME$i");
-      String password = sp.getString("$PASSWORD$i");
-      //list.add(UserInfo(username, password));
+      list.add(UserInfo(loginName: username));
     }
     return list;
   }
 
   ///保存账号列表
   static saveUsers(List<UserInfo> users, SharedPreferences sp){
-    sp.clear();
     int size = users.length;
     for (int i = 0; i < size; i++) {
       sp.setString("$USERNAME$i", users[i].loginName);
-      //sp.setString("$PASSWORD$i", users[i]);
     }
     sp.setInt(ACCOUNT_NUMBER, size);
   }

@@ -3,7 +3,6 @@ import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
-import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'CommonUtil.dart';
 import 'MessageUtils.dart';
@@ -73,7 +72,7 @@ class BadgeUtil{
   }
   request(String method) async {
     int count=0;
-    String url = Constant.serverUrl+method;
+    String url =method;
     UserInfo userInfo = await LocalStorage.load("userInfo");
     String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
     var res = await Http().post(url,queryParameters:({
@@ -98,7 +97,7 @@ class BadgeUtil{
   Future<int> requestNewFriendCount() async{
     String method = "userFriend/beAgreeingFriendList";
     int count=0;
-    String url = Constant.serverUrl+method;
+    String url = method;
     UserInfo userInfo = await LocalStorage.load("userInfo");
         String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
         var res = await Http().post(url,queryParameters:({

@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:amap_location_fluttify/amap_location_fluttify.dart';
-import 'package:flutter_arcface/flutter_arcface.dart';
+//import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -41,7 +41,7 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
         actions: <Widget>[
           IconButton(
               icon: Image.asset(
-                "assets/icons/添加新好友@2x.png",
+                "assets/icons/user_addfriend.png",
                 scale: 2.0,
               ),
               onPressed: () {
@@ -88,17 +88,17 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
   }
   //获取当前经纬度
   void initVariables()async{
-    if(await requestPermission()){
-      AmapLocation.startLocation(
-          once: true,
-          locationChanged: (location) async {
-            _location=location;
-            shownAddress=await location.address;
-            setState(() {
-
-            });
-          });
-    }
+//    if(await requestPermission()){
+//      AmapLocation.startLocation(
+//          once: true,
+//          locationChanged: (location) async {
+//            _location=location;
+//            shownAddress=await location.address;
+//            setState(() {
+//
+//            });
+//          });
+//    }
   }
   void appbarMore(){
     showDialog(
@@ -155,7 +155,7 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
                                             width: 20,
                                             height: MediaQuery.of(context).size.height / 15,
                                             padding: EdgeInsets.only(top: 5),
-                                            child: Image.asset('assets/icons/添加@2x.png', scale: 2.0,),
+                                            child: Image.asset('assets/icons/app_add.png', scale: 2.0,),
                                           ),
                                         ),
                                       ],
@@ -194,7 +194,7 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
                                             width: 20,
                                             height: MediaQuery.of(context).size.height / 15,
                                             padding: EdgeInsets.only(top: 5),
-                                            child: Image.asset('assets/icons/新的好友@2x.png', scale: 2.0,),
+                                            child: Image.asset('assets/icons/app_newfriend.png', scale: 2.0,),
                                           ),
                                         ),
                                       ],
@@ -233,7 +233,7 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
                                             width: 20,
                                             height: MediaQuery.of(context).size.height / 15,
                                             padding: EdgeInsets.only(top: 5),
-                                            child: Image.asset('assets/icons/新的好友@2x.png', scale: 2.0,),
+                                            child: Image.asset('assets/icons/app_newfriend.png', scale: 2.0,),
                                           ),
                                         ),
                                       ],
@@ -266,15 +266,15 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
     UserInfo userInfo=await LocalStorage.load("userInfo");
     if(_currentPhoto!=null){
       print(_currentPhoto.path);
-      var result=await FlutterArcface.singleImage(path: _currentPhoto.path);
-      print(result);
+//      var result=await FlutterArcface.singleImage(path: _currentPhoto.path);
+//      print(result);
       SharedPreferences sp = await SharedPreferences.getInstance();
       String head=sp.getString("headPhoto");
       if(head==null){
 //        var filepath=await saveNetworkImageToPhoto(Constant.imageServerUrl+userInfo.idHandleImgUrl);
 //        await sp.setString("headPhoto",filepath);
       }else{
-        String url = Constant.serverUrl+"";
+        String url = "";
       }
     }else{
       ToastUtil.showShortToast("头像检测失败");

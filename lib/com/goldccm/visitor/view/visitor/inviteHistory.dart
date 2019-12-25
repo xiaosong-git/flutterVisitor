@@ -7,9 +7,6 @@ import 'package:visitor/com/goldccm/visitor/model/QrcodeMode.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
-import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
-import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/QrcodeHandler.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 
@@ -99,7 +96,7 @@ class InviteHistoryState extends State<InviteHistory>{
     if (!isPerformingRequest) {
       Future.delayed(Duration(seconds: 1), () async {
         setState(() => isPerformingRequest = true);
-        String url = Constant.serverUrl + "visitorRecord/inviteRecord/$count/10";
+        String url = "visitorRecord/inviteRecord/$count/10";
         String threshold = await CommonUtil.calWorkKey();
         var res = await Http().post(url,
             queryParameters: ({

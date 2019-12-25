@@ -56,7 +56,7 @@ class NewsView extends StatelessWidget {
                           ),
                     ),
                     new Container(
-                        height: 70,
+                        height: 75,
                         child: (new Padding(
                             padding: const EdgeInsets.only(
                               top: 5.0,
@@ -75,7 +75,7 @@ class NewsView extends StatelessWidget {
                     new Row(children: <Widget>[
                       new Padding(
                           padding: const EdgeInsets.only(
-                            top: 0.0,
+                            top: 5.0,
                             left: 10.0,
                           ),
                           child: new Text(newsInfo.newsDate,

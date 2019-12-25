@@ -42,7 +42,7 @@ class AddFriendPageState extends State<AddFriendPage>{
       ToastUtil.showShortClearToast("手机号码不正确");
       return ;
     }
-    String url = Constant.serverUrl+"userFriend/addFriendByPhoneAndUser";
+    String url ="userFriend/addFriendByPhoneAndUser";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
       "token": _userInfo.token,

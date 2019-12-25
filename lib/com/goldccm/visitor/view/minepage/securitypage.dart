@@ -73,7 +73,7 @@ class SecurityPageState extends State<SecurityPage> {
                         textScaleFactor: 1.0,
                       )
                     : Text(""),
-                Image.asset('assets/icons/更多@2x.png', scale: 2.0),
+                Image.asset('assets/icons/app_more.png', scale: 2.0),
               ],
             ),
             onTap: () {
@@ -88,7 +88,7 @@ class SecurityPageState extends State<SecurityPage> {
                     fontSize: Constant.normalFontSize,
                     fontWeight: FontWeight.w600),
                 textScaleFactor: 1.0),
-            trailing: Image.asset('assets/icons/更多@2x.png', scale: 2.0),
+            trailing: Image.asset('assets/icons/app_more.png', scale: 2.0),
             onTap: () {
               Navigator.push(
                   context,
@@ -104,7 +104,7 @@ class SecurityPageState extends State<SecurityPage> {
                     fontSize: Constant.normalFontSize,
                     fontWeight: FontWeight.w600),
                 textScaleFactor: 1.0),
-            trailing: Image.asset('assets/icons/更多@2x.png', scale: 2.0),
+            trailing: Image.asset('assets/icons/app_more.png', scale: 2.0),
             onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ChangeGesturePage()));
@@ -269,7 +269,7 @@ class ChangePhonePageState extends State<ChangePhonePage> {
 
   ///发送验证码
   sendCode() async {
-    String url = Constant.serverUrl + Constant.sendCodeUrl;
+    String url = Constant.sendCodeUrl;
     String phone = phoneController.text;
     String type = "1";
     if (phone == null || phone == "") {
@@ -294,7 +294,7 @@ class ChangePhonePageState extends State<ChangePhonePage> {
 
   ///提交
   updatePhone() async {
-    String url = Constant.serverUrl + Constant.updatePhoneUrl;
+    String url = Constant.updatePhoneUrl;
     String phone = phoneController.text;
     String threshold = await CommonUtil.calWorkKey();
     String code = codeController.text;
@@ -540,7 +540,7 @@ class ChangePwdPageState extends State<ChangePwdPage> {
       ToastUtil.showShortToast("两次密码不一致");
       return;
     }
-    String url = Constant.serverUrl + Constant.updatePwdUrl;
+    String url =  Constant.updatePwdUrl;
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: {
@@ -709,7 +709,7 @@ class UpdateGesturePageState extends State<UpdateGesturePage> {
           Container(
             child: Center(
               child: Image.asset(
-                "assets/icons/手势密码用户@2x.png",
+                "assets/icons/user_gesture.png",
                 scale: 1.7,
               ),
             ),
@@ -801,7 +801,7 @@ class UpdateGesturePageState extends State<UpdateGesturePage> {
 
   Future _updateGesPwd() async {
     LoadingDialog().show(context, '请等待');
-    String url = Constant.serverUrl + Constant.updateGesturePwdUrl;
+    String url =  Constant.updateGesturePwdUrl;
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: {
@@ -887,7 +887,7 @@ class GesturePageState extends State<GesturePage> {
           Container(
             child: Center(
               child: Image.asset(
-                "assets/icons/手势密码用户@2x.png",
+                "assets/icons/user_gesture.png",
                 scale: 1.7,
               ),
             ),
@@ -972,7 +972,7 @@ class GesturePageState extends State<GesturePage> {
 
   Future _setGesPwd() async {
     LoadingDialog().show(context, '请等待');
-    String url = Constant.serverUrl + Constant.setGesturePwdUrl;
+    String url = Constant.setGesturePwdUrl;
     String threshold = await CommonUtil.calWorkKey();
     String pwd = Md5Util().encryptByMD5ByHex(repeatStr);
     var res = await Http().post(url,

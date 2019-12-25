@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -100,6 +102,9 @@ class NewFriendPageState extends State<NewFriendPage> {
     Provider.of<BadgeModel>(context).update(badgeInfo);
     await loadFriend(_userInfo, str);
     await loadRequest(_userInfo);
+    setState(() {
+
+    });
     return null;
   }
 
@@ -137,7 +142,7 @@ class NewFriendPageState extends State<NewFriendPage> {
   }
 
   addFriend(String name, String phone, UserInfo user) async {
-    String url = Constant.serverUrl + "userFriend/addFriendByPhoneAndUser";
+    String url = "userFriend/addFriendByPhoneAndUser";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
       "token": user.token,
@@ -156,7 +161,7 @@ class NewFriendPageState extends State<NewFriendPage> {
 
   Future loadFriend(UserInfo user, String str) async {
     _friends.clear();
-    String url = Constant.serverUrl + "userFriend/findIsUserByPhone";
+    String url ="userFriend/findIsUserByPhone";
     String threshold = await CommonUtil.calWorkKey();
     if (str != "") {
       var res = await Http().post(url,
@@ -195,7 +200,7 @@ class NewFriendPageState extends State<NewFriendPage> {
 
   Future loadRequest(UserInfo user) async {
     _request.clear();
-    String url = Constant.serverUrl + "userFriend/beAgreeingFriendList";
+    String url = "userFriend/beAgreeingFriendList";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
       "token": user.token,
@@ -439,7 +444,7 @@ class remarkFriendPage extends StatelessWidget {
   }
 
   Future<bool> agreeRequest(int friendId, String remark, UserInfo user) async {
-    String url = Constant.serverUrl + "userFriend/agreeFriend";
+    String url =  "userFriend/agreeFriend";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
       "token": user.token,
@@ -455,6 +460,7 @@ class remarkFriendPage extends StatelessWidget {
       Map map = jsonDecode(res);
       ToastUtil.showShortClearToast(map['verify']['desc']);
       if (map['verify']['sign'] == "success") {
+        EventBusUtil().eventBus.fire(FriendListEvent(1));
         return true;
       }
       ToastUtil.showShortClearToast(map['verify']['desc']);

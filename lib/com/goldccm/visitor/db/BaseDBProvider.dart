@@ -15,13 +15,10 @@ abstract class BaseDBProvider {
   tableName();
 
   tableBaseString(String name,String primaryKey){
-    return
-      '''
-      create table $name (
-      $primaryKey integer primary key autoincrement,
+    return '''
+    create table $name ( 
+    $primaryKey integer primary key autoincrement,
     ''';
-
-
   }
 
   Future<Database> getDataBase () async{

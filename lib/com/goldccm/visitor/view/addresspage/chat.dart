@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
-import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
@@ -140,9 +138,8 @@ class ChatPageState extends State<ChatPage> {
         });
       }
     }
-  }
-  getAddressInfo(int visitorId) async {
-    String url = Constant.serverUrl+"companyUser/findVisitComSuc";
+  }  getAddressInfo(int visitorId) async {
+    String url = "companyUser/findVisitComSuc";
     String threshold = await CommonUtil.calWorkKey();
     List<AddressInfo> _list=<AddressInfo>[];
     var res = await Http().post(url,queryParameters: {
@@ -173,6 +170,7 @@ class ChatPageState extends State<ChatPage> {
     }
     return _list;
   }
+
   @override
   initState() {
     super.initState();
@@ -641,7 +639,7 @@ class ChatPageState extends State<ChatPage> {
           Flexible(
             child: TextField(
               controller: _textController,
-              onSubmitted: _handleSubmmited,
+//              onSubmitted: _handleSubmmited,
               decoration: InputDecoration.collapsed(),
               onChanged: (String text) {
                 setState(() {

@@ -1,3 +1,4 @@
+import 'package:visitor/com/goldccm/visitor/model/FunctionLists.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 
@@ -10,8 +11,9 @@ class LocalStorage{
   static UserInfo _userInfo;
   static List _privilegeLists;
   static String _phoneStr;
+  static List<FunctionLists> _flists;
   //读取
-  static save(String name,dynamic value){
+  static save(String name,dynamic value) async {
     if(name=="userInfo"){
       _userInfo=value;
     }
@@ -21,15 +23,20 @@ class LocalStorage{
     if(name=="phoneStr"){
       _phoneStr=value;
     }
+    if(name=="flists"){
+      _flists=_flists;
+    }
   }
   //存储
   //先从sp中读取，存在则替换当前变量并返回，不存在直接返回当前变量
   static load(String name) async {
     if(name=="userInfo"){
+      if(_userInfo!=null){
+        return _userInfo;
+      }
       UserInfo userInfo=await DataUtils.getUserInfo();
       if(userInfo!=null&&userInfo.id!=null){
         _userInfo=userInfo;
-        return userInfo;
       }
       return _userInfo;
     }
@@ -38,6 +45,9 @@ class LocalStorage{
     }
     if(name=="phoneStr"){
       return _phoneStr;
+    }
+    if(name=="flists"){
+      return _flists;
     }
   }
 }

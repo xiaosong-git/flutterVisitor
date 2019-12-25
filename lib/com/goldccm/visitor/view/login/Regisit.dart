@@ -451,7 +451,7 @@ class RegisitState extends State<Regisit> {
         String sysPwd = Md5Util.instance
             .encryptByMD5ByHex(_passwordController.text.toString());
         var response = await Http.instance.post(
-            Constant.serverUrl + Constant.registerUrl,
+            Constant.registerUrl,
             queryParameters: {"phone": phone, "code": code, "sysPwd": sysPwd},userCall: true);
         if(response=="isBlocking"||response==""||response==null){
           ToastUtil.showShortToast("注册失败");
@@ -462,7 +462,7 @@ class RegisitState extends State<Regisit> {
           String _passNum =
               Md5Util().encryptByMD5ByHex(_passwordController.text.toString());
           var data = await Http.instance.post(
-              Constant.serverUrl + Constant.loginUrl,
+               Constant.loginUrl,
               queryParameters: {
                 "phone": phone,
                 "style": "1",
@@ -638,7 +638,7 @@ class RegisitState extends State<Regisit> {
   Future<bool> getCheckCode() async {
     bool _userNameCheck = checkLoginUser();
     if (_userNameCheck) {
-      String url = Constant.serverUrl +
+      String url =
           Constant.sendCodeUrl +
           "/" +
           _userNameController.text.toString() +

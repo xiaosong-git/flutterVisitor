@@ -55,7 +55,7 @@ class RoomAfterOrderState extends State<RoomAfterOrder>{
                   height: 210,
                   padding: EdgeInsets.only(right: 30),
                   child: FittedBox(
-                    child: Image.asset("assets/icons/预定成功@2x.png",scale: 2.0),
+                    child: Image.asset("assets/icons/shareroom_booking_success.png",scale: 2.0),
                     fit: BoxFit.scaleDown,
                   ),
                 ),

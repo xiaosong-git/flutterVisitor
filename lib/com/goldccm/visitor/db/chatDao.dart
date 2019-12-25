@@ -8,7 +8,7 @@ import 'BaseDBProvider.dart';
 
 class ChatDao extends BaseDBProvider {
   //存储表明
-  String table_name = "tbl_ChatMessagev1";
+  String table_name = "tbl_ChatMessages";
 
   //主键
   String primary_Key = "M_ID";
@@ -23,32 +23,31 @@ class ChatDao extends BaseDBProvider {
   @override
   tableSqlString() {
     return tableBaseString(table_name, primary_Key) +
-        '''
-    M_MessageContet text,
-    M_Status text,
-    M_Time text,
-    M_MessageType text,
-    M_IsSend text,
-    M_userId integer,
-    M_FriendId integer,
-    M_FnickName text,
-    M_FrealName text,
-    M_FheadImgUrl text,
-    M_visitId integer,
-    M_StartDate text,
-    M_EndDate text,
-    M_orgName text,
-    M_companyName text,
-    M_province text,
-    M_city text,
-    M_cStatus text,
-    M_recordType text,
-    M_orgId text,
-    M_answerContent text,
-    M_isSended integer,
-    M_isDeleted integer
-    )
-    ''';
+   '''
+   M_MessageContet text,
+   M_Status text,
+   M_Time text,
+   M_MessageType text,
+   M_IsSend text,
+   M_userId integer,
+   M_FriendId integer,
+   M_FnickName text,
+   M_FrealName text,
+   M_FheadImgUrl text,
+   M_visitId integer,
+   M_StartDate text,
+   M_EndDate text,
+   M_orgName text,
+   M_companyName text,
+   M_province text,
+   M_city text,
+   M_cStatus text,
+   M_recordType text,
+   M_orgId text,
+   M_answerContent text,
+   M_isSended integer,
+   M_isDeleted integer)
+   ''';
   }
 
   //插入一条消息
@@ -63,7 +62,7 @@ class ChatDao extends BaseDBProvider {
   Future<List<ChatMessage>> queryMessage(String content) async {
     Database db = await getDataBase();
     List<Map<String, dynamic>> listRes = await db.query(table_name,
-        where: 'M_MessageContet like %?%', whereArgs: [content]);
+        where: 'M_MessageContent like %?%', whereArgs:[content]);
     if (listRes.length > 0) {
       List<ChatMessage> msgs =
           listRes.map((item) => ChatMessage.fromJson(item)).toList();
@@ -89,7 +88,7 @@ class ChatDao extends BaseDBProvider {
   Future<List<ChatMessage>> getLatestMessage(int userId) async {
     Database db = await getDataBase();
     List<Map<String, dynamic>> listRes = await db.rawQuery(
-        "select c.unreadCount,a.* from $table_name a  join (select M_FriendId,max(M_Time) M_Time from $table_name where M_FriendId!=M_userId  group by M_FriendId) b on a.M_FriendId = b.M_FriendId and a.M_Time = b.M_Time left join (select M_FriendId,count(*) unreadCount from $table_name where M_status='0' group by M_FriendId) c on a.M_FriendId = c.M_FriendId  where M_userId = $userId order by a.M_Time desc");
+        "select c.unreadCount,a.* from $table_name a  join (select M_FriendId,max(M_Time) M_Time from $table_name where M_FriendId!=M_userId  group by M_FriendId) b on a.M_FriendId = b.M_FriendId and a.M_Time = b.M_Time left join (select M_FriendId,count(*) unreadCount from $table_name where M_status='0' group by M_FriendId) c on a.M_FriendId = c.M_FriendId  where M_userId = $userId group by a.M_FriendId order by a.M_Time desc");
     if (listRes.length > 0) {
       List<ChatMessage> msgs =
           listRes.map((item) => ChatMessage.fromJson(item)).toList();

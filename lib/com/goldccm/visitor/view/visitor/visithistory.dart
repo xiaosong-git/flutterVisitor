@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -7,10 +6,11 @@ import 'package:visitor/com/goldccm/visitor/model/QrcodeMode.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/QrcodeHandler.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
-
+/*
+ * 访问码
+ */
 class VisitHistory extends StatefulWidget{
   final UserInfo userInfo;
   VisitHistory({Key key,this.userInfo}):super(key:key);
@@ -97,7 +97,7 @@ class VisitHistoryState extends State<VisitHistory>{
     if (!isPerformingRequest) {
       Future.delayed(Duration(seconds: 1), () async {
         setState(() => isPerformingRequest = true);
-        String url = Constant.serverUrl + "visitorRecord/visitRecord/$count/10";
+        String url = "visitorRecord/visitRecord/$count/10";
         String threshold = await CommonUtil.calWorkKey(userInfo:widget.userInfo);
         var res = await Http().post(url,
             queryParameters: ({

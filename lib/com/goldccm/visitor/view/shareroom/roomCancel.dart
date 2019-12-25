@@ -30,7 +30,7 @@ class RoomBook extends StatefulWidget {
 class RoomBookState extends State<RoomBook> {
   RoomInfo _roomInfo = new RoomInfo();
   cancelOrder(RoomOrderInfo room) async {
-    String url = Constant.serverUrl+"meeting/cancle";
+    String url = "meeting/cancle";
     String threshold = await CommonUtil.calWorkKey();
     print(widget.userInfo.id);
     var res = await Http().post(url,queryParameters:({

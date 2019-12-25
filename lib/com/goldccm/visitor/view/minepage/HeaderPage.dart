@@ -127,7 +127,7 @@ class HeadImagePageState extends State<HeadImagePage> {
     var res = await Http().post(url, data: formData);
     Map map = jsonDecode(res);
     var _userProvider=Provider.of<UserModel>(context);
-    String nickurl = Constant.serverUrl+ Constant.updateNickAndHeadUrl;
+    String nickurl =  Constant.updateNickAndHeadUrl;
     String threshold = await CommonUtil.calWorkKey();
     var nickres = await Http().post(nickurl, queryParameters: {
       "headImgUrl": map['data']['imageFileName'],

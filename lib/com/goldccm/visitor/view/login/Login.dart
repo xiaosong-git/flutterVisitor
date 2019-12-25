@@ -9,6 +9,7 @@ import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
@@ -68,27 +69,34 @@ class LoginState extends State<Login> {
   int _seconds;
   Color colorStyle = _availableStyle;
   String _verifyStr = '获取验证码';
-
+  FocusNode _focusNode;
   TextEditingController _userNameController = new TextEditingController();
   TextEditingController _passwordController = new TextEditingController();
   TextEditingController _checkCodeController = new TextEditingController();
-
   @override
   void initState() {
-
     super.initState();
-
     if(Platform.isAndroid){
       _deviceType=1;
     }
     if(Platform.isIOS){
       _deviceType=2;
     }
-
+    _focusNode=FocusNode();
     _seconds = widget.countdown;
-
+    initUserName();
   }
-
+  initUserName() async {
+    await PermissionHandlerUtil().initPermission();
+    PermissionHandlerUtil().askStoragePermission();
+    List userNameLists = await SharedPreferenceUtil.getUsers();
+    setState(() {
+      if(userNameLists.length>0&&userNameLists[0].loginName!=null){
+        _userNameController.text=userNameLists[0].loginName;
+        FocusScope.of(context).requestFocus(_focusNode);
+      }
+    });
+  }
   void _startTimer() {
 
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -120,7 +128,7 @@ class LoginState extends State<Login> {
 
   @override
   void dispose() {
-
+    _focusNode.dispose();
     _cancelTimer();
     super.dispose();
 
@@ -144,13 +152,18 @@ class LoginState extends State<Login> {
                             new Padding(
                               padding: const EdgeInsets.only(right: 20.0),
                               child: GestureDetector(
-                                  onTap: _regisit, //写入方法名称就可以了，但是是无参的
+                                  onTap: _regisit,
                                   child: new Text('注册', style: _labelStyle)),
                             ),
                           ]),
                       new Padding(
                         padding: const EdgeInsets.only(top: 70),
-                        child: new Image.asset("assets/icons/ic_launcher.png"),
+                        child: GestureDetector(
+                          child: new Image.asset("assets/icons/ic_launcher.png"),
+                          onLongPress: (){
+
+                          },
+                        ),
                       ),
                       new Padding(
                           padding: const EdgeInsets.only(
@@ -192,6 +205,7 @@ class LoginState extends State<Login> {
                                 style: _labelStyle,
                                 keyboardType: TextInputType.text,
                                 controller: _passwordController,
+                                focusNode: _focusNode,
                                 decoration: InputDecoration(
                                     border: InputBorder.none,
                                     contentPadding: EdgeInsets.all(10)
@@ -472,7 +486,7 @@ class LoginState extends State<Login> {
       bool passCheck = checkPass();
       if (passCheck) {
            _passNum = Md5Util().encryptByMD5ByHex(_passwordController.text.toString());
-           data = await Http().post(Constant.serverUrl+Constant.loginUrl, queryParameters: {
+           data = await Http().post(Constant.loginUrl, queryParameters: {
           "phone": _userNameController.text.toString(),
           "style": "1",
           "sysPwd": _passNum,
@@ -487,7 +501,7 @@ class LoginState extends State<Login> {
       //验证码登录
       if (checkCode()) {
         _codeNum = _checkCodeController.text.toString();
-        data = await Http().post(Constant.serverUrl+Constant.loginUrl, queryParameters: {
+        data = await Http().post(Constant.loginUrl, queryParameters: {
           "phone": _userNameController.text.toString(),
           "style": "1",
           "code": _codeNum,

@@ -1,15 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
-import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
-import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
-import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitAddress.dart';
@@ -73,7 +68,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
   }
   getAddressInfo(int visitorId) async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-    String url = Constant.serverUrl+"companyUser/findVisitComSuc";
+    String url ="companyUser/findVisitComSuc";
     String threshold = await CommonUtil.calWorkKey();
     List<AddressInfo> _list=<AddressInfo>[];
     var res = await Http().post(url,queryParameters: {
@@ -107,7 +102,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
 
   visitMyPeople() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-      String url = Constant.serverUrl + "visitorRecord/visitMyPeople/1/100";
+      String url = "visitorRecord/visitMyPeople/1/100";
       String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
@@ -148,7 +143,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
 
   visitMyCompany() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-      String url = Constant.serverUrl +
+      String url =
           "visitorRecord/visitMyCompany/1/100";
       String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
@@ -191,7 +186,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
   visitMine() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
       String url =
-          Constant.serverUrl + "visitorRecord/visitRecord/$_visitMineCount/100";
+         "visitorRecord/visitRecord/$_visitMineCount/100";
       String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
@@ -207,7 +202,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
           Map map = jsonDecode(res);
           if (map['verify']['sign'] == "success") {
             for (var data in map['data']['rows']) {
-              if (data['recordType'] == 1 && data['userId'] == userInfo.id ){
+              if (data['recordType'] == 1 && data['userId'] == userInfo.id){
                 VisitInfo visitInfo = new VisitInfo(
                   realName: data['realName'],
                   visitDate: data['visitDate'],
@@ -224,7 +219,6 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
                   companyName: data['companyName'],
                   id: data['id'].toString(),
                 );
-                print(visitInfo.toString());
                 _visitLists.add(visitInfo);
               }
             }
@@ -235,7 +229,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
 
   adoptAndReject(VisitInfo info, int index, int type) async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-    String url = Constant.serverUrl + "visitorRecord/adoptionAndRejection";
+    String url = "visitorRecord/adoptionAndRejection";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: ({
@@ -698,7 +692,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
     );
   }
   changeVisitCompany(VisitInfo info,int companyId,int index) async {
-      String url = Constant.serverUrl + "visitorRecord/modifyCompanyFromId";
+      String url = "visitorRecord/modifyCompanyFromId";
       String threshold = await CommonUtil.calWorkKey(userInfo: _userInfo);
       var res = await Http().post(url,
           queryParameters: ({

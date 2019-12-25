@@ -25,7 +25,7 @@ class NoticePageState extends State<NoticePage> {
   }
 
   getNotice() async {
-    String url = Constant.serverUrl+"notice/allList/1/20";
+    String url = "notice/allList/1/20";
     UserInfo userInfo = await DataUtils.getUserInfo();
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
@@ -174,7 +174,7 @@ class Notice extends StatelessWidget {
                   Positioned(
                     child: FittedBox(
                       fit: BoxFit.fill,
-                      child: Image.asset("assets/icons/大楼.png"),
+                      child: Image.asset("assets/icons/building.png"),
                     ),
                     width: 40,
                     height: 40,

@@ -105,7 +105,7 @@ class FriendHistoryState extends State<FriendHistory>{
     if (!isPerformingRequest) {
       Future.delayed(Duration(seconds: 1), () async {
         setState(() => isPerformingRequest = true);
-        String url = Constant.serverUrl + "userFriend/findFriendApplyMe";
+        String url =  "userFriend/findFriendApplyMe";
         String threshold = await CommonUtil.calWorkKey();
         var res = await Http().post(url,
             queryParameters: ({

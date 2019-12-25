@@ -22,7 +22,7 @@ class RulePageState extends State<RulePage> with SingleTickerProviderStateMixin{
         actions: <Widget>[
           IconButton(
               icon: Image.asset(
-                "assets/icons/添加新好友@2x.png",
+                "assets/icons/user_addfriend.png",
                 scale: 2.0,
               ),
               onPressed: () {

@@ -2,7 +2,7 @@
  * 接口URL地址全部存在放这
  */
 class Constant {
-  //生存环境
+  //生产环境
 //    static final String imageServerApiUrl = "http://47.98.205.206:8081/goldccm-imgServer/goldccm/image/gainData";
 //    static final String serverUrl = "http://47.96.71.163:8082/visitor/";
 //    static final String webSocketServerUrl ="ws://47.96.71.163:8082/visitor/";
@@ -38,7 +38,7 @@ class Constant {
    * sendCode 发送验证码
    * isVerify 实名状态
    * verify 实名
-   * forget/sysPwd 找回密码
+   * forget/sysPwd 找回密码'
    * update/sysPwd 更新密码
    * nick 修改昵称头像
    * getUser 获取用户信息

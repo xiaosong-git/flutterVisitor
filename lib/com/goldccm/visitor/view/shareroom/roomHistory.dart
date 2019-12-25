@@ -53,7 +53,7 @@ class RoomHistoryState extends State<RoomHistory> {
     if (!isPerformingRequest) {
       Future.delayed(Duration(seconds: 1), () async {
         setState(() => isPerformingRequest = true);
-        String url = Constant.serverUrl + "meeting/myReserveList/$count/10";
+        String url = "meeting/myReserveList/$count/10";
         String threshold = await CommonUtil.calWorkKey();
         var res = await Http().post(url,
             queryParameters: ({
@@ -145,7 +145,7 @@ class RoomHistoryState extends State<RoomHistory> {
     Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomeApp(tabIndex: 3,)));
   }
   getHistory() async {
-    String url = Constant.serverUrl + "meeting/myReserveList/$count/10";
+    String url =  "meeting/myReserveList/$count/10";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: ({

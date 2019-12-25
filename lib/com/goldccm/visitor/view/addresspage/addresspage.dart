@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:badges/badges.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:visitor/com/goldccm/visitor/db/friendDao.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -11,7 +11,6 @@ import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
-import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
@@ -82,13 +81,21 @@ class AddressPageState extends State<AddressPage> {
   @override
   void initState() {
     super.initState();
+    initAddress();
     _handleRefresh();
-    _friendListSub =
-        EventBusUtil().eventBus.on<FriendListEvent>().listen((event) {
+    _friendListSub = EventBusUtil().eventBus.on<FriendListEvent>().listen((event) {
            _handleRefresh();
         });
   }
-
+  initAddress() async {
+    FriendDao friendDao=FriendDao();
+    List<FriendInfo> lists=await friendDao.getFriendInfo();
+    if(lists.length>0){
+      setState(() {
+        _userLists=lists;
+      });
+    }
+  }
   @override
   void dispose() {
     _friendListSub.cancel();
@@ -113,7 +120,7 @@ class AddressPageState extends State<AddressPage> {
           actions: <Widget>[
             IconButton(
                 icon: Image.asset(
-                  "assets/icons/添加新好友@2x.png",
+                  "assets/icons/user_addfriend.png",
                   scale: 2.0,
                 ),
                 onPressed: () {
@@ -205,7 +212,7 @@ class AddressPageState extends State<AddressPage> {
                                                               EdgeInsets.only(
                                                                   top: 5),
                                                           child: Image.asset(
-                                                            'assets/icons/添加@2x.png',
+                                                            'assets/icons/app_add.png',
                                                             scale: 2.0,
                                                           ),
                                                         ),
@@ -278,7 +285,7 @@ class AddressPageState extends State<AddressPage> {
                                                               EdgeInsets.only(
                                                                   top: 5),
                                                           child: Image.asset(
-                                                            'assets/icons/新的好友@2x.png',
+                                                            'assets/icons/app_newfriend.png',
                                                             scale: 2.0,
                                                           ),
                                                         ),
@@ -342,8 +349,8 @@ class AddressPageState extends State<AddressPage> {
   Future _handleRefresh() async {
     await _presenter.loadUserList();
     setState(() {
-      _userLists = _presenter.getUserList();
-      initFlag = _presenter.getFlag();
+      _userLists = _presenter.userlists;
+      initFlag = _presenter.initFlag;
     });
     return null;
   }
@@ -431,7 +438,7 @@ class AddressPageState extends State<AddressPage> {
                         color: Colors.orange,
                       ),
                       child: Image.asset(
-                        "assets/icons/添加新好友@2x.png",
+                        "assets/icons/user_addfriend.png",
                         color: Colors.white,
                         scale: 1.7,
                       ),
@@ -453,12 +460,12 @@ class AddressPageState extends State<AddressPage> {
                       color: Colors.orange,
                     ),
                     child: Image.asset(
-                      "assets/icons/添加新好友@2x.png",
+                      "assets/icons/user_addfriend.png",
                       color: Colors.white,
                       scale: 1.7,
                     ),
                   ),
-                  trailing: Image.asset('assets/icons/更多@2x.png', scale: 1.7),
+                  trailing: Image.asset('assets/icons/app_more.png', scale: 1.7),
                   onTap: () {
                     Navigator.push(
                         context,
@@ -562,7 +569,7 @@ class AddressPageState extends State<AddressPage> {
                                 color: Colors.orange,
                               ),
                               child: Image.asset(
-                                "assets/icons/添加新好友@2x.png",
+                                "assets/icons/user_addfriend.png",
                                 color: Colors.white,
                                 scale: 1.7,
                               ),
@@ -584,12 +591,12 @@ class AddressPageState extends State<AddressPage> {
                               color: Colors.orange,
                             ),
                             child: Image.asset(
-                              "assets/icons/添加新好友@2x.png",
+                              "assets/icons/user_addfriend.png",
                               color: Colors.white,
                               scale: 1.7,
                             ),
                           ),
-                    trailing: Image.asset('assets/icons/更多@2x.png', scale: 1.7),
+                    trailing: Image.asset('assets/icons/app_more.png', scale: 1.7),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -750,27 +757,22 @@ class Choice {
 ///自定义类
 ///用于存放变量和操作变量
 class Presenter {
-  List<FriendInfo> _userlists = new List<FriendInfo>();
+  List<FriendInfo> userlists = new List<FriendInfo>();
   String _imageUrl = "";
   bool initFlag = false;
-  getUserList() {
-    return _userlists;
-  }
 
   getImageUrl() {
     return _imageUrl;
   }
 
-  getFlag() {
-    return initFlag;
-  }
 
   loadUserList() async {
-    _userlists.clear();
+    FriendDao friendDao=FriendDao();
+    userlists.clear();
     UserInfo user = await LocalStorage.load("userInfo");
     _imageUrl = await DataUtils.getPararInfo("imageServerUrl");
     String threshold = await CommonUtil.calWorkKey(userInfo: user);
-    String url = Constant.serverUrl + Constant.findUserFriendUrl;
+    String url = Constant.findUserFriendUrl;
     var res = await Http().post(url,
         queryParameters: {
           "token": user.token,
@@ -794,25 +796,32 @@ class Presenter {
             if (userInfo['realName'] != null && userInfo['phone'] != null) {
               FriendInfo user = FriendInfo(
                 name: userInfo['realName'],
+                nickname: userInfo['nickname'],
                 phone: userInfo['phone'],
                 realImageUrl: userInfo['idHandleImgUrl'],
                 virtualImageUrl: userInfo['headImgUrl'],
                 companyName: userInfo['companyName'],
-                userId: userInfo['id'],
                 notice: userInfo['remark'],
+                userId: userInfo['id'],
                 orgId: userInfo['orgId'].toString(),
                 imageServerUrl: _imageUrl,
                 firstZiMu: userInfo['realName']!=null?PinyinHelper.getFirstWordPinyin(userInfo['realName'])
                     .substring(0, 1)
                     .toUpperCase():"",
+                applyType: userInfo['applyType'],
+                lastMessageId: null,
               );
-              _userlists.add(user);
+              userlists.add(user);
+              bool isExist=await friendDao.isExist(user.userId);
+              if(!isExist){
+                friendDao.insertFriendInfo(user);
+              }
             }
           }
-          if(_userlists.length==0){
+          if(userlists.length==0){
             initFlag=true;
           }
-          _userlists.sort((a, b) => PinyinHelper.getFirstWordPinyin(a.name)
+          userlists.sort((a, b) => PinyinHelper.getFirstWordPinyin(a.name)
               .substring(0, 1)
               .compareTo(
                   PinyinHelper.getFirstWordPinyin(b.name).substring(0, 1)));

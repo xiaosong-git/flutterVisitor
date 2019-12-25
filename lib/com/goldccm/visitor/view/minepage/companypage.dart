@@ -152,7 +152,7 @@ class CompanyPageState extends State<CompanyPage>{
   //获取公司信息
   getCompanyInfo() async {
     _keys=null;
-    String url = Constant.serverUrl+Constant.findApplySucUrl;
+    String url = Constant.findApplySucUrl;
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
       "token": userInfo.token,
@@ -189,7 +189,7 @@ class CompanyPageState extends State<CompanyPage>{
   }
   ///更新默认公司
   Future updateGroupValue(int v) async {
-    String url = Constant.serverUrl+Constant.updateCompanyIdAndRoleUrl;
+    String url = Constant.updateCompanyIdAndRoleUrl;
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,queryParameters: {
       "token": userInfo.token,
@@ -203,6 +203,7 @@ class CompanyPageState extends State<CompanyPage>{
     Map map = jsonDecode(res);
     if(map['verify']['sign']=="success"){
       ToastUtil.showShortClearToast("修改公司成功");
+      print(_keys[v]);
       setState(() {
         groupValue=v;
         userInfo.companyId=_keys[v]['companyId'];

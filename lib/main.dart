@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_arcface/flutter_arcface.dart';
+//import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'com/goldccm/visitor/model/BadgeModel.dart';
 import 'com/goldccm/visitor/model/UserModel.dart';
+import 'com/goldccm/visitor/view/login/Login.dart';
 import 'splash.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 /*
@@ -14,10 +15,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
  * UMPush 友盟推送
  */
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;
   final UserModel userModel = UserModel();
   final BadgeModel badgeModel = BadgeModel();
-  FlutterArcface.active();
+//  FlutterArcface.active();
   userModel.init(null);
   badgeModel.init();
   NPush().init();
@@ -47,7 +49,7 @@ void main() {
           const Locale('zh','CH'),
           const Locale('en','US'),
         ],
-        home: SplashPage(),
+        home:SplashPage(),
       )
     ),
   );

@@ -227,7 +227,7 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
         }
       }
     } else if (Platform.isIOS) {
-      String url = Constant.serverUrl + "appVersion/updateIOS";
+      String url = "appVersion/updateIOS";
       var res = await Http().post(url, userCall: false);
       if (res != null) {
         if (res is String) {

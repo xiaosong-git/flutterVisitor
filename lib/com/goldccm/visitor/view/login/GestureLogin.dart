@@ -68,7 +68,7 @@ class GestureLoginState extends State<GestureLogin> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Image.asset(
-                  "assets/icons/手势密码用户@2x.png",
+                  "assets/icons/user_gesture.png",
                   scale: 1.7,
                 ),
               ],
@@ -124,7 +124,7 @@ class GestureLoginState extends State<GestureLogin> {
 
   verifyGesturePwd(String s) async {
     String phone = await getPhone();
-    String url = Constant.serverUrl + Constant.loginUrl;
+    String url = Constant.loginUrl;
     String _passNum = Md5Util().encryptByMD5ByHex(s);
     var res = await Http().post(url, queryParameters: {
       "phone": phone,

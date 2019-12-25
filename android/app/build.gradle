@@ -7,6 +7,7 @@ if (localPropertiesFile.exists()) {
 }
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
+
 if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
@@ -42,10 +43,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk {
-            //设置支持的SO库架构
-            //AS调试的时候，使用的是JIT编译模式，需要点击运行下拉菜单中的Edit Configuration...，增加一个参数：--target-platform android-arm，强行指定armeabi-v7a，否则是不能启动的。
-            //flutter build apk时，由于是AOT版本，所以肯定是armeabi-v7a
-            abiFilters 'armeabi-v7a'//,'armeabi','arm64-v8a'
+            abiFilters 'armeabi-v7a'
+//                    'armeabi','arm64-v8a'
         }
 
         manifestPlaceholders = [
@@ -58,11 +57,11 @@ android {
                 XIAOMI_APP_KEY  : "5291800098997",
                 MEIZU_APP_ID    : "120513",
                 MEIZU_APP_KEY   : "06e98e15129341508f59fb7523ca60f4",
-                HUAWEI_APP_ID   : "100993753",
+                HUAWEI_APP_ID   : "101494383",
                 OPPO_APP_KEY   :  "4b672513adf84c72a08671e3d7820937",
                 OPPO_APP_SECRET  : "89f2c5c6fce04a73aa5a19887b10845a",
-                VIVO_APP_ID   : "",
-                VIVO_APP_KEY  : ""
+                VIVO_APP_ID   : "17687",
+                VIVO_APP_KEY  : "6b2cfb2b-a4d2-4f87-9774-e85003b679be"
         ]
     }
     signingConfigs{

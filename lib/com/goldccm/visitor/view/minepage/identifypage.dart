@@ -303,8 +303,8 @@ class IdentifyPageState extends State<IdentifyPage> {
       ToastUtil.showShortToast("请上传头像");
       return false;
     }
-      String preurl = Constant.serverUrl + Constant.isVerifyUrl;
-      String url = Constant.serverUrl + Constant.verifyUrl;
+      String preurl = Constant.isVerifyUrl;
+      String url = Constant.verifyUrl;
       String threshold = await CommonUtil.calWorkKey();
       var preres = await Http().post(preurl, queryParameters: {
         "token": userInfo.token,

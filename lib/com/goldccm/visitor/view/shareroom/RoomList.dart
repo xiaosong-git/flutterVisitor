@@ -29,9 +29,10 @@ class RoomListState extends State<RoomList>{
   ScrollController _scrollController = new ScrollController();
   var _roomListBuilderFuture;
   bool notEmpty=true;
+  String roomName="共享";
   getRoomLists(int type) async {
     UserInfo userInfo=await DataUtils.getUserInfo();
-    String url = Constant.serverUrl+"meeting/list/$count/10";
+    String url = "meeting/list/$count/10";
     String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
     var res = await Http().post(url,queryParameters: {
       "token": userInfo.token,
@@ -91,7 +92,7 @@ class RoomListState extends State<RoomList>{
       Future.delayed(Duration(seconds: 1),() async {
         setState(() => isPerformingRequest = true);
         UserInfo userInfo=await DataUtils.getUserInfo();
-        String url=Constant.serverUrl+"meeting/list/$count/10";
+        String url="meeting/list/$count/10";
         String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
         var res = await Http().post(url,queryParameters: ({
           "token": userInfo.token,
@@ -125,6 +126,15 @@ class RoomListState extends State<RoomList>{
   @override
   void initState() {
     super.initState();
+    if(widget.type==0){
+      setState(() {
+        roomName="共享会议室";
+      });
+    }else if(widget.type==1){
+      setState(() {
+        roomName="共享茶室";
+      });
+    }
     _roomListBuilderFuture=getRoomLists(widget.type);
     _scrollController.addListener((){
       if(_scrollController.position.pixels == _scrollController.position.maxScrollExtent){
@@ -132,12 +142,13 @@ class RoomListState extends State<RoomList>{
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
-        title:Text( '共享会议室',   style: new TextStyle(
+        title:Text(roomName,   style: new TextStyle(
             fontSize: 17.0, color: Colors.white),textScaleFactor: 1.0,),
         backgroundColor: Theme.of(context).appBarTheme.color,
         leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context);}),

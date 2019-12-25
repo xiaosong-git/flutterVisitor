@@ -172,7 +172,7 @@ class RoomCheckoutState extends State<RoomCheckOut>{
           CheckboxListTile(
             secondary: Container(
               width: 50,
-              child: Image.asset("assets/icons/支付宝logo.png"),
+              child: Image.asset("assets/icons/app_alipay_logo.png"),
             ),
             title: Text('支付宝',style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),textScaleFactor: 1.0,),
             subtitle: Text('数亿用户都在用，安全可托付',textScaleFactor: 1.0,),
@@ -208,7 +208,7 @@ class RoomCheckoutState extends State<RoomCheckOut>{
     );
   }
   createOrder() async {
-      String url = Constant.serverUrl+"pay/createOrder";
+      String url = "pay/createOrder";
       String threshold = await CommonUtil.calWorkKey();
       var res = await Http().post(url,queryParameters:({
         "token": widget.userInfo.token,

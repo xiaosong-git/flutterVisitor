@@ -23,6 +23,7 @@ import 'package:visitor/com/goldccm/visitor/view/shareroom/roomHistory.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/friendHistory.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/inviteList.dart';
 import 'package:visitor/com/goldccm/visitor/view/visitor/visitList.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 /*
    个人中心
@@ -40,32 +41,35 @@ class MinePage extends StatefulWidget {
 class MinePageState extends State<MinePage> {
   List<FunctionLists> _addlist = [
     FunctionLists(
-        iconImage: 'assets/icons/会议室icon@2x.png',
+        iconImage: 'assets/icons/shareroom_meetingroom.png',
         iconTitle: '会议室',
         iconType: '_meetingRoom'),
     FunctionLists(
-        iconImage: 'assets/icons/公司管理@2x.png',
+        iconImage: 'assets/icons/user_company_setting.png',
         iconTitle: '公司管理',
         iconType: '_companySetting'),
   ];
   List<FunctionLists> _baseList = [
     FunctionLists(
-        iconImage: 'assets/icons/实名认证V.png',
+        iconImage: 'assets/icons/user_verify.png',
         iconTitle: '实名认证',
         iconType: '_verify'),
     FunctionLists(
-        iconImage: 'assets/icons/安全管理@2x.png',
+        iconImage: 'assets/icons/user_safe_setting.png',
         iconTitle: '安全管理',
         iconType: '_securitySetting'),
     FunctionLists(
-        iconImage: 'assets/icons/设置@2x.png',
+        iconImage: 'assets/icons/user_setting.png',
         iconTitle: '设置',
         iconType: '_setting')
   ];
   List<FunctionLists> _list = [];
   BadgeUtil badge = BadgeUtil();
   int visitBadgeNumTotal = 0;
-  int _currentRole=0;
+  int _currentRole = 0;
+  bool visitBadgeShow = false;
+  bool inviteBadgeShow = false;
+  bool friendBadgeShow = false;
   ScrollController _minescrollController = new ScrollController();
   final double expandedHeight = 65.0;
   double get top {
@@ -94,35 +98,40 @@ class MinePageState extends State<MinePage> {
       }
     });
   }
+
   init() async {
-    UserInfo userInfo=await LocalStorage.load("userInfo");
+    UserInfo userInfo = await LocalStorage.load("userInfo");
     getAddressInfo(userInfo.id);
   }
+
   /*
    * 公司角色
    */
   getAddressInfo(int visitorId) async {
-    UserInfo userInfo=await LocalStorage.load("userInfo");
-    String url = Constant.serverUrl+"companyUser/findVisitComSuc";
+    UserInfo userInfo = await LocalStorage.load("userInfo");
+    String url = "companyUser/findVisitComSuc";
     String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
-    var res = await Http().post(url,queryParameters: {
-      "token": userInfo.token,
-      "userId": userInfo.id,
-      "factor": CommonUtil.getCurrentTime(),
-      "threshold": threshold,
-      "requestVer": await CommonUtil.getAppVersion(),
-      "visitorId":visitorId,
-    },userCall: false);
-    if(res !=null&&res !=""){
-      if(res is String){
+    var res = await Http().post(url,
+        queryParameters: {
+          "token": userInfo.token,
+          "userId": userInfo.id,
+          "factor": CommonUtil.getCurrentTime(),
+          "threshold": threshold,
+          "requestVer": await CommonUtil.getAppVersion(),
+          "visitorId": visitorId,
+        },
+        userCall: false);
+    if (res != null && res != "") {
+      if (res is String) {
         Map map = jsonDecode(res);
-        if(map['verify']['sign']=="success"){
-          if(map['data']!=null&&map['data'].length>0){
-            for(var info in map['data']){
-              if(info['status']=="applySuc"&&info['currentStatus']=="normal"){
-                   if(info['companyId']==userInfo.companyId){
-                      _currentRole=1;
-                   }
+        if (map['verify']['sign'] == "success") {
+          if (map['data'] != null && map['data'].length > 0) {
+            for (var info in map['data']) {
+              if (info['status'] == "applySuc" &&
+                  info['currentStatus'] == "normal") {
+                if (info['companyId'] == userInfo.companyId) {
+                  _currentRole = 1;
+                }
               }
             }
           }
@@ -130,6 +139,7 @@ class MinePageState extends State<MinePage> {
       }
     }
   }
+
   /*
    * 刷新
    */
@@ -140,6 +150,7 @@ class MinePageState extends State<MinePage> {
     ToastUtil.showShortClearToast("更新完毕");
     return null;
   }
+
   /*
    * 更新用户信息
    * save LocalStorage
@@ -176,6 +187,7 @@ class MinePageState extends State<MinePage> {
       }
     }
   }
+
   /*
    * 更新访问信息数量
    */
@@ -183,13 +195,14 @@ class MinePageState extends State<MinePage> {
     BadgeInfo badgeInfo = await BadgeUtil().updateVisit();
     Provider.of<BadgeModel>(context).update(badgeInfo);
   }
+
   /*
    * 权限列表获取
    */
   Future getPrivilege() async {
     _list.clear();
     UserInfo userInfo = await LocalStorage.load("userInfo");
-    String url = Constant.serverUrl + "userAppRole/getRoleMenu";
+    String url = "userAppRole/getRoleMenu";
     String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
     var res = await Http().post(url, queryParameters: {
       "token": userInfo.token,
@@ -309,14 +322,8 @@ class MinePageState extends State<MinePage> {
                                           Constant.imageServerUrl +
                                               (userProvider.info.headImgUrl),
                                         )
-                                      : userProvider.info.idHandleImgUrl != null
-                                          ? NetworkImage(
-                                              Constant.imageServerUrl +
-                                                  (userProvider
-                                                      .info.idHandleImgUrl),
-                                            )
-                                          : AssetImage(
-                                              'assets/images/visitor_icon_account.png'),
+                                      : AssetImage(
+                                          'assets/images/visitor_icon_account.png'),
                                   radius: 100,
                                 ),
                               ),
@@ -380,21 +387,14 @@ class MinePageState extends State<MinePage> {
                                       padding: EdgeInsets.all(15),
                                       child: Column(
                                         children: <Widget>[
-                                          badgeProvider.info.newVisitCount > 0
-                                              ? Badge(
-                                                  child: Image.asset(
-                                                    "assets/icons/访问.png",
-                                                    scale: 7.0,
-                                                  ),
-                                                  badgeContent: Text(
-                                                      badgeProvider.info.newVisitCount.toString(),
-                                                      style: TextStyle(color: Colors.white), textScaleFactor: 1.0),
-                                                  badgeColor: Colors.red,
-                                                )
-                                              : Image.asset(
-                                                  "assets/icons/访问.png",
-                                                  scale: 7.0,
-                                                ),
+                                          Badge(
+                                            child: Image.asset(
+                                              "assets/icons/app_visit.png",
+                                              scale: 7.0,
+                                            ),
+                                            badgeColor: Colors.red,
+                                            showBadge: visitBadgeShow,
+                                          ),
                                           Text('访问', textScaleFactor: 1.0),
                                         ],
                                       ),
@@ -404,9 +404,10 @@ class MinePageState extends State<MinePage> {
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) =>
-                                                    VisitList(currentRole: _currentRole,))).then((value) {
-                                           updateVisitInfo();
+                                                builder: (context) => VisitList(
+                                                      currentRole: _currentRole,
+                                                    ))).then((value) {
+                                          updateVisitInfo();
                                         });
                                       } else {
                                         ToastUtil.showShortClearToast("请先实名认证");
@@ -426,7 +427,7 @@ class MinePageState extends State<MinePage> {
                                       child: Column(
                                         children: <Widget>[
                                           Image.asset(
-                                            "assets/icons/邀约.png",
+                                            "assets/icons/app_invite.png",
                                             scale: 7.0,
                                           ),
                                           Text('邀约', textScaleFactor: 1.0),
@@ -461,7 +462,7 @@ class MinePageState extends State<MinePage> {
                                       child: Column(
                                         children: <Widget>[
                                           Image.asset(
-                                            "assets/icons/好友.png",
+                                            "assets/icons/app_friend.png",
                                             scale: 7.0,
                                           ),
                                           Text('好友', textScaleFactor: 1.0),

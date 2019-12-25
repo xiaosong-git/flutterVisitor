@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';//用于配置公用常量
+import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 /*
@@ -27,6 +28,7 @@ class Http{
       _timerUtil.cancel();
     });
   }
+
   static Http _getInstance() {
     if (_instance == null) {
       _instance = new Http._internal();

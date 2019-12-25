@@ -165,7 +165,7 @@ class RoomDetailState extends State<RoomDetail> {
   }
 
   getRoomStatus() async {
-    String url = Constant.serverUrl + "meeting/roomStatus";
+    String url ="meeting/roomStatus";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
       'room_id': widget.roomInfo.id,
@@ -485,7 +485,7 @@ class RoomDetailState extends State<RoomDetail> {
 
   bookRoom(int userID, int roomID, String timeLines, int day) async {
     var splits = timeLines.split(",");
-    String url = Constant.serverUrl + "meeting/reserve";
+    String url =  "meeting/reserve";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url,
         queryParameters: ({

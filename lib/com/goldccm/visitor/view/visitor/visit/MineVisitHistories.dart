@@ -38,7 +38,7 @@ class MineVisitHistoriesState extends State<MineVisitHistories> {
 
   visitMine() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-    String url = Constant.serverUrl + "visitorRecord/visitRecord/1/100";
+    String url = "visitorRecord/visitRecord/1/100";
     String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
     var res = await Http().post(url,
         queryParameters: ({

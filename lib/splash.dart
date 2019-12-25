@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'com/goldccm/visitor/util/DataUtils.dart';
 import 'home.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/Login.dart';
@@ -22,10 +22,11 @@ class SplashState extends State<SplashPage> {
     checkPermission();
   }
   Future checkPermission() async {
+    if(Platform.isAndroid){
+
+    }
     //权限获取
-    await PermissionHandlerUtil().initPermission();
-    PermissionHandlerUtil().askStoragePermission();
-      _t = new Timer(const Duration(milliseconds: 1500), () {
+      _t = new Timer(const Duration(milliseconds: 2000), () {
         //延时操作启动页面后跳转到主页面
         try {
           Navigator.of(context).pushAndRemoveUntil(
@@ -53,7 +54,7 @@ class SplashState extends State<SplashPage> {
       child: Container(
         child: FittedBox(
           fit: BoxFit.none,
-          child: Image.asset('assets/icons/Logo跳转图片.png',scale: 2.0,),
+          child: Image.asset('assets/icons/logo_splash.png',scale: 2.0,),
         ),
       ),
     );
