@@ -87,8 +87,6 @@ class LoginState extends State<Login> {
     initUserName();
   }
   initUserName() async {
-    await PermissionHandlerUtil().initPermission();
-    PermissionHandlerUtil().askStoragePermission();
     List userNameLists = await SharedPreferenceUtil.getUsers();
     setState(() {
       if(userNameLists.length>0&&userNameLists[0].loginName!=null){

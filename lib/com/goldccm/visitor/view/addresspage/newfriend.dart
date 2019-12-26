@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,6 @@ import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
-import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
@@ -20,8 +20,6 @@ import 'package:visitor/com/goldccm/visitor/view/common/error.dart';
 
 /*
  * 新的好友
- * Author:ody997
- * Email:hwk@growingpine.com
  * 2019/10/16
  */
 class NewFriendPage extends StatefulWidget {
@@ -70,7 +68,7 @@ class NewFriendPageState extends State<NewFriendPage> {
         return Text('无连接', textScaleFactor: 1.0);
         break;
       case ConnectionState.waiting:
-        return LoadingDialog(text: '加载中');
+        return Container(color: Colors.white,);
         break;
       case ConnectionState.active:
         return Text('active', textScaleFactor: 1.0);
@@ -96,49 +94,52 @@ class NewFriendPageState extends State<NewFriendPage> {
   }
 
   Future init() async {
-    String str = await loadContacts();
+    await loadContacts();
     BadgeInfo badgeInfo = await BadgeUtil().updateFriendRequest();
-    badgeInfo.newFriendRequestCount=0;
+    badgeInfo.newFriendRequestCount = 0;
     Provider.of<BadgeModel>(context).update(badgeInfo);
-    await loadFriend(_userInfo, str);
     await loadRequest(_userInfo);
-    setState(() {
-
-    });
+    setState(() {});
     return null;
   }
 
-  /*
-   * 读取手机通讯录
-   */
-  Future<String> loadContacts() async {
-    String _phoneStr = await LocalStorage.load("phoneStr");
-    if (_phoneStr != "" && _phoneStr != null) {
-      return _phoneStr;
-    }
-    if (PermissionHandlerUtil.contact != 2) {
-      PermissionHandlerUtil().askContactPermission();
-    } else {
-      _phoneStr = "";
-      Iterable<Contact> contacts = await ContactsService.getContacts();
-      for (Contact contact in contacts) {
-        for (var phone in contact.phones) {
-          if (phone != null && phone.value != null) {
-            String str = "";
-            var cuts = phone.value.split(" ");
-            for (var cut in cuts) {
-              str = str + cut;
-            }
-            RegExp exp = RegExp('\^[0-9]*\$');
-            if (exp.hasMatch(str)) {
-              _phoneStr += str + ",";
+  //读取手机通讯录
+  Future<void> loadContacts() async {
+    PermissionHandlerUtil().askContactPermission().then((value) async {
+      if (value) {
+        LoadingDialog().show(context, 'Loading');
+        String _phoneStr = await LocalStorage.load("phoneStr");
+        if (_phoneStr != "" && _phoneStr != null) {
+          await loadFriend(_userInfo, _phoneStr);
+          setState(() {
+            Navigator.pop(context);
+          });
+          return;
+        }
+        _phoneStr = "";
+        Iterable<Contact> contacts = await ContactsService.getContacts();
+        for (Contact contact in contacts) {
+          for (var phone in contact.phones) {
+            if (phone != null && phone.value != null) {
+              String str = "";
+              var cuts = phone.value.split(" ");
+              for (var cut in cuts) {
+                str = str + cut;
+              }
+              RegExp exp = RegExp('\^[0-9]*\$');
+              if (exp.hasMatch(str)) {
+                _phoneStr += str + ",";
+              }
             }
           }
         }
+        LocalStorage.save("phoneStr", _phoneStr);
+        await loadFriend(_userInfo, _phoneStr);
+        setState(() {
+          Navigator.pop(context);
+        });
       }
-      LocalStorage.save("phoneStr", _phoneStr);
-    }
-    return _phoneStr;
+    });
   }
 
   addFriend(String name, String phone, UserInfo user) async {
@@ -161,7 +162,7 @@ class NewFriendPageState extends State<NewFriendPage> {
 
   Future loadFriend(UserInfo user, String str) async {
     _friends.clear();
-    String url ="userFriend/findIsUserByPhone";
+    String url = "userFriend/findIsUserByPhone";
     String threshold = await CommonUtil.calWorkKey();
     if (str != "") {
       var res = await Http().post(url,
@@ -243,11 +244,17 @@ class NewFriendPageState extends State<NewFriendPage> {
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         return ListTile(
             leading: Container(
-              child: CircleAvatar(
-                backgroundImage: _friends[index].imageUrl != null
-                    ? NetworkImage(
-                        Constant.imageServerUrl + _friends[index].imageUrl)
-                    : AssetImage("assets/images/visitor_icon_head.png"),
+              child: CachedNetworkImage(
+                imageUrl: Constant.imageServerUrl + _friends[index].imageUrl,
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => CircleAvatar(
+                  backgroundImage: AssetImage("assets/icons/ic_launcher.png"),
+                  radius: 100,
+                ),
+                imageBuilder: (context, imageProvider) => CircleAvatar(
+                  backgroundImage: imageProvider,
+                  radius: 100,
+                ),
               ),
               height: 50,
               width: 50,
@@ -400,10 +407,10 @@ class remarkFriendPage extends StatelessWidget {
                         style: TextStyle(fontSize: Constant.normalFontSize),
                         textScaleFactor: 1.0),
                     onPressed: () async {
-                        formKey.currentState.save();
-                        agreeRequest(userId, remark, userInfo);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
+                      formKey.currentState.save();
+                      agreeRequest(userId, remark, userInfo);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                   ),
                 ),
@@ -444,7 +451,7 @@ class remarkFriendPage extends StatelessWidget {
   }
 
   Future<bool> agreeRequest(int friendId, String remark, UserInfo user) async {
-    String url =  "userFriend/agreeFriend";
+    String url = "userFriend/agreeFriend";
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
       "token": user.token,
@@ -467,5 +474,4 @@ class remarkFriendPage extends StatelessWidget {
     }
     return false;
   }
-
 }

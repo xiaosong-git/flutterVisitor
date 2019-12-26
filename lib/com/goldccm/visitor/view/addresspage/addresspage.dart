@@ -93,7 +93,7 @@ class AddressPageState extends State<AddressPage> {
   initAddress() async {
     FriendDao friendDao = FriendDao();
     List<FriendInfo> lists = await friendDao.getFriendInfo();
-    if (lists.length > 0) {
+    if (lists!=null&&lists.length > 0) {
       setState(() {
         _userLists = lists;
       });

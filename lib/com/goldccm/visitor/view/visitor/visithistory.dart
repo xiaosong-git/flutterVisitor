@@ -1,15 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/QrcodeMode.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/QrcodeHandler.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
+import 'package:visitor/com/goldccm/visitor/view/common/emptyPage.dart';
 /*
- * 访问码
+ * 访问记录
+ * 展示可用于访问的访问二维码
  */
 class VisitHistory extends StatefulWidget{
   final UserInfo userInfo;
@@ -22,81 +27,83 @@ class VisitHistory extends StatefulWidget{
 
 class VisitHistoryState extends State<VisitHistory>{
   int count = 1;
+  int _totalNum=-1;
   List<VisitInfo> _visitLists = <VisitInfo>[];
-  ScrollController _scrollController = new ScrollController();
   bool isPerformingRequest = false;
   bool notEmpty=true;
   var _visitBuilderFuture;
+  EasyRefreshController _easyRefreshController;
+
   @override
   void initState() {
     super.initState();
+    _easyRefreshController = EasyRefreshController();
     _visitBuilderFuture=_getMoreData();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        _getMoreData();
-      }
-    });
   }
+
   @override
   void dispose() {
-    _scrollController.dispose();
+    _easyRefreshController.dispose();
     super.dispose();
   }
+  //构建列表
   _buildInviteList(){
-    return ListView.separated(
-      itemCount: isPerformingRequest == true
-          ? _visitLists.length
-          : _visitLists.length + 1,
-      itemBuilder: (BuildContext context, int index) {
-        if (index == _visitLists.length) {
-          return ListTile(
-            title: Text('加载中',textScaleFactor: 1.0,),
-          );
-        } else {
-          return ListTile(
-            title: Text(_visitLists[index].realName!=null?_visitLists[index].realName:"",textScaleFactor: 1.0,),
-            subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(_visitLists[index].startDate!=null?_visitLists[index].startDate:"",textScaleFactor: 1.0,),
-                  Text(_visitLists[index].endDate!=null?"至 ${_visitLists[index].endDate}":"",textScaleFactor: 1.0,),
-                ]
+    return EasyRefresh(
+      child:ListView.separated(
+        itemCount: _visitLists.length,
+        itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(_visitLists[index].realName!=null?_visitLists[index].realName:"",textScaleFactor: 1.0,),
+              subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(_visitLists[index].startDate!=null?_visitLists[index].startDate:"",textScaleFactor: 1.0,),
+                    Text(_visitLists[index].endDate!=null?"至 ${_visitLists[index].endDate}":"",textScaleFactor: 1.0,),
+                  ]
+              ),
+              trailing: Text(_visitLists[index].cstatus!=null?(_visitLists[index].cstatus=="applyConfirm"?"审核中":_visitLists[index].cstatus=="applySuccess"?"已通过":"未通过"):"",textScaleFactor: 1.0,),
+              onTap: () {
+                if(_visitLists[index].cstatus=="applySuccess") {
+                  QrcodeMode model = new QrcodeMode(userInfo: widget.userInfo,
+                      totalPages: 1,
+                      bitMapType: 2,
+                      visitInfo: _visitLists[index]);
+                  List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
+                  Navigator.push(context,
+                      new MaterialPageRoute(builder: (BuildContext context) {
+                        return new Qrcode(qrCodecontent: qrMsg);
+                      }));
+                }else{
+                  ToastUtil.showShortClearToast("您的访问还没有通过申请哦");
+                }
+              },
+            );
+          },
+        separatorBuilder: (BuildContext context, int index) {
+          return Container(
+            child: Divider(
+              height: 0,
             ),
-            trailing: Text(_visitLists[index].cstatus!=null?(_visitLists[index].cstatus=="applyConfirm"?"审核中":_visitLists[index].cstatus=="applySuccess"?"已通过":"未通过"):"",textScaleFactor: 1.0,),
-            onTap: () {
-              if(_visitLists[index].cstatus=="applySuccess") {
-                QrcodeMode model = new QrcodeMode(userInfo: widget.userInfo,
-                    totalPages: 1,
-                    bitMapType: 2,
-                    visitInfo: _visitLists[index]);
-                List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
-                Navigator.push(context,
-                    new MaterialPageRoute(builder: (BuildContext context) {
-                      return new Qrcode(qrCodecontent: qrMsg);
-                    }));
-              }else{
-                ToastUtil.showShortClearToast("您的访问还没有通过申请哦");
-              }
-            },
           );
-        }
+        },
+        padding: EdgeInsets.all(8),
+      ),
+      onRefresh: ()async{
       },
-      separatorBuilder: (BuildContext context, int index) {
-        return Container(
-          child: Divider(
-            height: 0,
-          ),
-        );
+      onLoad: ()async{
+        _getMoreData();
       },
-      padding: EdgeInsets.all(8),
-      controller: _scrollController,
+      controller: _easyRefreshController,
+      enableControlFinishLoad: true,
+//      enableControlFinishRefresh: true,
+      firstRefresh: true,
+      firstRefreshWidget: LoadingDialog(text: '加载中',),
+      emptyWidget: notEmpty!=true?EmptyPage():null,
     );
   }
+  //加载更多数据
   _getMoreData() async {
-    if (!isPerformingRequest) {
       Future.delayed(Duration(seconds: 1), () async {
-        setState(() => isPerformingRequest = true);
         String url = "visitorRecord/visitRecord/$count/10";
         String threshold = await CommonUtil.calWorkKey(userInfo:widget.userInfo);
         var res = await Http().post(url,
@@ -107,13 +114,11 @@ class VisitHistoryState extends State<VisitHistory>{
               "requestVer": await CommonUtil.getAppVersion(),
               "userId": widget.userInfo.id,
             }),debugMode: true,userCall: false);
-        print(res);
         if (res is String) {
           Map map = jsonDecode(res);
           if(map['verify']['sign']=="success"){
             if(map['data']['total']==0){
               setState(() {
-                isPerformingRequest = true;
                 notEmpty = false;
               });
             }else{
@@ -137,62 +142,29 @@ class VisitHistoryState extends State<VisitHistory>{
               }
               setState(() {
                 count++;
-                isPerformingRequest = false;
+                _totalNum+=10;
               });
               if (map['data']['rows'].length < 10) {
                 setState(() {
                   count--;
-                  isPerformingRequest = true;
                 });
+                _easyRefreshController.finishLoad(success: true,noMore: true);
+              }else{
+                _easyRefreshController.finishLoad(success: true);
               }
             }
           }
         }
       });
-    } else {
-      ToastUtil.showShortToast("已加载到底哦！");
-    }
   }
+
   Widget _visitFuture(BuildContext context, AsyncSnapshot snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
         return Text('无连接',textScaleFactor: 1.0,);
         break;
       case ConnectionState.waiting:
-        return Stack(
-          children: <Widget>[
-            Opacity(
-                opacity: 0.1,
-                child: ModalBarrier(
-                  color: Colors.black,
-                )
-            ),
-            Center(
-              child:Container(
-                padding: const EdgeInsets.all(30.0),
-                decoration: BoxDecoration(
-                  //黑色背景
-                    color: Colors.black87,
-                    //圆角边框
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Column(
-                  //控件里面内容主轴负轴剧中显示
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  //主轴高度最小
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    CircularProgressIndicator(),
-                    Text(
-                      '加载中',
-                      style: TextStyle(color: Colors.white),textScaleFactor: 1.0,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        return LoadingDialog(text: '加载中',);
         break;
       case ConnectionState.active:
         return Text('active',textScaleFactor: 1.0,);
@@ -205,6 +177,7 @@ class VisitHistoryState extends State<VisitHistory>{
         return null;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

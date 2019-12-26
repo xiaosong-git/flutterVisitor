@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 //import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'com/goldccm/visitor/model/BadgeModel.dart';
 import 'com/goldccm/visitor/model/UserModel.dart';
+import 'com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'com/goldccm/visitor/view/login/Login.dart';
 import 'splash.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -44,10 +46,13 @@ void main() {
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
+          GlobalEasyRefreshLocalizations.delegate,
         ],
         supportedLocales: [
           const Locale('zh','CH'),
           const Locale('en','US'),
+          const Locale('en', ''),
+          const Locale('zh','CN'),
         ],
         home:SplashPage(),
       )

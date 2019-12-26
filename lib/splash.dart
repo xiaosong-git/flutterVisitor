@@ -54,7 +54,7 @@ class SplashState extends State<SplashPage> {
       child: Container(
         child: FittedBox(
           fit: BoxFit.none,
-          child: Image.asset('assets/icons/logo_splash.png',scale: 2.0,),
+          child: Image.asset('assets/icons/visitor_splash.png',scale: 2.0,),
         ),
       ),
     );

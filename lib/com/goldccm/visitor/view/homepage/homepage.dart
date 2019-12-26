@@ -17,6 +17,7 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/MessageUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/QrcodeHandler.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
@@ -150,6 +151,8 @@ class HomePageState extends State<HomePage> {
   }
 
   init() async {
+    await PermissionHandlerUtil().initPermission();
+    PermissionHandlerUtil().askStoragePermission();
     UserInfo user = await LocalStorage.load("userInfo");
     getImageServerUrl();
     getBanner();

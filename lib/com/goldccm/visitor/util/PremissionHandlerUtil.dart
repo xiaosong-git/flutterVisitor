@@ -50,18 +50,21 @@ class PermissionHandlerUtil{
     /*
      * 通讯录权限
      */
-    askContactPermission()async{
+    Future<bool> askContactPermission()async{
       if(contact==null){
         print("通讯录权限尚未完成初始化");
+        return false;
       }else if(contact==2){
         print("通讯录权限已经获取");
+        return true;
       }else{
         Map<PermissionGroup, PermissionStatus> permissions =
         await PermissionHandler()
             .requestPermissions([PermissionGroup.contacts]);
-        if(permissions.entries.elementAt(0).value==PermissionStatus.denied){
-          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        if(permissions.entries.elementAt(0).value==PermissionStatus.granted){
+          return true;
         }
+        return false;
       }
     }
     /*
