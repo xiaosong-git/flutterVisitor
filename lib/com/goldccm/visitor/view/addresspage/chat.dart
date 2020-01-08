@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
-import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
-import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
+import 'package:visitor/com/goldccm/visitor/db/ChatMessage.dart';
+import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/MessageUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitAddress.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitRequest.dart';
@@ -795,7 +796,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
               Container(
                 margin: EdgeInsets.only(left: 16.0),
                 child: CircleAvatar(
-                  backgroundImage:widget.imageURL!=null?NetworkImage(Constant.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
+                  backgroundImage:widget.imageURL!=null?NetworkImage(RouterUtil.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
                 ),
               ),
             ],
@@ -811,7 +812,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
               Container(
                 margin: EdgeInsets.only(right: 16.0),
                 child: CircleAvatar(
-                  backgroundImage:widget.imageURL!=null?NetworkImage(Constant.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
+                  backgroundImage:widget.imageURL!=null?NetworkImage(RouterUtil.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
                 ),
               ),
               Column(
@@ -885,7 +886,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
               Container(
                 margin: EdgeInsets.only(left: 16.0),
                 child: CircleAvatar(
-                  backgroundImage:widget.imageURL!=null?NetworkImage(Constant.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
+                  backgroundImage:widget.imageURL!=null?NetworkImage(RouterUtil.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
                 ),
               ),
             ],
@@ -902,7 +903,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
               Container(
                 margin: EdgeInsets.only(right: 16.0),
                 child: CircleAvatar(
-                  backgroundImage:widget.imageURL!=null?NetworkImage(Constant.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
+                  backgroundImage:widget.imageURL!=null?NetworkImage(RouterUtil.imageServerUrl+widget.imageURL):AssetImage("assets/images/visitor_icon_head.png"),
                 ),
               ),
               Column(
@@ -959,7 +960,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
                 margin: EdgeInsets.only(right: 16.0),
                 child: CircleAvatar(
                   backgroundImage: widget.imageURL != null ? NetworkImage(
-                      Constant.imageServerUrl + widget.imageURL) : AssetImage(
+                      RouterUtil.imageServerUrl + widget.imageURL) : AssetImage(
                       "assets/images/visitor_icon_head.png"),
                 ),
               ),

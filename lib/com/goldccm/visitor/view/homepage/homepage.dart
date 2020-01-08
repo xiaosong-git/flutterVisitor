@@ -19,6 +19,7 @@ import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/MessageUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/QrcodeHandler.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/model/BannerInfo.dart';
@@ -122,9 +123,6 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    SystemUiOverlayStyle systemUiOverlayStyle =
-        SystemUiOverlayStyle(statusBarColor: Colors.transparent);
-    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     init();
     _swiperController = new SwiperController();
     _swiperController.startAutoplay();
@@ -153,6 +151,7 @@ class HomePageState extends State<HomePage> {
   init() async {
     await PermissionHandlerUtil().initPermission();
     PermissionHandlerUtil().askStoragePermission();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     UserInfo user = await LocalStorage.load("userInfo");
     getImageServerUrl();
     getBanner();
@@ -462,7 +461,7 @@ class HomePageState extends State<HomePage> {
 
   Widget _buildItemImage(BuildContext context, int index) {
     return CachedNetworkImage(
-      imageUrl: Constant.imageServerUrl + imageList[index],
+      imageUrl: RouterUtil.imageServerUrl + imageList[index],
       placeholder: (context, url) =>
           CircularProgressIndicator(),
       errorWidget: (context, url, error) =>

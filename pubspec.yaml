@@ -38,7 +38,7 @@ dependencies:
   sqflite: ^1.2.0
   web_socket_channel: ^1.1.0
   flutter_local_notifications: ^0.9.0+1
-  path_provider: ^1.1.2
+  path_provider: ^1.5.1
   provider: ^3.0.0+1
   city_pickers:
     git:
@@ -61,6 +61,9 @@ dependencies:
   getuiflut: ^0.1.7
   cached_network_image: ^2.0.0-rc
   flutter_easyrefresh: ^2.0.8
+  flutter_custom_dialog: ^1.0.15
+  flutter_screenutil: ^0.7.0
+  flutter_svg: ^0.15.0
 
   permission_handler:
     path: plugin/flutter_permission_handler
@@ -147,6 +150,7 @@ flutter:
     - assets/images/visitor_icon_setting.png
     - assets/images/visitor_icon_account.png
     - assets/images/visitor_icon_meetingroom.png
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

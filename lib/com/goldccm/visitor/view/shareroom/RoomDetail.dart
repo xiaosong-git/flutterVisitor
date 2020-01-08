@@ -8,6 +8,7 @@ import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:visitor/com/goldccm/visitor/view/shareroom/RoomCheckOut.dart';
@@ -384,7 +385,7 @@ class RoomDetailState extends State<RoomDetail> {
                   child: FittedBox(
                     fit: BoxFit.fill,
                     child:
-                    (room.roomImage[0]!=null&&room.roomImage[0]!="")?Image.network(Constant.imageServerUrl+room.roomImage[0]) :
+                    (room.roomImage[0]!=null&&room.roomImage[0]!="")?Image.network(RouterUtil.imageServerUrl+room.roomImage[0]) :
                     Image.asset("assets/images/visitor_icon_nodata.png"),
                   ),
                   height: 180,

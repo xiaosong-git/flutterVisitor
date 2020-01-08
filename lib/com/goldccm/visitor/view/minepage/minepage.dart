@@ -13,6 +13,7 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/HeaderPage.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/companypage.dart';
@@ -316,7 +317,7 @@ class MinePageState extends State<MinePage> {
                                 },
                                 child:
                                   CachedNetworkImage(
-                                          imageUrl: Constant.imageServerUrl +
+                                          imageUrl: RouterUtil.imageServerUrl +
                                               userProvider.info.headImgUrl,
                                           placeholder: (context, url) =>
                                               CircularProgressIndicator(),

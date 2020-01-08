@@ -14,6 +14,7 @@ import 'package:city_pickers/city_pickers.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/DesUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
@@ -315,7 +316,7 @@ class IdentifyPageState extends State<IdentifyPage> {
       },debugMode: true);
       Map premap = jsonDecode(preres);
       if (premap['verify']['sign'] == "fail") {
-        String imageurl = Constant.imageServerApiUrl;
+        String imageurl = RouterUtil.uploadServerUrl;
         var name = _image.path.split("/");
         var filename = name[name.length - 1];
         FormData formData = FormData.from({

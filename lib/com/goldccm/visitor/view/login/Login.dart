@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -10,6 +12,7 @@ import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
@@ -17,16 +20,12 @@ import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
+import 'package:visitor/com/goldccm/visitor/view/login/RouterLogin.dart';
 import 'package:visitor/home.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'GestureLogin.dart';
 import 'Regisit.dart';
 
-
-final Color _availableStyle = Colors.blue;
-final Color _unavailableStyle = Colors.grey;
-final TextStyle _labelStyle =
-    new TextStyle(fontSize: 15.0, color: Colors.blue,);
 /*
  * 登录
  * author:ody997<hwk@growingpine.com>
@@ -37,7 +36,6 @@ final TextStyle _labelStyle =
  */
 
 class Login extends StatefulWidget {
-
   final int countdown;
   final Function onTapCallback;
   final bool available;
@@ -50,337 +48,398 @@ class Login extends StatefulWidget {
 
   @override
   State<Login> createState() => new LoginState();
-
 }
+
 /*
  * _codeBtnflag 验证码控制状态
  * _verifyStr 验证码字符
  * _seconds 倒计时
  * _deviceType 1-安卓 2-IOS
  */
-class LoginState extends State<Login> {
-
+class LoginState extends State<Login> with SingleTickerProviderStateMixin{
   int _deviceType = 1;
   int _loginType = 1;
   final int _loginPass = 1;
   final int _loginCode = 2;
   bool _codeBtnflag = true;
+  TabController _tabController;
   Timer _timer;
   int _seconds;
-  Color colorStyle = _availableStyle;
+  Color msgColor = _availColor;
+  static Color _availColor=Color(0xFF0073FE);
+  static Color _unavailColor=Color(0xFFCFCFCF);
   String _verifyStr = '获取验证码';
   FocusNode _focusNode;
   TextEditingController _userNameController = new TextEditingController();
   TextEditingController _passwordController = new TextEditingController();
   TextEditingController _checkCodeController = new TextEditingController();
+  //tabBar控件和相应的监听事件
   @override
   void initState() {
     super.initState();
-    if(Platform.isAndroid){
-      _deviceType=1;
+    _tabController = TabController(length: 2,vsync: this);
+    _tabController.addListener(() {
+      if(_tabController.indexIsChanging){
+        switch(_tabController.index){
+          case 0:
+            setState(() {
+              _loginType=1;
+            });
+            break;
+          case 1:
+            setState(() {
+              _loginType=2;
+            });
+            break;
+        }
+      }
+    });
+    if (Platform.isAndroid) {
+      _deviceType = 1;
     }
-    if(Platform.isIOS){
-      _deviceType=2;
+    if (Platform.isIOS) {
+      _deviceType = 2;
     }
-    _focusNode=FocusNode();
+    _focusNode = FocusNode();
     _seconds = widget.countdown;
     initUserName();
   }
+
   initUserName() async {
     List userNameLists = await SharedPreferenceUtil.getUsers();
     setState(() {
-      if(userNameLists.length>0&&userNameLists[0].loginName!=null){
-        _userNameController.text=userNameLists[0].loginName;
-        FocusScope.of(context).requestFocus(_focusNode);
+      if (userNameLists.length > 0 && userNameLists[0].loginName != null) {
+        _userNameController.text = userNameLists[0].loginName;
+//        FocusScope.of(context).requestFocus(_focusNode);
       }
     });
   }
-  void _startTimer() {
 
+  void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_seconds == 0) {
         _cancelTimer();
         _seconds = widget.countdown;
-        colorStyle = _availableStyle;
+        msgColor = _availColor;
         _codeBtnflag = true;
         setState(() {});
         return;
       }
       _seconds--;
-      _verifyStr = '已发送$_seconds' + 's';
-      colorStyle = _unavailableStyle;
+      _verifyStr = '$_seconds' + 's后重新获取';
+      msgColor = _unavailColor;
       _codeBtnflag = false;
       setState(() {});
       if (_seconds == 0) {
         _verifyStr = '重新发送';
       }
     });
-
   }
 
   void _cancelTimer() {
-
     _timer?.cancel();
-
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _tabController.dispose();
     _cancelTimer();
     super.dispose();
-
   }
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return WillPopScope(
       child: Scaffold(
-          body: new SingleChildScrollView(
-              child: new ConstrainedBox(
-                  constraints: new BoxConstraints(
-                    minHeight: 120.0,
-                  ),
-                  child: new Padding(
-                    padding: const EdgeInsets.only(top: 30.0),
-                    child: new Column(children: <Widget>[
-                      new Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            new Padding(
-                              padding: const EdgeInsets.only(right: 20.0),
-                              child: GestureDetector(
-                                  onTap: _regisit,
-                                  child: new Text('注册', style: _labelStyle)),
-                            ),
-                          ]),
-                      new Padding(
-                        padding: const EdgeInsets.only(top: 70),
-                        child: GestureDetector(
-                          child: new Image.asset("assets/icons/ic_launcher.png"),
-                          onLongPress: (){
-
-                          },
+         body: SingleChildScrollView(
+           child: Container(
+             width: ScreenUtil().setWidth(750),
+             height: ScreenUtil().setHeight(1334),
+             color:  Color(0xFFFFFFFF),
+             child: Column(
+               children: <Widget>[
+                 Container(
+                   height: ScreenUtil().setHeight(356-88)+MediaQuery.of(context).padding.top,
+                   width: ScreenUtil().setWidth(750),
+                   child: Container(
+                     padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                     child: Image(image: AssetImage("assets/images/login_logo.png"),width: ScreenUtil().setWidth(180),height: ScreenUtil().setHeight(180),),
+                      alignment: Alignment.bottomCenter,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/login_background.png'),
+                          fit: BoxFit.fill,
                         ),
                       ),
-                      new Padding(
-                          padding: const EdgeInsets.only(
-                              top: 30.0, left: 20.0, right: 20.0),
-                          child: new ConstrainedBox(
-                            constraints:
-                            BoxConstraints(maxHeight:MediaQuery.of(context).size.height/10, maxWidth: 400),
-                            child: new TextField(
-                              autocorrect: true,
-                              keyboardType: TextInputType.number,
-                              maxLines: 1,
-                              maxLength: 11,
-                              maxLengthEnforced: true,
-                              inputFormatters: [
-                                WhitelistingTextInputFormatter.digitsOnly
-                              ],
-                              controller: _userNameController,
-                              style: _labelStyle,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.all(10)
-                                      .copyWith(top: 20.0, bottom: 10.0),
-                                  prefixIcon: Icon(Icons.perm_identity),
-                                  hintText: '请输入手机号',
-                                  fillColor: Colors.black12,
-                                  filled: true),
-                              autofocus: true,
-                            ),
-                          )),
-                      new Padding(
-                          padding: const EdgeInsets.only(
-                              top: 5.0, left: 20.0, right: 20.0),
-                          child: new ConstrainedBox(
-                              constraints:
-                              BoxConstraints(maxHeight:MediaQuery.of(context).size.height/10, maxWidth: 400),
-                              child: _loginType == _loginPass
-                                  ? new TextField(
-                                maxLines: 1,
-                                style: _labelStyle,
-                                keyboardType: TextInputType.text,
-                                controller: _passwordController,
-                                focusNode: _focusNode,
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.all(10)
-                                        .copyWith(top: 15.0, bottom: 10.0),
-                                    prefixIcon: Icon(Icons.lock),
-                                    hintText: '请输入密码',
-                                    fillColor: Colors.black12,
-                                    filled: true),
-                                obscureText: true,
-                              )
-                                  : new Row(
-                                children: <Widget>[
-                                  new Expanded(
-                                    flex: 2,
-                                    child: new TextField(
-                                      style: _labelStyle,
-                                      keyboardType: TextInputType.number,
-                                      controller: _checkCodeController,
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          contentPadding:
-                                          EdgeInsets.all(10.0).copyWith(
-                                              top: 12.0, bottom: 12.0),
-                                          prefixIcon: Icon(Icons.lock),
-                                          hintText: '请输入验证码',
-                                          hintStyle: new TextStyle(
+                   ),
+                 ),
+                 Container(
+                     height: ScreenUtil().setHeight(60),
+//              width: ScreenUtil().setWidth(454),
+                     padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), 0, ScreenUtil().setWidth(112), 0),
+                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(110)),
+                     child: Stack(
+                       fit: StackFit.passthrough,
+                       alignment: Alignment.bottomCenter,
+                       children: <Widget>[
+                         Container(
+                           decoration: BoxDecoration(
+                             border: Border(
+                               bottom: BorderSide(color: Color(0xFFECECEC), width: ScreenUtil().setHeight(4)),
+                             ),
+                           ),
+                         ),
+                         TabBar(
+                           indicatorColor: Color(0xFF0073FE),
+                           controller: _tabController,
+                           labelColor: Color(0xFF0073FE),
+                           unselectedLabelColor: Color(0xFFE1E1E1),
+                           indicatorWeight: ScreenUtil().setHeight(4),
+                           tabs: <Widget>[
+                             Container(
+                               child:  Tab(
+                                 child: Text('密码登录',style: TextStyle(fontSize: ScreenUtil().setSp(32),),),
+                               ),
+                             ),
+                             Container(
+                               child:  Tab(
+                                 child: Text('验证码登录',style: TextStyle(fontSize: ScreenUtil().setSp(32),),),
+                               ),
+                             )
+                           ],
+                         ),
+                       ],
+                     )
+                 ),
+                 Container(
+                   height: ScreenUtil().setHeight(154),
+                   padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(80), ScreenUtil().setWidth(112), 0),
+                   child: Row(
+                     children: <Widget>[
+                       Expanded(
+                         flex: 17,
+                         child:Image(image: AssetImage('assets/images/login_account.png'),width: ScreenUtil().setWidth(67),height: ScreenUtil().setHeight(67),),
+                       ),
+                       Expanded(
+                         flex: 109,
+                         child:Container(
+                             padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(35)),
+                             child: TextField(
+                               maxLines: 1,
+                               textAlign: TextAlign.left,
+                               textAlignVertical: TextAlignVertical.bottom,
+                               keyboardType: TextInputType.phone,
+                               controller: _userNameController,
+                               maxLengthEnforced: true,
+                               decoration: InputDecoration(
+                                 border: InputBorder.none,
+                                 hintText: '请输入手机号',
+                                 hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                               ),
+                             ),
+                             decoration: BoxDecoration(
+                               border:Border(
+                                 bottom: BorderSide(
+                                   color: Color(0xFFECECEC),
+                                   width: ScreenUtil().setHeight(2),
+                                   style: BorderStyle.solid,
+                                 ),
+                               ),
+                             )
+                         ),
+                       ),
+                     ],
+                   ),
+                 ),
+                 _loginType==_loginPass?Container(
+                   height: ScreenUtil().setHeight(108),
+                   padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                   child: Row(
+                     children: <Widget>[
+                       Expanded(
+                           flex: 17,
+                           child: Center(
+                             child:Image(image: AssetImage('assets/images/login_password.png'),width: ScreenUtil().setWidth(66),height: ScreenUtil().setHeight(66),),
+                           )
+                       ),
+                       Expanded(
+                         flex: 109,
+                         child: Container(
+                             padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                             child: TextField(
+                               maxLines: 1,
+                               textAlign: TextAlign.left,
+                               textAlignVertical: TextAlignVertical.bottom,
+                               maxLengthEnforced: true,
+                               controller: _passwordController,
+                               decoration: InputDecoration(
+                                 border: InputBorder.none,
+                                 hintText: '请输入密码',
+                                 hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                               ),
+                             ),
+                             decoration: BoxDecoration(
+                               border:Border(
+                                 bottom: BorderSide(
+                                   color: Color(0xFFECECEC),
+                                   width: ScreenUtil().setHeight(2),
+                                   style: BorderStyle.solid,
+                                 ),
+                               ),
+                             )
+                         ),
+                       ),
+                     ],
+                   ),
+                 ):Container(
+                   height: ScreenUtil().setHeight(108),
+                   padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                   child: Row(
+                     children: <Widget>[
+                       Expanded(
+                           flex: 17,
+                           child: Center(
+                             child:Image(image: AssetImage('assets/images/login_msgcode.png'),width: ScreenUtil().setWidth(66),height: ScreenUtil().setHeight(66),),
+                           )
+                       ),
+                       Expanded(
+                         flex: 109,
+                         child: Stack(
+                           children: <Widget>[
+                             Positioned(
+                               child:  Container(
+                                   padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                                   child: TextField(
+                                     maxLines: 1,
+                                     textAlign: TextAlign.left,
+                                     textAlignVertical: TextAlignVertical.bottom,
+                                     maxLengthEnforced: true,
+                                     controller: _checkCodeController,
+                                     decoration: InputDecoration(
+                                       border: InputBorder.none,
+                                       hintText: '请输入验证码',
+                                       hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                                     ),
+                                   ),
+                                   decoration: BoxDecoration(
+                                     border:Border(
+                                       bottom: BorderSide(
+                                         color: Color(0xFFECECEC),
+                                         width: ScreenUtil().setHeight(2),
+                                         style: BorderStyle.solid,
+                                       ),
+                                     ),
+                                   )
+                               ),
+                             ),
+                             Positioned(
+                               right: ScreenUtil().setWidth(0),
+                               bottom: ScreenUtil().setHeight(-16),
+                               child: FlatButton(
+                                 child: Text(_verifyStr,style: TextStyle(color: msgColor,fontSize: ScreenUtil().setSp(24)),),
+                                 onPressed: () async {
+                                   if(_codeBtnflag){
+                                     _startTimer();
+                                     bool res = await getCheckCode();
+                                     if(res!=true){
+                                       _seconds=0;
+                                     }
+                                   }
+                                 },
+                               ),
+                             ),
+                           ],
+                         ),
+                       ),
+                     ],
+                   ),
+                 ),
+                 Container(
+                   height: ScreenUtil().setHeight(212),
+                   padding: EdgeInsets.only(top:ScreenUtil().setHeight(110),left: ScreenUtil().setWidth(112),right:ScreenUtil().setWidth(112)),
+                   child: SizedBox(
+                     width: ScreenUtil().setWidth(520),
+                     height: ScreenUtil().setHeight(102),
+                     child: RaisedButton(
+                       shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(5.0)),
+                       child: Text('登录',style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFFFFFFFF)),textAlign: TextAlign.center,),
+                       onPressed: (){
+                         LoadingDialog().show(context, "登陆中");
+                         _loginAction().then((value){
+                           Navigator.pop(context);
+                           if(value){
+                             Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
+                           }
+                         });
+                       },
+                       color: Color(0xFF79B6FF),
+                     ),
+                   ),
+                 ),
+                 Container(
+                   width: ScreenUtil().setWidth(750),
+                   height: ScreenUtil().setHeight(40),
+                   margin: EdgeInsets.only(top:ScreenUtil().setHeight(46)),
+                   padding: EdgeInsets.only(left: ScreenUtil().setWidth(225)),
+                   child: Row(
+                     children: <Widget>[
+                       Container(
+                         width:ScreenUtil().setWidth(120),
+                         height:ScreenUtil().setHeight(40),
+                         alignment: Alignment.center,
+                         child: GestureDetector(
+                           child: Text('注册账号',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFFA8A8A8)),),
+                           onTap: _regisit,
+                         ),
 
-                                          ),
-                                          fillColor: Colors.black12,
-                                          filled: true),
-                                      obscureText: true,
-                                    ),
-                                  ),
-                                  new Expanded(
-                                      flex: 1,
-                                      child: new Padding(
-                                        padding:
-                                        EdgeInsets.only(left: 10.0),
-                                        child: new RaisedButton(
-                                          onPressed: () async {
-                                            if (_codeBtnflag) {
-                                              _startTimer();
-                                              bool res = await getCheckCode();
-                                              if (res != true) {
-                                                _seconds=0;
-                                              }
-                                            }
-                                          },
-                                          child: new Padding(
-                                            padding:
-                                            new EdgeInsets.fromLTRB(
-                                                0.0, 12.0, 0.0, 12.0),
-                                            child: new Text(
-                                              _verifyStr,
-                                              style: new TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ),
-                                          color: colorStyle,
-                                        ),
-                                      )),
-                                ],
-                              ))),
-                      new Padding(
-                        padding: new EdgeInsets.only(
-                            top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-                        child: new Row(
-                          children: <Widget>[
-                            new Expanded(
-                              child: new RaisedButton(
-                                onPressed:(){
-                                    LoadingDialog().show(context, "登陆中");
-                                    _loginAction().then((value){
-                                      Navigator.pop(context);
-                                      if(value){
-                                        Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
-                                      }
-                                    });
-                                },
-                                //通过控制 Text 的边距来控制控件的高度
-                                child: new Padding(
-                                  padding: new EdgeInsets.fromLTRB(
-                                      0.0, 15.0, 0.0, 15.0),
-                                  child: new Text(
-                                    "登录",
-                                    style: new TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-//TODO 忘记密码功能暂时不开放
-//                      new Padding(
-//                        padding: const EdgeInsets.only(right: 20.0),
-//                        child: new Row(
-//                          mainAxisAlignment: MainAxisAlignment.end,
-//                          children: <Widget>[
-//                            new GestureDetector(
-//                              onTap: () {},
-//                              child: new Text(
-//                                '忘记密码',
-//                                style: _labelStyle,
-//                              ),
-//                            )
-//                          ],
-//                        ),
-//                      ),
-                      new Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: <Widget>[
-                              new Padding(
-                                padding: EdgeInsets.only(right: 10.0),
-                                child: _loginType == _loginPass
-                                    ? new GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _loginType = _loginCode;
-                                    });
-                                  },
-                                  child: new Text(
-                                    '短信登录',
-                                    style: _labelStyle,
-                                  ),
-                                )
-                                    : new GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _loginType = _loginPass;
-                                    });
-                                  },
-                                  child: new Text(
-                                    '密码登录',
-                                    style: _labelStyle,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              new Padding(
-                                padding: EdgeInsets.only(left: 10.0),
-                                child: new GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(context, new MaterialPageRoute(
-                                        builder: (BuildContext context) {
-                                          return new GestureLogin();
-                                        }));
-                                  },
-                                  child: new Text(
-                                    '手势密码',
-                                    style: _labelStyle,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ]),
-                  )))),
-                  onWillPop: (){
-
-                  },
+                       ),
+                       Container(
+                         width: ScreenUtil().setWidth(52),
+                         height:ScreenUtil().setHeight(40),
+                         alignment: Alignment.center,
+                         child:Text('|',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFFA8A8A8)),),
+                         padding: EdgeInsets.only(left: ScreenUtil().setWidth(25),right:ScreenUtil().setWidth(25)),
+                       ),
+                       Container(
+                         width:ScreenUtil().setWidth(120),
+                         height:ScreenUtil().setHeight(40),
+                         alignment: Alignment.center,
+                         child: Text('忘记密码',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFFA8A8A8)),),
+                       ),
+                     ],
+                   )
+                 ),
+                 Container(
+                   width: ScreenUtil().setWidth(750),
+                   height: ScreenUtil().setHeight(40),
+                   margin: EdgeInsets.only(top: ScreenUtil().setHeight(186)),
+                   padding: EdgeInsets.only(left: ScreenUtil().setWidth(248*2)),
+                   child: InkWell(
+                     child: Container(
+                       width: ScreenUtil().setWidth(200),
+                       height: ScreenUtil().setHeight(40),
+                       child: Row(
+                         mainAxisAlignment: MainAxisAlignment.start,
+                         children: <Widget>[
+                           Text('专属用户登录',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF0073FE)),),
+                           Image(image: AssetImage('assets/images/login_next.png'),width: ScreenUtil().setWidth(30),height: ScreenUtil().setHeight(30),),
+                         ],
+                       ),
+                     ),
+                     onTap:_router,
+                   ),
+                 ),
+               ],
+             ),
+           ),
+         ),
+      ),
+      onWillPop: () {
+        return Future.value(false);
+      },
     );
   }
 
@@ -392,20 +451,30 @@ class LoginState extends State<Login> {
       }));
     });
   }
+  void _router() {
+    setState(() {
+      Navigator.push(context,
+          new MaterialPageRoute(builder: (BuildContext context) {
+            return new RouterLogin();
+          }));
+    });
+  }
 
   // 获取验证码
 
   Future<bool> getCheckCode() async {
     bool _userNameCheck = checkLoignUser();
     if (_userNameCheck) {
-      String url = Constant.sendCodeUrl +
+      String url = Constant.serverUrl+Constant.sendCodeUrl +
           "/" +
           _userNameController.text.toString() +
           "/1";
-      var data = await Http().get(url, queryParameters: {
-        "phone": _userNameController.text.toString(),
-        "type": "1"
-      },userCall: true);
+      var data = await Http().get(url,
+          queryParameters: {
+            "phone": _userNameController.text.toString(),
+            "type": "1"
+          },
+          userCall: true);
       if (data != null) {
         JsonResult result = JsonResult.fromJson(data);
         if (result.sign == 'success') {
@@ -437,7 +506,8 @@ class LoginState extends State<Login> {
     }
     return checkResult;
   }
-   // 密码校验
+
+  // 密码校验
   bool checkPass() {
     String _pass = _passwordController.text.toString();
     bool checkResult = true;
@@ -483,37 +553,43 @@ class LoginState extends State<Login> {
     if (userNameCheck && _loginType == _loginPass) {
       bool passCheck = checkPass();
       if (passCheck) {
-           _passNum = Md5Util().encryptByMD5ByHex(_passwordController.text.toString());
-           data = await Http().post(Constant.loginUrl, queryParameters: {
-          "phone": _userNameController.text.toString(),
-          "style": "1",
-          "sysPwd": _passNum,
-             "deviceToken":NPush.clientId??"",
-             "deviceType":_deviceType,
-        },userCall: true);
-      }else{
-        ToastUtil.showShortToast("用户名或密码错误");
+        _passNum =
+            Md5Util().encryptByMD5ByHex(_passwordController.text.toString());
+        data = await Http().post(Constant.serverUrl+Constant.loginUrl,
+            queryParameters: {
+              "phone": _userNameController.text.toString(),
+              "style": "1",
+              "sysPwd": _passNum,
+              "deviceToken": NPush.clientId ?? "",
+              "deviceType": _deviceType,
+            },
+            userCall: true);
+      } else {
         return false;
       }
     } else if (_loginType == _loginCode) {
       //验证码登录
       if (checkCode()) {
         _codeNum = _checkCodeController.text.toString();
-        data = await Http().post(Constant.loginUrl, queryParameters: {
-          "phone": _userNameController.text.toString(),
-          "style": "1",
-          "code": _codeNum,
-          "deviceToken":NPush.clientId??"",
-          "deviceType":_deviceType,
-        },userCall: true,);
-      }else{
+        data = await Http().post(
+          Constant.serverUrl+Constant.loginUrl,
+          queryParameters: {
+            "phone": _userNameController.text.toString(),
+            "style": "1",
+            "code": _codeNum,
+            "deviceToken": NPush.clientId ?? "",
+            "deviceType": _deviceType,
+          },
+          userCall: true,
+        );
+      } else {
         return false;
       }
     }
-    if(data=="isBlocking"){
+    if (data == "isBlocking") {
       return false;
     }
-    if (data != null&&data!="") {
+    if (data != null && data != "") {
       JsonResult result = JsonResult.fromJson(data);
       if (result.sign == 'success') {
         var userMap = result.data['user'];
@@ -523,13 +599,18 @@ class LoginState extends State<Login> {
         DataUtils.saveUserInfo(userMap);
         SharedPreferenceUtil.saveUser(userInfo);
         Provider.of<UserModel>(context).init(userInfo);
-        LocalStorage.save("userInfo",userInfo);
+        LocalStorage.save("userInfo", userInfo);
+        RouterUtil.apiServerUrl=Constant.serverUrl;
+        RouterUtil.webSocketServerUrl=Constant.webSocketServerUrl;
+        RouterUtil.uploadServerUrl=Constant.imageServerApiUrl;
+        RouterUtil.imageServerUrl=Constant.imageServerUrl;
+        RouterUtil.refresh();
         return true;
       } else {
         ToastUtil.showShortToast(result.desc);
         return false;
       }
-    }else{
+    } else {
       ToastUtil.showShortToast("登录异常");
       return false;
     }

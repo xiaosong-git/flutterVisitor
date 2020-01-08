@@ -6,6 +6,7 @@ import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/shareroom/RoomDetail.dart';
 
@@ -243,7 +244,7 @@ class RoomListState extends State<RoomList>{
                   child: FittedBox(
                     fit: BoxFit.fill,
                     child:
-                    (room.roomImage[0]!=null&&room.roomImage[0]!="")?Image.network(Constant.imageServerUrl+room.roomImage[0]) : Image.asset("assets/images/visitor_icon_nodata.png"),
+                    (room.roomImage[0]!=null&&room.roomImage[0]!="")?Image.network(RouterUtil.imageServerUrl+room.roomImage[0]) : Image.asset("assets/images/visitor_icon_nodata.png"),
                   ),
                   width: 104,
                   height: 132,

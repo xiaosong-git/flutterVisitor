@@ -23,6 +23,7 @@ class Constant {
   static final String companyUrl = "company/";
   static final String noticeUrl = "notice/";
   static final String paramUrl = "param/";
+  static final String attendanceUrl = "checkInWork/";
   static final String appVersionUrl = "appVersion/";
   static final String companyUserUrl = "companyUser/";
   static final String newsUrl = "news/";
@@ -72,8 +73,25 @@ class Constant {
   static final String getBannerUrl = "banner/";
   static final String checkUpdateUrl = appVersionUrl +
       "updateAndroid/{channel}/{versionCode}";
-
-
+  /*
+   * 打卡接口
+   * save/group 保存打卡规则
+   * gain/one 查看打卡
+   * save/work 打卡
+   * flow/create 提交流程
+   * flow/check 查看流程
+   * flow/myApprove 我审批的流程
+   * flow/approveDetail 根据id查看流程
+   * flow/approve 根据id批准流程
+   */
+   static final String attendanceSaveRuleUrl = attendanceUrl + "save/group";
+   static final String attendanceCheckOneDayUrl = attendanceUrl + "gain/one";
+   static final String attendanceRecordUrl = attendanceUrl + "save/work";
+   static final String attendanceApplyUrl = "flow/create";
+   static final String attendanceCheckApplyUrl = "flow/Check";
+   static final String attendanceMyApproveUrl = "flow/myApprove";
+   static final String attendanceApproveDetailUrl = "flow/approveDetail";
+   static final String attendanceApproveUrl = "flow/approve";
   /*
    * 查询员工人员访客
    */

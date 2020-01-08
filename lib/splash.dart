@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'com/goldccm/visitor/util/DataUtils.dart';
 import 'home.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/Login.dart';
@@ -21,6 +22,7 @@ class SplashState extends State<SplashPage> {
     checkIsLogin();
     checkPermission();
   }
+
   Future checkPermission() async {
     if(Platform.isAndroid){
 
@@ -46,7 +48,7 @@ class SplashState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-
+    ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return new Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,

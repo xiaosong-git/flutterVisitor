@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 //import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
@@ -25,6 +27,10 @@ void main() {
   userModel.init(null);
   badgeModel.init();
   NPush().init();
+  SystemUiOverlayStyle routerLoginStyle= SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  );
+  SystemChrome.setSystemUIOverlayStyle(routerLoginStyle);
   runApp(
     MultiProvider(
         providers: [
@@ -58,4 +64,5 @@ void main() {
       )
     ),
   );
+
 }

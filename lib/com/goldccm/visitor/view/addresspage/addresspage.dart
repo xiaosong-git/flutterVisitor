@@ -9,13 +9,14 @@ import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
-import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
+import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/addfriend.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/frienddetail.dart';
@@ -83,7 +84,7 @@ class AddressPageState extends State<AddressPage> {
   void initState() {
     super.initState();
     initAddress();
-    _handleRefresh();
+//    _handleRefresh();
     _friendListSub =
         EventBusUtil().eventBus.on<FriendListEvent>().listen((event) {
       _handleRefresh();
@@ -91,11 +92,26 @@ class AddressPageState extends State<AddressPage> {
   }
 
   initAddress() async {
+    await _presenter.loadUserList();
     FriendDao friendDao = FriendDao();
     List<FriendInfo> lists = await friendDao.getFriendInfo();
+    print(lists);
     if (lists!=null&&lists.length > 0) {
+      List<FriendInfo> onlineLists = _presenter.userlists;
+      if(onlineLists.length>0&&onlineLists!=null){
+        setState(() {
+          _userLists = _presenter.userlists;
+          initFlag = _presenter.initFlag;
+        });
+      }else{
+        setState(() {
+          _userLists = lists;
+          initFlag = false;
+        });
+      }
+    }else{
       setState(() {
-        _userLists = lists;
+        initFlag = true;
       });
     }
   }
@@ -635,7 +651,7 @@ class AddressPageState extends State<AddressPage> {
                     leading: _userLists[index].virtualImageUrl != null &&
                             _userLists[index].virtualImageUrl != ""
                         ? CachedNetworkImage(
-                            imageUrl: Constant.imageServerUrl +
+                            imageUrl: RouterUtil.imageServerUrl +
                                 _userLists[index].virtualImageUrl,
                             imageBuilder: (context, imageProvider) =>
                                 CircleAvatar(backgroundImage: imageProvider),
@@ -647,7 +663,7 @@ class AddressPageState extends State<AddressPage> {
                         : _userLists[index].realImageUrl != null &&
                                 _userLists[index].realImageUrl != ""
                             ? CachedNetworkImage(
-                                imageUrl: Constant.imageServerUrl +
+                                imageUrl: RouterUtil.imageServerUrl +
                                     _userLists[index].realImageUrl,
                                 imageBuilder: (context, imageProvider) =>
                                     CircleAvatar(
@@ -696,14 +712,14 @@ class AddressPageState extends State<AddressPage> {
                             _userLists[index].virtualImageUrl != ""
                         ? CircleAvatar(
                             backgroundImage: NetworkImage(
-                                Constant.imageServerUrl +
+                                RouterUtil.imageServerUrl +
                                     _userLists[index].virtualImageUrl),
                           )
                         : _userLists[index].realImageUrl != null &&
                                 _userLists[index].realImageUrl != ""
                             ? CircleAvatar(
                                 backgroundImage: NetworkImage(
-                                    Constant.imageServerUrl +
+                                    RouterUtil.imageServerUrl +
                                         _userLists[index].realImageUrl),
                               )
                             : CircleAvatar(
@@ -734,14 +750,14 @@ class AddressPageState extends State<AddressPage> {
                 leading: _userLists[index].virtualImageUrl != null &&
                         _userLists[index].virtualImageUrl != ""
                     ? CircleAvatar(
-                        backgroundImage: NetworkImage(Constant.imageServerUrl +
+                        backgroundImage: NetworkImage(RouterUtil.imageServerUrl +
                             _userLists[index].virtualImageUrl),
                       )
                     : _userLists[index].realImageUrl != null &&
                             _userLists[index].realImageUrl != ""
                         ? CircleAvatar(
                             backgroundImage: NetworkImage(
-                                Constant.imageServerUrl +
+                                RouterUtil.imageServerUrl +
                                     _userLists[index].realImageUrl),
                           )
                         : CircleAvatar(
@@ -833,6 +849,8 @@ class Presenter {
               bool isExist = await friendDao.isExist(user.userId);
               if (!isExist) {
                 friendDao.insertFriendInfo(user);
+              }else{
+                friendDao.updateFriendInfo(user);
               }
             }
           }

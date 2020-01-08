@@ -5,11 +5,13 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
  * 数据库操作管理类
  */
 class DBManager {
-  static const int _VERSION = 1; //数据库版本号
 
-  static const String _DBNAME = "visitor_db.db"; //数据库名称
-
-  static Database _dataBase; //数据库实例
+  //数据库版本号
+  static const int _VERSION = 1;
+  //数据库名称
+  static const String _DBNAME = "visitor_db.db";
+  //数据库实例
+  static Database _dataBase;
 
   static init() async {
     var databasePath = await getDatabasesPath();
@@ -18,6 +20,7 @@ class DBManager {
     if (CommonUtil.getAppPlat() == 'ios') {
       path = databasePath + "/" + dbName;
     }
+    //打开数据库
     _dataBase = await openDatabase(path, version: _VERSION,
         onCreate: (Database db, int version) async {
 

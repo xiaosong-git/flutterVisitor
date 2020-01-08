@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
+import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/addresspage.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/frienddetail.dart';

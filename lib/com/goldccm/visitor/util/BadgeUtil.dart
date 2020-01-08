@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
-import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
+import 'package:visitor/com/goldccm/visitor/db/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';

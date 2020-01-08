@@ -1,27 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/component/MessageCompent.dart';
-import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/db/friendDao.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
-import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
-import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
-import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
+import 'package:visitor/com/goldccm/visitor/db/ChatMessage.dart';
+import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
-import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
-import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/MessageUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/chat.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 /*
  * 消息中心
- * author:hwk<hwk@growingpine.com>
  * create_time:2019/11/22
  */
 class ChatList extends StatefulWidget {
@@ -32,7 +27,9 @@ class ChatList extends StatefulWidget {
 }
 
 class ChatListState extends State<ChatList> {
+  StreamSubscription _refreshSub;
   List<ChatMessage> _chatHis = [];
+  List<FriendInfo> _chatHisInfo = [];
   final SlidableController slidableController = SlidableController();
   Timer _timer;
   final List<String> actions = [
@@ -42,7 +39,10 @@ class ChatListState extends State<ChatList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.color,
+        backgroundColor: Theme
+            .of(context)
+            .appBarTheme
+            .color,
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: null,
@@ -59,10 +59,10 @@ class ChatListState extends State<ChatList> {
           onRefresh: refresh),
     );
   }
-
   //构建每个聊天体
   Widget buildMessageListItem(BuildContext context, int index) {
     ChatMessage message = _chatHis[index];
+    FriendInfo friend = _chatHisInfo[index]??FriendInfo();
     return new Slidable(
       controller:slidableController,
         child:InkWell(
@@ -71,24 +71,21 @@ class ChatListState extends State<ChatList> {
             EventBusUtil().eventBus.fire(MessageCountChangeEvent(1));
             FriendInfo user = new FriendInfo(
                 userId: message.M_FriendId,
-                name: message.M_FrealName,
-                virtualImageUrl: message.M_FheadImgUrl == "null"
-                    ? null
-                    : message.M_FheadImgUrl,
-                imageServerUrl: Constant.imageServerUrl,
-                orgId: message.M_orgId.toString());
+                name: friend.notice ?? "",
+                virtualImageUrl: friend.virtualImageUrl,
+                imageServerUrl:RouterUtil.imageServerUrl,
+                orgId: friend.orgId.toString());
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ChatPage(user: user)));
           },
           child:MessageCompent(
-                headImgUrl:
-                message.M_FheadImgUrl == "null" ? null : message.M_FheadImgUrl,
-                realName: message.M_FrealName ?? "",
+                headImgUrl: friend.virtualImageUrl,
+                realName: friend.notice ?? "",
                 latestTime: message.M_Time,
                 latestMsg: message.M_MessageContent ?? "",
                 isSend: message.M_IsSend,
                 unreadCount: message.unreadCount,
-                imageServerUrl: Constant.imageServerUrl,
+                imageServerUrl: RouterUtil.imageServerUrl,
           ),
         ),
       actionPane: SlidableScrollActionPane(),
@@ -116,6 +113,7 @@ class ChatListState extends State<ChatList> {
     var callback = (timer) => {getLatestMessage()};
     _timer = Timer.periodic(oneCall, callback);
   }
+  //删除单个聊天栏
   Future deleteSingle(int id) async {
      int count=await MessageUtils.removeLastestMessage(id);
      if(count>0){
@@ -126,12 +124,20 @@ class ChatListState extends State<ChatList> {
   }
   //读取聊天信息
   getLatestMessage() async {
-    UserInfo userInfo = await LocalStorage.load("userInfo");
     _chatHis.clear();
+    _chatHisInfo.clear();
+    UserInfo userInfo = await LocalStorage.load("userInfo");
     List<ChatMessage> list = await MessageUtils.getLatestMessage(userInfo.id);
     if (list != null) {
       for (var chat in list) {
         if (chat.M_isDeleted!=1) {
+          FriendDao friendDao=FriendDao();
+          FriendInfo friendInfo=await friendDao.querySingle(chat.M_FriendId);
+          if(friendInfo!=null){
+            _chatHisInfo.add(friendInfo);
+          }else{
+            _chatHisInfo.add(FriendInfo());
+          }
           _chatHis.add(chat);
         }
       }
@@ -149,12 +155,17 @@ class ChatListState extends State<ChatList> {
   void dispose() {
     _timer?.cancel();
     _timer = null;
+    _refreshSub.cancel();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+    //监听WebSocket更新
+//    _refreshSub = EventBusUtil().eventBus.on<MessageCountChangeEvent>().listen((event) {
+//      getLatestMessage();
+//    });
     initData();
   }
 

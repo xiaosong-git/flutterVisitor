@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
-import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
+import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/newfriend.dart';
 
@@ -50,7 +51,7 @@ class FriendHistoryState extends State<FriendHistory>{
               leading: Container(
                 child: CircleAvatar(
                   backgroundImage: NetworkImage(
-                      Constant.imageServerUrl + _friendLists[index].virtualImageUrl),
+                      RouterUtil.imageServerUrl + _friendLists[index].virtualImageUrl),
                 ),
                 height: 50,
                 width: 50,

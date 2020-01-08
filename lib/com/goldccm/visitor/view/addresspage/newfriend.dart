@@ -14,6 +14,7 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/error.dart';
@@ -92,13 +93,13 @@ class NewFriendPageState extends State<NewFriendPage> {
         ),
         onRefresh: init);
   }
-
+  //初始化
+  //加载潜在好友列表
   Future init() async {
     await loadContacts();
     BadgeInfo badgeInfo = await BadgeUtil().updateFriendRequest();
     badgeInfo.newFriendRequestCount = 0;
     Provider.of<BadgeModel>(context).update(badgeInfo);
-    await loadRequest(_userInfo);
     setState(() {});
     return null;
   }
@@ -110,7 +111,7 @@ class NewFriendPageState extends State<NewFriendPage> {
         LoadingDialog().show(context, 'Loading');
         String _phoneStr = await LocalStorage.load("phoneStr");
         if (_phoneStr != "" && _phoneStr != null) {
-          await loadFriend(_userInfo, _phoneStr);
+          await loadAll(_phoneStr);
           setState(() {
             Navigator.pop(context);
           });
@@ -134,7 +135,7 @@ class NewFriendPageState extends State<NewFriendPage> {
           }
         }
         LocalStorage.save("phoneStr", _phoneStr);
-        await loadFriend(_userInfo, _phoneStr);
+        await loadAll( _phoneStr);
         setState(() {
           Navigator.pop(context);
         });
@@ -160,55 +161,90 @@ class NewFriendPageState extends State<NewFriendPage> {
     }
   }
 
-  Future loadFriend(UserInfo user, String str) async {
-    _friends.clear();
-    String url = "userFriend/findIsUserByPhone";
-    String threshold = await CommonUtil.calWorkKey();
-    if (str != "") {
-      var res = await Http().post(url,
-          queryParameters: {
-            "token": user.token,
-            "factor": CommonUtil.getCurrentTime(),
-            "threshold": threshold,
-            "requestVer": await CommonUtil.getAppVersion(),
-            "userId": user.id,
-            "phoneStr": str ?? "",
-          },
-          debugMode: true);
-      if (res is String) {
-        Map map = jsonDecode(res);
-        if (map['verify']['sign'] == "success") {
-          List userList = map['data'];
-          if (userList == null) {
-            return;
-          }
-          for (var userInfo in userList) {
-            Person user = Person(
-                name: userInfo['realName'],
-                phone: userInfo['phone'],
-                imageUrl: userInfo['idHandleImgUrl'],
-                userId: userInfo['id'],
-                applyType: userInfo['applyType'],
-                nickname: userInfo['nickName']);
-            if (user.name != null && user.name != "") {
-              _friends.add(user);
-            }
-          }
-        }
-      }
-    }
-  }
+//  Future loadFriend(UserInfo user, String str) async {
+//    _friends.clear();
+//    String url = "userFriend/findIsUserByPhone";
+//    String threshold = await CommonUtil.calWorkKey();
+//    if (str != "") {
+//      var res = await Http().post(url,
+//          queryParameters: {
+//            "token": user.token,
+//            "factor": CommonUtil.getCurrentTime(),
+//            "threshold": threshold,
+//            "requestVer": await CommonUtil.getAppVersion(),
+//            "userId": user.id,
+//            "phoneStr": str ?? "",
+//          },
+//          debugMode: true);
+//      if (res is String) {
+//        Map map = jsonDecode(res);
+//        if (map['verify']['sign'] == "success") {
+//          List userList = map['data'];
+//          if (userList == null) {
+//            return;
+//          }
+//          for (var userInfo in userList) {
+//            Person user = Person(
+//                name: userInfo['realName'],
+//                phone: userInfo['phone'],
+//                imageUrl: userInfo['idHandleImgUrl'],
+//                userId: userInfo['id'],
+//                applyType: userInfo['applyType'],
+//                nickname: userInfo['nickName']);
+//            if (user.name != null && user.name != "") {
+//              _friends.add(user);
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
 
-  Future loadRequest(UserInfo user) async {
+//  Future loadRequest(UserInfo user) async {
+//    _request.clear();
+//    String url = "userFriend/beAgreeingFriendList";
+//    String threshold = await CommonUtil.calWorkKey();
+//    var res = await Http().post(url, queryParameters: {
+//      "token": user.token,
+//      "factor": CommonUtil.getCurrentTime(),
+//      "threshold": threshold,
+//      "requestVer": await CommonUtil.getAppVersion(),
+//      "userId": user.id,
+//    });
+//    if (res is String) {
+//      Map map = jsonDecode(res);
+//      if (map['verify']['sign'] == "success") {
+//        List userList = map['data'];
+//        if (userList != null) {
+//          for (var userInfo in userList) {
+//            Person user = Person(
+//                name: userInfo['realName'],
+//                phone: userInfo['phone'],
+//                imageUrl: userInfo['idHandleImgUrl'],
+//                userId: userInfo['id'],
+//                nickname: userInfo['nickName'],
+//                applyType: userInfo['applyType']);
+//            if (user.name != null && user.name != "") {
+//              _request.add(user);
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+  loadAll(String phoneStr) async {
     _request.clear();
-    String url = "userFriend/beAgreeingFriendList";
+    _friends.clear();
+    String url="userFriend/newFriend";
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {
-      "token": user.token,
+      "token": userInfo.token,
       "factor": CommonUtil.getCurrentTime(),
       "threshold": threshold,
       "requestVer": await CommonUtil.getAppVersion(),
-      "userId": user.id,
+      "userId": userInfo.id,
+      "phoneStr":phoneStr,
     });
     if (res is String) {
       Map map = jsonDecode(res);
@@ -224,7 +260,11 @@ class NewFriendPageState extends State<NewFriendPage> {
                 nickname: userInfo['nickName'],
                 applyType: userInfo['applyType']);
             if (user.name != null && user.name != "") {
-              _request.add(user);
+              if(user.applyType=='同意'){
+                _request.add(user);
+              }else{
+                _friends.add(user);
+              }
             }
           }
         }
@@ -245,7 +285,7 @@ class NewFriendPageState extends State<NewFriendPage> {
         return ListTile(
             leading: Container(
               child: CachedNetworkImage(
-                imageUrl: Constant.imageServerUrl + _friends[index].imageUrl,
+                imageUrl: RouterUtil.imageServerUrl + _friends[index].imageUrl,
                 placeholder: (context, url) => CircularProgressIndicator(),
                 errorWidget: (context, url, error) => CircleAvatar(
                   backgroundImage: AssetImage("assets/icons/ic_launcher.png"),
@@ -271,7 +311,7 @@ class NewFriendPageState extends State<NewFriendPage> {
               child: SizedBox(
                   width: 75,
                   height: 35,
-                  child: _friends[index].applyType == null
+                  child: _friends[index].applyType == '添加'
                       ? RaisedButton(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0)),
@@ -286,7 +326,7 @@ class NewFriendPageState extends State<NewFriendPage> {
                             addFriend(_friends[index].name,
                                 _friends[index].phone, _userInfo);
                           })
-                      : _friends[index].applyType == 0
+                      : _friends[index].applyType == '申请中'
                           ? Align(
                               child: Text(
                                 '申请中',
@@ -316,7 +356,7 @@ class NewFriendPageState extends State<NewFriendPage> {
               leading: Container(
                 child: CircleAvatar(
                   backgroundImage: NetworkImage(
-                      Constant.imageServerUrl + _request[index].imageUrl),
+                     RouterUtil.imageServerUrl + _request[index].imageUrl),
                 ),
                 height: 50,
                 width: 50,
@@ -333,7 +373,7 @@ class NewFriendPageState extends State<NewFriendPage> {
                 child: SizedBox(
                     width: 75,
                     height: 35,
-                    child: _request[index].applyType == 0
+                    child: _request[index].applyType == '同意'
                         ? RaisedButton(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30.0)),
@@ -370,7 +410,7 @@ class Person {
   String nickname;
   String phone;
   String imageUrl;
-  int applyType;
+  String applyType;
   int userId;
 
   Person(

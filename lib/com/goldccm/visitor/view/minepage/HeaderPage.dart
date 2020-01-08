@@ -15,6 +15,7 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 
 class HeadImagePage extends StatefulWidget {
@@ -71,7 +72,7 @@ class HeadImagePageState extends State<HeadImagePage> {
                 child: ClipOval(
                   child: _image == null
                       ? Image.network(
-                    Constant.imageServerUrl +
+                    RouterUtil.imageServerUrl +
                         (userProvider.info.headImgUrl != null
                             ? userProvider.info.headImgUrl
                             : userProvider.info.idHandleImgUrl),
@@ -116,7 +117,7 @@ class HeadImagePageState extends State<HeadImagePage> {
   ///修改后的头像上传和个人信息内的头像地址的修改
   _uploadImg() async {
     UserInfo _userInfo=await LocalStorage.load("userInfo");
-    String url = Constant.imageServerApiUrl;
+    String url = RouterUtil.uploadServerUrl;
     var name = _image.path.split("/");
     var filename = name[name.length - 1];
     FormData formData = FormData.from({

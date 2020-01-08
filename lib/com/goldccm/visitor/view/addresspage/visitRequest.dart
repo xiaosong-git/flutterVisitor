@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
-import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
+import 'package:visitor/com/goldccm/visitor/db/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/model/VisitInfo.dart';
@@ -109,6 +109,7 @@ class VisitRequestState extends State<VisitRequest> {
           M_cStatus: 'applySuccess',
         );
         var send = jsonEncode(object);
+
         WebSocketChannel channel = MessageUtils.getChannel();
         channel.sink.add(send);
         ToastUtil.showShortToast("您已同意邀约");

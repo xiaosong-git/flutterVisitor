@@ -28,6 +28,10 @@ import 'com/goldccm/visitor/util/MessageUtils.dart';
 import 'com/goldccm/visitor/util/ToastUtil.dart';
 import 'com/goldccm/visitor/view/login/Login.dart';
 
+/*
+ * 主页
+ * create_time:2019/12/30
+ */
 class MyHomeApp extends StatefulWidget {
   final int tabIndex;
   final int type;
@@ -94,7 +98,6 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     initWebSocket();
     initBadge();
     initData();
-    subscribe();
   }
 
   @override
@@ -145,9 +148,10 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     String version = packageInfo.version;
     String buildNumber = packageInfo.buildNumber;
     bool isUpToDate = true;
+    //android
     if (Platform.isAndroid) {
       String url =
-          Constant.serverUrl + "appVersion/updateAndroid/visitor/$buildNumber";
+           "appVersion/updateAndroid/visitor/$buildNumber";
       var res = await Http().post(url, userCall: false);
       if (res != null) {
         if (res is String) {
@@ -226,7 +230,9 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
           }
         }
       }
-    } else if (Platform.isIOS) {
+    }
+    //ios
+    else if (Platform.isIOS) {
       String url = "appVersion/updateIOS";
       var res = await Http().post(url, userCall: false);
       if (res != null) {
@@ -333,23 +339,18 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
         getTabImage('assets/images/visitor_tab_profile_center_selected.png')
       ]
     ];
-    /*
-     * 四个子界面
-     */
+    //四个主要页面
     _pageList = [
       new HomePage(),
       new ChatList(),
-      new AddressPage(
-        type: 1,
-      ),
+      new AddressPage(type: 1,),
       new MinePage(),
     ];
   }
 
-  /* 订阅事件
-   * event传入阅读数，如果有则直接减去
-   * 没有从BadgeUtil中读取最新的数量
-   */
+    //订阅事件
+    //event传入阅读数，如果有则直接减去
+    //没有从BadgeUtil中读取最新的数量
   subscribe() {
     _messageSubscription =
         EventBusUtil().eventBus.on<MessageCountChangeEvent>().listen((event) {
@@ -372,26 +373,28 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    subscribe();
+  }
   //更新聊天栏数量
   updateMessage() async {
     BadgeInfo badgeInfo = await BadgeUtil().updateMessage();
     Provider.of<BadgeModel>(context).update(badgeInfo);
   }
-
+  //初始化聊天服务器连接
   Future initWebSocket() async {
-    print("init");
     UserInfo userInfo = await LocalStorage.load("userInfo");
     int userId = userInfo.id;
     String token = userInfo.token;
     MessageUtils.setChannel(userId.toString(), token.toString());
   }
-
+  //返回键操作
+  _onWillPop() async {
+    await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+  }
   @override
   Widget build(BuildContext context) {
-    _onWillPop() async {
-      await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-    }
-
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
         child: WillPopScope(
@@ -454,6 +457,7 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
               )),
           onWillPop: () {
             _onWillPop();
+            return Future.value(false);
           },
         ));
   }

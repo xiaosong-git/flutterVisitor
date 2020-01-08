@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:visitor/com/goldccm/visitor/model/RouterList.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';//用于配置公用常量
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
@@ -15,10 +17,10 @@ class Http{
   static Http _instance;
   static TimerUtil _timerUtil;
   static bool block;
-  Dio _dio;
+  static Dio _dio;
   Http._internal() {
     _dio = new Dio();
-    _dio.options.baseUrl = Constant.serverUrl;
+    _dio.options.baseUrl = RouterUtil.apiServerUrl;
     _dio.options.connectTimeout = 5000;
     _dio.options.receiveTimeout = 5000;
     block=false;
@@ -27,6 +29,9 @@ class Http{
       block=false;
       _timerUtil.cancel();
     });
+  }
+  static modifyChange(String url){
+    _dio.options.baseUrl = url;
   }
 
   static Http _getInstance() {

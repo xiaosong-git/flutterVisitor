@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:visitor/com/goldccm/visitor/model/RoomInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/shareroom/roomHistory.dart';
 
 /*
@@ -96,7 +97,7 @@ class RoomAfterOrderState extends State<RoomAfterOrder>{
                   child: FittedBox(
                     fit: BoxFit.fill,
                     child:
-                    (room.roomImage[0]!=null&&room.roomImage[0]!="")?Image.network(Constant.imageServerUrl+room.roomImage[0]) :
+                    (room.roomImage[0]!=null&&room.roomImage[0]!="")?Image.network(RouterUtil.imageServerUrl+room.roomImage[0]) :
                     Image.asset("assets/images/visitor_icon_nodata.png"),
                   ),
                   width: 104,

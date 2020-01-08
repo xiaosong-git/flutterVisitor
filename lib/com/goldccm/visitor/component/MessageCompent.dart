@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 
 class MessageCompent extends StatelessWidget {
   String headImgUrl; //头像图片
@@ -37,7 +38,7 @@ class MessageCompent extends StatelessWidget {
                       height: 50.0,
                       child:  CircleAvatar(
                         backgroundImage: headImgUrl!=null
-                            ? NetworkImage(Constant.imageServerUrl + headImgUrl)
+                            ? NetworkImage(RouterUtil.imageServerUrl + headImgUrl)
                             : AssetImage(
                             'assets/images/visitor_icon_head.png'),
                         radius: 100,

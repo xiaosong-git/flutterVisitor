@@ -8,6 +8,7 @@ import 'dbManager.dart';
  */
 
 abstract class BaseDBProvider {
+
   bool isTableExist = false;
 
   tableSqlString();
@@ -26,11 +27,11 @@ abstract class BaseDBProvider {
   }
 
   @mustCallSuper
-  prepare(String name,String creatSql) async{
+  prepare(String name,String createSql) async{
     isTableExist = await DBManager.isTableExist(name);
     if(!isTableExist){
       Database db = await DBManager.getCurrentDatabase();
-      return await db.execute(creatSql);
+      return await db.execute(createSql);
     }
   }
 

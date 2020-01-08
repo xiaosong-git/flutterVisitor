@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="92px" height="92px" viewBox="0 0 92 92" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61 (89581) - https://sketch.com -->
+    <title>logo</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="70" height="70" rx="10"></rect>
+        <filter x="-25.0%" y="-22.1%" width="150.0%" height="150.0%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="5.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0.357319438   0 0 0 0 0.664402174  0 0 0 0.349623033 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <path d="M40,54 L30,54 L30,45 L24,45 L24,54 L12,54 L12,50 L20,50 L20,22 L24,22 L24,22 L30,22 L30,22 L34,22 L34,50 L36,50 L36,20 L30,20 L30,16 L53,16 L53,50 L58.5,50 L58.5,54 L45.5,54 L45.5,46 L40,46 L40,54 Z M30,36 L24,36 L24,41 L30,41 L30,36 Z M45.5,34.999 L40,34.999 L40,39 L45.5,39 L45.5,34.999 Z M30,28 L24,28 L24,32 L30,32 L30,28 Z M45.5,23.389 L40,23.389 L40,27.999 L45.5,27.999 L45.5,23.389 Z" id="path-3"></path>
+        <filter x="-1.1%" y="-1.3%" width="104.3%" height="105.3%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="1" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.116859703 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="iPhone-8备份-21" transform="translate(-141.000000, -233.000000)" fill-rule="nonzero">
+            <g id="logo" transform="translate(152.000000, 242.000000)">
+                <g id="矩形备份">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <use fill="#0073FE" xlink:href="#path-1"></use>
+                </g>
+                <g id="形状结合">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                    <use fill="#FFFFFF" xlink:href="#path-3"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/model/NewsInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 
 class NewsView extends StatelessWidget {
   final NewsInfo newsInfo;
@@ -26,7 +27,7 @@ class NewsView extends StatelessWidget {
               height: 120,
               padding: EdgeInsets.all(10),
               child:CachedNetworkImage(
-                imageUrl: Constant.imageServerUrl + newsInfo.newsImageUrl,
+                imageUrl: RouterUtil.imageServerUrl + newsInfo.newsImageUrl,
                 placeholder: (context, url) =>Container(
                   child: CircularProgressIndicator(backgroundColor: Colors.black,),
                   width: 10,

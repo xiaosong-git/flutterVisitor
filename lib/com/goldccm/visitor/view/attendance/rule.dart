@@ -11,6 +11,11 @@ class RulePage extends StatefulWidget{
     return RulePageState();
   }
 }
+/*
+ * 打卡规则分为上下班和外出两种
+ * 点击规则进入详情页
+ * 右上角添加新规则
+ */
 class RulePageState extends State<RulePage> with SingleTickerProviderStateMixin{
   var _tabLists=['上下班','外出'];
   TabController _tabController;
@@ -26,10 +31,10 @@ class RulePageState extends State<RulePage> with SingleTickerProviderStateMixin{
                 scale: 2.0,
               ),
               onPressed: () {
-//                appbarMore();
+                settingRule();
               }),
         ],
-        bottom: TabBar(tabs:_tabLists.map((e)=>Tab(text: e,)).toList(),controller: _tabController,indicatorColor: Colors.blue,),
+        bottom: TabBar(tabs:_tabLists.map((e)=>Tab(text: e,)).toList(),controller: _tabController,indicatorColor: Colors.blue,labelColor: Colors.white,),
       ),
       body: TabBarView(children: <Widget>[
         Container(
@@ -47,10 +52,15 @@ class RulePageState extends State<RulePage> with SingleTickerProviderStateMixin{
     super.initState();
     _tabController = TabController(length: _tabLists.length, vsync: this);
   }
-  settingNormal(){
-
+  //添加新打卡规则
+  settingRule(){
+    //当前类型
+    int currentIndex=_tabController.index;
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>EditRulePage(type: currentIndex,)));
   }
-  settingOut(){
-
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 }

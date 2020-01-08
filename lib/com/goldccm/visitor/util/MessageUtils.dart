@@ -8,9 +8,10 @@ import 'package:visitor/com/goldccm/visitor/db/chatDao.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/FriendCountChangeEvent.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
-import 'package:visitor/com/goldccm/visitor/model/ChatMessage.dart';
+import 'package:visitor/com/goldccm/visitor/db/ChatMessage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/TimerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -58,7 +59,7 @@ class MessageUtils {
       userID = id;
       userToken = token;
       _channel = IOWebSocketChannel.connect(
-          Constant.webSocketServerUrl + 'chat?userId=$id&token=$token');
+         RouterUtil.webSocketServerUrl + 'chat?userId=$id&token=$token');
       if (_channel != null) {
         _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
         _isOpen = true;
@@ -91,7 +92,7 @@ class MessageUtils {
       Future.delayed(Duration(seconds: 10), () {
         if (reCount < 3) {
           if (_channel == null) {
-            _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl +
+            _channel = IOWebSocketChannel.connect(RouterUtil.webSocketServerUrl +
                 'chat?userId=$userID&token=$userToken');
             if (_channel != null) {
               _channel.stream
@@ -116,7 +117,7 @@ class MessageUtils {
     if (isLogin) {
       closeChannel();
       if (_channel == null) {
-        _channel = IOWebSocketChannel.connect(Constant.webSocketServerUrl +
+        _channel = IOWebSocketChannel.connect(RouterUtil.webSocketServerUrl +
             'chat?userId=$userID&token=$userToken');
         if (_channel != null) {
           _channel.stream.listen(_onData, onError: _onError, onDone: _onDone);
@@ -259,24 +260,24 @@ class MessageUtils {
           );
           chatDao.updateMessage(msg);
 //          chatDao.insertNewMessage(msg);
-//          ChatMessage notice = new ChatMessage(
-//            M_FriendId: int.parse(map['fromUserId'].toString()),
-//            M_userId: int.parse(map['toUserId'].toString()),
-//            M_Status: "0",
-//            M_IsSend: "1",
-//            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now().add(Duration(seconds: 1))),
-//            M_cStatus: map['cstatus'].toString(),
-//            M_visitId: int.parse(map['id'].toString()),
-//            M_StartDate: map['startDate'].toString(),
-//            M_EndDate: map['endDate'].toString(),
-//            M_companyName: map['companyName'].toString(),
-//            M_MessageType: "notice",
-//            M_recordType: map['recordType'].toString(),
-//            M_answerContent: map['answerContent'].toString(),
-//            M_isSended: 1,
-//            M_MessageContent: "您有一条信息已审核",
-//          );
-//          chatDao.insertNewMessage(notice);
+          ChatMessage notice = new ChatMessage(
+            M_FriendId: int.parse(map['fromUserId'].toString()),
+            M_userId: int.parse(map['toUserId'].toString()),
+            M_Status: "0",
+            M_IsSend: "1",
+            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now().add(Duration(seconds: 1))),
+            M_cStatus: map['cstatus'].toString(),
+            M_visitId: int.parse(map['id'].toString()),
+            M_StartDate: map['startDate'].toString(),
+            M_EndDate: map['endDate'].toString(),
+            M_companyName: map['companyName'].toString(),
+            M_MessageType: "notice",
+            M_recordType: map['recordType'].toString(),
+            M_answerContent: map['answerContent'].toString(),
+            M_isSended: 1,
+            M_MessageContent: "您有一条信息已审核",
+          );
+          chatDao.insertNewMessage(notice);
         } else if (map['type'] == 4) {
           EventBusUtil().eventBus.fire(FriendCountChangeEvent(map['count']));
         } else {}

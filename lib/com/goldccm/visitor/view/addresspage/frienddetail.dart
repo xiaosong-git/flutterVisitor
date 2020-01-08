@@ -5,11 +5,12 @@ import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/MessageCountChangeEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
-import 'package:visitor/com/goldccm/visitor/model/FriendInfo.dart';
+import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/addresspage.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/chat.dart';
@@ -100,11 +101,11 @@ class FriendDetailPageState extends State<FriendDetailPage> {
                 child: CircleAvatar(
                   backgroundImage: _user.virtualImageUrl != null
                       ? NetworkImage(
-                          Constant.imageServerUrl + _user.virtualImageUrl,
+                          RouterUtil.imageServerUrl + _user.virtualImageUrl,
                         )
                       : _user.realImageUrl != null
                           ? NetworkImage(
-                              Constant.imageServerUrl + _user.realImageUrl,
+                              RouterUtil.imageServerUrl + _user.realImageUrl,
                             )
                           : AssetImage('assets/images/visitor_icon_head.png'),
                   radius: 100,
@@ -116,7 +117,7 @@ class FriendDetailPageState extends State<FriendDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(_user.notice != null ? _user.notice : '备注',
+                  Text(_user.notice != null && _user.notice !="" ? _user.notice : _user.name,
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 18.0,
