@@ -6,7 +6,6 @@ import 'dart:ui';
 import 'package:city_pickers/city_pickers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -23,9 +22,7 @@ import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
-import 'package:amap_location_fluttify/amap_location_fluttify.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
-
 import '../../../../../home.dart';
 
 /*
@@ -58,6 +55,9 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
   String _selectAddress;
   int _seconds;
   String _verifyStr = '获取验证码';
+  bool isPhoneEditing=false;
+  bool isPwdEditing=false;
+  bool isSeen=false;
   @override
   void initState() {
     super.initState();
@@ -66,14 +66,18 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
       if(_tabController.indexIsChanging){
         switch(_tabController.index){
           case 0:
-            setState(() {
-              _loginType=1;
-            });
+            if(mounted){
+              setState(() {
+                _loginType=1;
+              });
+            }
             break;
           case 1:
-            setState(() {
-              _loginType=2;
-            });
+            if(mounted){
+              setState(() {
+                _loginType=2;
+              });
+            }
             break;
         }
       }
@@ -122,6 +126,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                 child: Divider(
                   color: Color(0x0F000000),
                   height: ScreenUtil().setHeight(2),
+                  thickness: ScreenUtil().setHeight(2),
                 ),
               ),
               Container(
@@ -167,116 +172,45 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                     ],
                   )
               ),
-              Container(
-                height: ScreenUtil().setHeight(128),
-                padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(54), ScreenUtil().setWidth(112), 0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 17,
-                      child:Image(image: AssetImage('assets/images/login_account.png'),width: ScreenUtil().setWidth(67),height: ScreenUtil().setHeight(67),),
-                    ),
-                    Expanded(
-                      flex: 109,
-                      child:Container(
-                         padding: EdgeInsets.only(left: ScreenUtil().setWidth(24)),
-                          margin: EdgeInsets.only(top: ScreenUtil().setHeight(30)),
-                        child: TextField(
-                          maxLines: 1,
-                          textAlign: TextAlign.left,
-                          textAlignVertical: TextAlignVertical.bottom,
-                          keyboardType: TextInputType.phone,
-                          controller: _userNameController,
-                          maxLengthEnforced: true,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: '请输入手机号',
-                            hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-                          ),
-                        ),
-                        decoration: BoxDecoration(
-                          border:Border(
-                            bottom: BorderSide(
-                              color: Color(0xFFECECEC),
-                              width: ScreenUtil().setHeight(2),
-                              style: BorderStyle.solid,
-                            ),
-                          ),
-                        )
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              _loginType==_loginPass?Container(
-                height: ScreenUtil().setHeight(108),
-                padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        flex: 17,
-                        child: Center(
-                          child:Image(image: AssetImage('assets/images/login_password.png'),width: ScreenUtil().setWidth(66),height: ScreenUtil().setHeight(66),),
-                        )
-                    ),
-                    Expanded(
-                      flex: 109,
-                      child: Container(
-                          padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
-                          child: TextField(
-                            maxLines: 1,
-                            textAlign: TextAlign.left,
-                            textAlignVertical: TextAlignVertical.bottom,
-                            maxLengthEnforced: true,
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: '请输入密码',
-                              hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-                            ),
-                          ),
-                          decoration: BoxDecoration(
-                            border:Border(
-                              bottom: BorderSide(
-                                color: Color(0xFFECECEC),
-                                width: ScreenUtil().setHeight(2),
-                                style: BorderStyle.solid,
-                              ),
-                            ),
-                          )
-                      ),
-                    ),
-                  ],
-                ),
-              ):Container(
-                height: ScreenUtil().setHeight(108),
-                padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        flex: 17,
-                        child: Center(
-                          child:Image(image: AssetImage('assets/images/login_msgcode.png'),width: ScreenUtil().setWidth(66),height: ScreenUtil().setHeight(66),),
-                        )
-                    ),
-                    Expanded(
-                      flex: 109,
-                      child: Stack(
+              Stack(
+                children: <Widget>[
+                  Positioned(
+                    child:    Container(
+                      height: ScreenUtil().setHeight(128),
+                      padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(54), ScreenUtil().setWidth(112), 0),
+                      child: Row(
                         children: <Widget>[
-                          Positioned(
-                            child:  Container(
-                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                          Expanded(
+                            flex: 17,
+                            child:Image(image: AssetImage('assets/images/login_account.png'),width: ScreenUtil().setWidth(67),height: ScreenUtil().setHeight(67),),
+                          ),
+                          Expanded(
+                            flex: 109,
+                            child:Container(
+                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(35)),
                                 child: TextField(
                                   maxLines: 1,
                                   textAlign: TextAlign.left,
                                   textAlignVertical: TextAlignVertical.bottom,
+                                  keyboardType: TextInputType.phone,
+                                  controller: _userNameController,
                                   maxLengthEnforced: true,
-                                  controller: _checkCodeController,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: '请输入验证码',
+                                    hintText: '请输入手机号',
                                     hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
                                   ),
+                                  onChanged: (value){
+                                    if(value!=null&&value.length>0){
+                                      setState(() {
+                                        isPhoneEditing=true;
+                                      });
+                                    }else{
+                                      setState(() {
+                                        isPhoneEditing=false;
+                                      });
+                                    }
+                                  },
                                 ),
                                 decoration: BoxDecoration(
                                   border:Border(
@@ -289,26 +223,182 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                                 )
                             ),
                           ),
-                          Positioned(
-                            right: ScreenUtil().setWidth(0),
-                            bottom: ScreenUtil().setHeight(-16),
-                            child: FlatButton(
-                              child: Text(_verifyStr,style: TextStyle(color: msgColor,fontSize: ScreenUtil().setSp(24)),),
-                              onPressed: () async {
-                                if(_codeBtnflag){
-                                  _startTimer();
-                                  bool res = await getCheckCode();
-                                  if(res!=true){
-                                    _seconds=0;
-                                  }
-                                }
-                              },
-                            ),
-                          ),
                         ],
                       ),
                     ),
+                  ),
+                  Positioned(
+                    right: ScreenUtil().setWidth(130),
+                    top: ScreenUtil().setHeight(70),
+                    child: GestureDetector(
+                      child: isPhoneEditing?Container(
+                        child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
+                      ):Container(),
+                      onTap: (){
+                        setState(() {
+                          _userNameController.text="";
+                          isPhoneEditing=false;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Offstage(
+                offstage: _loginType!=_loginPass,
+                child: Stack(
+                  children: <Widget>[
+                    Positioned(
+                      child:   Container(
+                        height: ScreenUtil().setHeight(108),
+                        padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                                flex: 17,
+                                child: Center(
+                                  child:Image(image: AssetImage('assets/images/login_password.png'),width: ScreenUtil().setWidth(66),height: ScreenUtil().setHeight(66),),
+                                )
+                            ),
+                            Expanded(
+                              flex: 109,
+                              child: Container(
+                                  padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                                  child: TextField(
+                                    maxLines: 1,
+                                    textAlign: TextAlign.left,
+                                    textAlignVertical: TextAlignVertical.bottom,
+                                    maxLengthEnforced: true,
+                                    controller: _passwordController,
+                                    obscureText: !isSeen,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: '请输入密码',
+                                      hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                                    ),
+                                    onChanged: (value){
+                                      if(value!=null&&value.length>0){
+                                        setState(() {
+                                          isPwdEditing=true;
+                                        });
+                                      }else{
+                                        setState(() {
+                                          isPwdEditing=false;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border:Border(
+                                      bottom: BorderSide(
+                                        color: Color(0xFFECECEC),
+                                        width: ScreenUtil().setHeight(2),
+                                        style: BorderStyle.solid,
+                                      ),
+                                    ),
+                                  )
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: ScreenUtil().setWidth(180),
+                      top: ScreenUtil().setHeight(50),
+                      child: GestureDetector(
+                        child: isPwdEditing?Container(
+                          child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
+                        ):Container(),
+                        onTap: (){
+                          setState(() {
+                            _passwordController.text="";
+                            isPwdEditing=false;
+                          });
+                        },
+                      ),
+                    ),
+                    Positioned(
+                      right: ScreenUtil().setWidth(120),
+                      top: ScreenUtil().setHeight(50),
+                      child: GestureDetector(
+                        child: isPwdEditing?Container(
+                          child: Image(image: isSeen?AssetImage('assets/images/login_visiable.png'):AssetImage('assets/images/login_secret.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
+                        ):Container(),
+                        onTap: (){
+                          setState(() {
+                            isSeen=!isSeen;
+                          });
+                        },
+                      ),
+                    ),
                   ],
+                )
+              ),
+              Offstage(
+                offstage: _loginType!=_loginCode,
+                child:Container(
+                  height: ScreenUtil().setHeight(108),
+                  padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                          flex: 17,
+                          child: Center(
+                            child:Image(image: AssetImage('assets/images/login_msgcode.png'),width: ScreenUtil().setWidth(66),height: ScreenUtil().setHeight(66),),
+                          )
+                      ),
+                      Expanded(
+                        flex: 109,
+                        child: Stack(
+                          children: <Widget>[
+                            Positioned(
+                              child:  Container(
+                                  padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                                  child: TextField(
+                                    maxLines: 1,
+                                    textAlign: TextAlign.left,
+                                    textAlignVertical: TextAlignVertical.bottom,
+                                    maxLengthEnforced: true,
+                                    controller: _checkCodeController,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: '请输入验证码',
+                                      hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border:Border(
+                                      bottom: BorderSide(
+                                        color: Color(0xFFECECEC),
+                                        width: ScreenUtil().setHeight(2),
+                                        style: BorderStyle.solid,
+                                      ),
+                                    ),
+                                  )
+                              ),
+                            ),
+                            Positioned(
+                              right: ScreenUtil().setWidth(0),
+                              bottom: ScreenUtil().setHeight(-16),
+                              child: FlatButton(
+                                child: Text(_verifyStr,style: TextStyle(color: msgColor,fontSize: ScreenUtil().setSp(24)),),
+                                onPressed: () async {
+                                  if(_codeBtnflag){
+                                    _startTimer();
+                                    bool res = await getCheckCode();
+                                    if(res!=true){
+                                      _seconds=0;
+                                    }
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Container(
@@ -339,7 +429,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                   ),
                   readOnly: true,
                   onTap: () async {
-                    Result result = await CityPickers.showFullPageCityPicker(context: context,);
+                    Result result = await CityPickers.showFullPageCityPicker(context: context);
                     if(result!=null&&result.provinceName!=null){
                       setState(() {
                         routers.clear();
@@ -430,7 +520,12 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
 
                 ),
                 alignment: Alignment.center,
-                child: Text('忘记密码',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFFA8A8A8)),),
+                child: GestureDetector(
+                  child: Text('忘记密码',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFFA8A8A8)),),
+                  onTap: (){
+                    ToastUtil.showShortClearToast("请联系所在企业修改");
+                  },
+                ),
               ),
             ],
           ),

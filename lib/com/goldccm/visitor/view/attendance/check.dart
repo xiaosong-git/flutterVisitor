@@ -4,7 +4,6 @@ import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:amap_location_fluttify/amap_location_fluttify.dart';
 //import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +30,6 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
   List _tabLists=['上下班打卡','外出打卡'];
   TabController _tabController;
   File _currentPhoto;
-  Location _location;
   String shownAddress;
   @override
   Widget build(BuildContext context) {

@@ -8,9 +8,8 @@ class NewsWebPage extends StatefulWidget {
   final String title;
   final bool news_bar;
   NewsWebPage({this.news_url, this.title, this.news_bar});
-
   @override
-  State<StatefulWidget> createState() => new NewsWebPageState(news_url, title);
+  State<StatefulWidget> createState() => NewsWebPageState(news_url, title);
 }
 
 class NewsWebPageState extends State<NewsWebPage> {

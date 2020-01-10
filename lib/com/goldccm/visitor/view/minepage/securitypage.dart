@@ -12,7 +12,7 @@ import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
-import 'package:visitor/com/goldccm/visitor/view/minepage/minepage.dart';
+import 'package:visitor/com/goldccm/visitor/view/visitor/minepage.dart';
 import 'package:provider/provider.dart';
 
 /*

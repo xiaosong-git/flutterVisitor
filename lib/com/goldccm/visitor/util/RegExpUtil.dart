@@ -23,4 +23,8 @@ class RegExpUtil{
     RegExp exp = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$');
     return exp.hasMatch(text);
   }
+  bool verifyCode(String text){
+    RegExp exp = RegExp(r'^\d{6}$');
+    return exp.hasMatch(text);
+  }
 }

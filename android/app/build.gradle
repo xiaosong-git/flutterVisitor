@@ -61,7 +61,8 @@ android {
                 OPPO_APP_KEY   :  "4b672513adf84c72a08671e3d7820937",
                 OPPO_APP_SECRET  : "89f2c5c6fce04a73aa5a19887b10845a",
                 VIVO_APP_ID   : "17687",
-                VIVO_APP_KEY  : "6b2cfb2b-a4d2-4f87-9774-e85003b679be"
+                VIVO_APP_KEY  : "6b2cfb2b-a4d2-4f87-9774-e85003b679be",
+                AMAP_KEY : "e5c38f34ff4a8f7fdbaae51a19660dd8"
         ]
     }
     signingConfigs{
