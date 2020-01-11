@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 //import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'com/goldccm/visitor/model/BadgeModel.dart';
 import 'com/goldccm/visitor/model/UserModel.dart';
 import 'com/goldccm/visitor/util/PremissionHandlerUtil.dart';
@@ -27,6 +28,7 @@ void main() {
   userModel.init(null);
   badgeModel.init();
   NPush().init();
+  RouterUtil.init();
   SystemUiOverlayStyle routerLoginStyle= SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   );

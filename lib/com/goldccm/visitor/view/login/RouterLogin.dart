@@ -82,6 +82,27 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
         }
       }
     });
+    initLoginData();
+  }
+  initLoginData() async {
+    List userNameLists = await SharedPreferenceUtil.getUsers();
+    RouterList routerList = await RouterUtil.getServerInfo();
+    setState(() {
+      if (userNameLists.length > 0 && userNameLists[0].loginName != null) {
+        _userNameController.text = userNameLists[0].loginName;
+//        FocusScope.of(context).requestFocus(_focusNode);
+      }
+      if(routerList.province!=null&&routerList.area!=null&&routerList.city!=null){
+        _selectAddressController.text=routerList.province+"/"+routerList.city+"/"+routerList.area;
+        if(routerList.routerName!=null){
+          _selectCompanyController.text=routerList.routerName;
+          RouterUtil.apiServerUrl="http://${routerList.ip}:${routerList.port}/visitor/";
+          RouterUtil.webSocketServerUrl="ws://${routerList.ip}:${routerList.port}/visitor/";
+          RouterUtil.uploadServerUrl="http://${routerList.ip}:${routerList.port}/goldccm-imgServer/goldccm/image/gainData";
+          RouterUtil.imageServerUrl="http://${routerList.ip}:${routerList.imagePort}/imgserver/";
+        }
+      }
+    });
   }
   @override
   void dispose() {
@@ -479,7 +500,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                           RouterUtil.uploadServerUrl="http://${value.ip}:${value.port}/goldccm-imgServer/goldccm/image/gainData";
                           RouterUtil.imageServerUrl="http://${value.ip}:${value.imagePort}/imgserver/";
                           RouterUtil.refresh();
-                          print(RouterUtil.apiServerUrl);
+                          RouterUtil.saveServerInfo(value);
                         }
                       });
                     }

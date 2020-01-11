@@ -97,9 +97,9 @@ class NewFriendPageState extends State<NewFriendPage> {
   //加载潜在好友列表
   Future init() async {
     await loadContacts();
-    BadgeInfo badgeInfo = await BadgeUtil().updateFriendRequest();
-    badgeInfo.newFriendRequestCount = 0;
-    Provider.of<BadgeModel>(context).update(badgeInfo);
+//    BadgeInfo badgeInfo = await BadgeUtil().updateFriendRequest();
+//    badgeInfo.newFriendRequestCount = 0;
+//    Provider.of<BadgeModel>(context).update(badgeInfo);
     setState(() {});
     return null;
   }

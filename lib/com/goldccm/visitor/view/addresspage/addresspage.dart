@@ -845,6 +845,7 @@ class Presenter {
                 applyType: userInfo['applyType'],
                 lastMessageId: null,
               );
+
               userlists.add(user);
               bool isExist = await friendDao.isExist(user.userId);
               if (!isExist) {
