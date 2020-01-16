@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:city_pickers/city_pickers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -458,7 +457,6 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                       readOnly: true,
                       onTap: () async {
                         Result result = await CityPickers.showFullPageCityPicker(context: context);
-//                        Navigator.push(context,MaterialPageRoute(builder: (context)=>SelectAddressPage()));
                         if(result!=null&&result.provinceName!=null){
                           setState(() {
                             routers.clear();
@@ -467,6 +465,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                             getRouters();
                           });
                         }
+//                        Navigator.push(context,MaterialPageRoute(builder: (context)=>SelectAddressPage()));
                       },
                     ),
                     Positioned(

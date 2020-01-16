@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -18,7 +19,9 @@ import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
+import 'package:visitor/com/goldccm/visitor/view/homepage/NewsWebView.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/Login.dart';
+import 'package:visitor/com/goldccm/visitor/view/login/VerifyCode.dart';
 import 'package:visitor/home.dart';
 
 import 'Agreement.dart';
@@ -33,7 +36,8 @@ class RegisterPageState extends State<RegisterPage> {
   TextEditingController _phoneController = TextEditingController();
   bool isEditing = false;
   bool isComplete = false;
-
+  String activeRadioValue = "";
+  NewsWebPage _newsWebPage = new NewsWebPage(news_url:"http://121.36.45.232:8082/visitor/xieyi2.html",title:"用户协议",news_bar: false,);
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
@@ -180,13 +184,50 @@ class RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                       ],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: ScreenUtil().setWidth(90),top: ScreenUtil().setHeight(20)),
+                child: Row(
+                  children: <Widget>[
+                   Radio(
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        value: 'policy',
+                        groupValue: activeRadioValue,
+                        activeColor: Colors.blue,
+                        onChanged:(value){
+                          print(value);
+                          setState(() {
+                            activeRadioValue='policy';
+                          });
+                        },
+                      ),
+//                    RichText(
+//                      text: TextSpan(
+//                        text: '我已阅读并接受',style: TextStyle(color:Colors.black,fontSize: ScreenUtil().setSp(26)),
+//                        children: <TextSpan>[
+//                          TextSpan(
+//                            text: '《朋悦比邻隐私政策》',
+//                            style: TextStyle(color:Colors.blue,fontSize: ScreenUtil().setSp(26)),
+//                          ),
+//                        ],
+//                      ),
+//                    ),
+                    Text('我已阅读并接受',style: TextStyle(color:Colors.black,fontSize: ScreenUtil().setSp(26)),),
+                    GestureDetector(
+                      child: Text('《朋悦比邻隐私政策》',style: TextStyle(color:Colors.blue,fontSize: ScreenUtil().setSp(26))),
+                      onTap: (){
+                        callPolicy();
+                      },
                     )
                   ],
                 ),
               ),
               Container(
-                height: ScreenUtil().setHeight(170),
-                padding: EdgeInsets.only(top: ScreenUtil().setHeight(80),
+                height: ScreenUtil().setHeight(150),
+                padding: EdgeInsets.only(top: ScreenUtil().setHeight(60),
                     left: ScreenUtil().setWidth(112),
                     right: ScreenUtil().setWidth(112)),
                 decoration: BoxDecoration(
@@ -214,10 +255,62 @@ class RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-
+  callPolicy(){
+    return YYDialog().build(context)
+      ..width = ScreenUtil().setWidth(267*2)
+      ..gravity = Gravity.center
+      ..borderRadius = 15.0
+      ..text(
+        padding: EdgeInsets.only(top: ScreenUtil().setHeight(30)),
+        alignment: Alignment.center,
+        text: "朋悦比邻隐私政策",
+        color: Colors.black,
+        fontSize: ScreenUtil().setHeight(32),
+        fontWeight: FontWeight.bold,
+      )
+      ..widget(Padding(
+        padding: EdgeInsets.only(bottom: ScreenUtil().setHeight(30)),
+        child:   Container(
+          child: Container(
+            padding: EdgeInsets.only(left: ScreenUtil().setWidth(10)),
+            height: ScreenUtil().setHeight(640),
+            child: _newsWebPage,
+          ),
+        ),
+      ))
+//      ..divider()
+//      ..doubleButton(
+//        padding: EdgeInsets.only(top: 10.0),
+//        gravity: Gravity.center,
+//        withDivider: true,
+//        text1: "不同意",
+//        color1: Colors.black26,
+//        fontSize1: ScreenUtil().setSp(36),
+//        onTap1: () {
+//          setState(() {
+//            activeRadioValue='';
+//          });
+//        },
+//        text2: "同意并继续",
+//        color2: Colors.blue[600],
+//        fontSize2: ScreenUtil().setSp(36),
+//        onTap2: () {
+//          setState(() {
+//            activeRadioValue='policy';
+//          });
+//        },
+//      )
+      ..show();
+  }
   void submitPhone() {
-    if (isComplete) {
-        Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>UserAgreementDealPage(phone: _phoneController.text,)));
+    if(activeRadioValue!='policy'){
+      ToastUtil.showShortClearToast("请先同意协议");
+    }else{
+      if (isComplete) {
+        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> VerifyCodePage(phone: _phoneController.text,title: '注册',)));
+      }else{
+        ToastUtil.showShortClearToast("电话号码不正确");
+      }
     }
   }
 }
