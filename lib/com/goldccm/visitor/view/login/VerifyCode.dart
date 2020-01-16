@@ -101,20 +101,24 @@ class VerifyCodePageState extends State<VerifyCodePage>{
                   Stack(
                     children: <Widget>[
                       Container(
-                        width: ScreenUtil().setWidth(542),
-                        height: ScreenUtil().setHeight(60),
+                        width: ScreenUtil().setWidth(750),
+                        height: ScreenUtil().setHeight(80),
                         child: TextField(
                           showCursor: false,
                           controller: _codeController,
                           style: TextStyle(color: Colors.transparent),
                           focusNode: _codeFocus,
-                          autofocus: true,
+//                         autofocus: true,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                           ),
                           onChanged: (value){
                             setState(() {
+//                              if(code.length==6&&value.length<6){
+//                                code="";
+//                                _codeController.text="";
+//                              }
                               if(value.length<=6){
                                 code=value;
                                 if(value.length==6){
@@ -137,8 +141,7 @@ class VerifyCodePageState extends State<VerifyCodePage>{
                           ),
                         ),
                       ),
-                      GestureDetector(
-                        child: Row(
+                      Row(
                           children: <Widget>[
                             Container(
                               alignment:Alignment.center,
@@ -237,10 +240,6 @@ class VerifyCodePageState extends State<VerifyCodePage>{
                             ),
                           ],
                         ),
-                        onTap: (){
-                            FocusScope.of(context).requestFocus(_codeFocus);
-                        },
-                      ),
                     ],
                   ),
                 ],
@@ -330,9 +329,9 @@ class VerifyCodePageState extends State<VerifyCodePage>{
       Map resMap=jsonDecode(response);
       if(resMap['verify']['sign']=="success"){
         if(widget.title=="注册"){
-          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>SetPasswordPage(phone: widget.phone,code:code)));
+          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>SetPasswordPage(phone: widget.phone,code:code)));
         }else if(widget.title=="忘记密码"){
-          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>ResetPassWord(phone: widget.phone,code:code)));
+          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>ResetPassWord(phone: widget.phone,code:code)));
         }
       }else{
         ToastUtil.showShortClearToast(resMap['verify']['desc']);

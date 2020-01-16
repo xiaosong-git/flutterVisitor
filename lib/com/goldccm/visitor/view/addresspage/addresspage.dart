@@ -96,20 +96,20 @@ class AddressPageState extends State<AddressPage> {
     FriendDao friendDao = FriendDao();
     List<FriendInfo> lists = await friendDao.getFriendInfo();
     print(lists);
-    if (lists!=null&&lists.length > 0) {
+    if (lists != null && lists.length > 0) {
       List<FriendInfo> onlineLists = _presenter.userlists;
-      if(onlineLists.length>0&&onlineLists!=null){
+      if (onlineLists.length > 0 && onlineLists != null) {
         setState(() {
           _userLists = _presenter.userlists;
           initFlag = _presenter.initFlag;
         });
-      }else{
+      } else {
         setState(() {
           _userLists = lists;
           initFlag = false;
         });
       }
-    }else{
+    } else {
       setState(() {
         initFlag = true;
       });
@@ -749,16 +749,24 @@ class AddressPageState extends State<AddressPage> {
                     : _userLists[index].name),
                 leading: _userLists[index].virtualImageUrl != null &&
                         _userLists[index].virtualImageUrl != ""
-                    ? CircleAvatar(
-                        backgroundImage: NetworkImage(RouterUtil.imageServerUrl +
-                            _userLists[index].virtualImageUrl),
+                    ? CachedNetworkImage(
+                        imageUrl: RouterUtil.imageServerUrl +
+                            _userLists[index].virtualImageUrl,
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                        fit: BoxFit.cover,
                       )
                     : _userLists[index].realImageUrl != null &&
                             _userLists[index].realImageUrl != ""
-                        ? CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                RouterUtil.imageServerUrl +
-                                    _userLists[index].realImageUrl),
+                        ? CachedNetworkImage(
+                            imageUrl: RouterUtil.imageServerUrl +
+                                _userLists[index].realImageUrl,
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                            fit: BoxFit.cover,
                           )
                         : CircleAvatar(
                             backgroundImage: AssetImage(
@@ -850,7 +858,7 @@ class Presenter {
               bool isExist = await friendDao.isExist(user.userId);
               if (!isExist) {
                 friendDao.insertFriendInfo(user);
-              }else{
+              } else {
                 friendDao.updateFriendInfo(user);
               }
             }

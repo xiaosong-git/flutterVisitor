@@ -31,10 +31,10 @@ class RouterList{
 
   RouterList.fromJson(Map json){
     routerID = json ['id'].toString();
-    routerName = json ['company_name'];
+    routerName = json ['companyName'];
     ip= json['ip'];
     routerAddress = json ['addr'];
     port = json['port'];
-    imagePort= json ['nginx_port'].toString();
+    imagePort= json ['nginxPort'].toString();
   }
 }

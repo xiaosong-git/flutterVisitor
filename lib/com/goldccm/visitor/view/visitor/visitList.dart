@@ -102,15 +102,19 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
 
   visitMyPeople() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
-      String url = "visitorRecord/visitMyPeople/1/100";
+      String url = "visitorRecord/visitorList";
       String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
+            "pageNum":1,
+            "pageSize":100,
             "token":userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": await CommonUtil.getAppVersion(),
             "userId": userInfo.id,
+            "condition":"visitorId",
+            "recordType":1,
           }),userCall: false);
       if(res !=""&&res!=null){
         if (res is String) {
@@ -186,15 +190,19 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
   visitMine() async {
     UserInfo userInfo=await LocalStorage.load("userInfo");
       String url =
-         "visitorRecord/visitRecord/$_visitMineCount/100";
+         "visitorRecord/visitorList";
       String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
       var res = await Http().post(url,
           queryParameters: ({
+            "pageNum":1,
+            "pageSize":100,
             "token": userInfo.token,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": await CommonUtil.getAppVersion(),
             "userId": userInfo.id,
+            "condition":"userId",
+            "recordType":1,
           }),
           debugMode: true,userCall: false);
       if(res !=""&&res!=null){
@@ -202,7 +210,6 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
           Map map = jsonDecode(res);
           if (map['verify']['sign'] == "success") {
             for (var data in map['data']['rows']) {
-              if (data['recordType'] == 1 && data['userId'] == userInfo.id){
                 VisitInfo visitInfo = new VisitInfo(
                   realName: data['realName'],
                   visitDate: data['visitDate'],
@@ -220,7 +227,6 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
                   id: data['id'].toString(),
                 );
                 _visitLists.add(visitInfo);
-              }
             }
           }
         }

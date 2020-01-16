@@ -131,7 +131,7 @@ class MessageUtils {
 
   //关闭
   static closeChannel() {
-    _timerUtil.cancel();
+    _timerUtil?.cancel();
     _channel?.sink?.close();
     _channel = null;
     _isOpen=false;

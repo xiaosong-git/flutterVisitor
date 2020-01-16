@@ -23,6 +23,7 @@ import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
+import 'package:visitor/com/goldccm/visitor/view/login/selectAddress.dart';
 import '../../../../../home.dart';
 
 /*
@@ -197,18 +198,21 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                 children: <Widget>[
                   Positioned(
                     child:    Container(
-                      height: ScreenUtil().setHeight(128),
-                      padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(54), ScreenUtil().setWidth(112), 0),
+                      height: ScreenUtil().setHeight(84),
+                      padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), 0, ScreenUtil().setWidth(112), 0),
+                      margin: EdgeInsets.only(top:ScreenUtil().setHeight(54)),
                       child: Row(
                         children: <Widget>[
                           Expanded(
                             flex: 17,
-                            child:Image(image: AssetImage('assets/images/login_account.png'),width: ScreenUtil().setWidth(67),height: ScreenUtil().setHeight(67),),
+                            child:Center(
+                              child: Image(image: AssetImage('assets/images/login_account.png'),width: ScreenUtil().setWidth(67),height: ScreenUtil().setHeight(67),),
+                            ),
                           ),
                           Expanded(
                             flex: 109,
                             child:Container(
-                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(35)),
+                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(24)),
                                 child: TextField(
                                   maxLines: 1,
                                   textAlign: TextAlign.left,
@@ -271,8 +275,9 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                   children: <Widget>[
                     Positioned(
                       child:   Container(
-                        height: ScreenUtil().setHeight(108),
-                        padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                        height: ScreenUtil().setHeight(88),
+                        padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112),0 , ScreenUtil().setWidth(112), 0),
+                        margin: EdgeInsets.only(top:ScreenUtil().setHeight(40)),
                         child: Row(
                           children: <Widget>[
                             Expanded(
@@ -284,7 +289,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                             Expanded(
                               flex: 109,
                               child: Container(
-                                  padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                                  padding: EdgeInsets.only(left: ScreenUtil().setWidth(24)),
                                   child: TextField(
                                     maxLines: 1,
                                     textAlign: TextAlign.left,
@@ -326,7 +331,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                     ),
                     Positioned(
                       right: ScreenUtil().setWidth(180),
-                      top: ScreenUtil().setHeight(50),
+                      top: ScreenUtil().setHeight(60),
                       child: GestureDetector(
                         child: isPwdEditing?Container(
                           child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
@@ -341,7 +346,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                     ),
                     Positioned(
                       right: ScreenUtil().setWidth(120),
-                      top: ScreenUtil().setHeight(50),
+                      top: ScreenUtil().setHeight(60),
                       child: GestureDetector(
                         child: isPwdEditing?Container(
                           child: Image(image: isSeen?AssetImage('assets/images/login_visiable.png'):AssetImage('assets/images/login_secret.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
@@ -359,8 +364,9 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
               Offstage(
                 offstage: _loginType!=_loginCode,
                 child:Container(
-                  height: ScreenUtil().setHeight(108),
-                  padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                  height: ScreenUtil().setHeight(88),
+                  padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), 0, ScreenUtil().setWidth(112), 0),
+                  margin: EdgeInsets.only(top:ScreenUtil().setHeight(40)),
                   child: Row(
                     children: <Widget>[
                       Expanded(
@@ -375,7 +381,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                           children: <Widget>[
                             Positioned(
                               child:  Container(
-                                  padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                                  padding: EdgeInsets.only(left: ScreenUtil().setWidth(24)),
                                   child: TextField(
                                     maxLines: 1,
                                     textAlign: TextAlign.left,
@@ -401,7 +407,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                             ),
                             Positioned(
                               right: ScreenUtil().setWidth(0),
-                              bottom: ScreenUtil().setHeight(-16),
+                              bottom: ScreenUtil().setHeight(-5),
                               child: FlatButton(
                                 child: Text(_verifyStr,style: TextStyle(color: msgColor,fontSize: ScreenUtil().setSp(24)),),
                                 onPressed: () async {
@@ -435,31 +441,40 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                   ),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: TextField(
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  maxLengthEnforced: true,
-                  maxLines: 1,
-                  controller: _selectAddressController,
-                  style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF212121)),
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '企业/单位所在地▼',
-                      hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-//                      suffixIcon: Icon(Icons.arrow_drop_down,color: Color(0xFFE1E1E1),),
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    Result result = await CityPickers.showFullPageCityPicker(context: context);
-                    if(result!=null&&result.provinceName!=null){
-                      setState(() {
-                        routers.clear();
-                        _selectAddressController.text=result.provinceName+"/"+result.cityName+"/"+result.areaName;
-                        _selectCompanyController.text="";
-                        getRouters();
-                      });
-                    }
-                  },
+                child: Stack(
+                  children: <Widget>[
+                    TextField(
+                      textAlign: TextAlign.center,
+                      textAlignVertical: TextAlignVertical.center,
+                      maxLengthEnforced: true,
+                      maxLines: 1,
+                      controller: _selectAddressController,
+                      style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF212121)),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: '企业/单位所在地',
+                        hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                      ),
+                      readOnly: true,
+                      onTap: () async {
+                        Result result = await CityPickers.showFullPageCityPicker(context: context);
+//                        Navigator.push(context,MaterialPageRoute(builder: (context)=>SelectAddressPage()));
+                        if(result!=null&&result.provinceName!=null){
+                          setState(() {
+                            routers.clear();
+                            _selectAddressController.text=result.provinceName+"/"+result.cityName+"/"+result.areaName;
+                            _selectCompanyController.text="";
+                            getRouters();
+                          });
+                        }
+                      },
+                    ),
+                    Positioned(
+                      top: ScreenUtil().setHeight(40),
+                      right: ScreenUtil().setWidth(115),
+                      child: Image(image: AssetImage('assets/images/login_triangle.png'),width: ScreenUtil().setWidth(24),height: ScreenUtil().setHeight(18),),
+                    ),
+                  ],
                 ),
               ),
               Container(
@@ -475,37 +490,45 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                   ),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: TextField(
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  maxLengthEnforced: true,
-                  controller: _selectCompanyController,
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: '企业/单位名称▼',
-                    hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-//                    suffixIcon: Icon(Icons.arrow_drop_down,color: Color(0xFFE1E1E1),),
-                  ),
-                  readOnly: true,
-                  onTap: (){
-                    if(routers!=null){
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> RouterSelectPage(lists: routers,))).then((value){
-                        if(value!=null){
-                          setState(() {
-                            _selectCompanyController.text=value.routerName;
+                child: Stack(
+                  children: <Widget>[
+                    TextField(
+                      textAlign: TextAlign.center,
+                      textAlignVertical: TextAlignVertical.center,
+                      maxLengthEnforced: true,
+                      controller: _selectCompanyController,
+                      maxLines: 1,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: '企业/单位名称',
+                        hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                      ),
+                      readOnly: true,
+                      onTap: (){
+                        if(routers!=null){
+                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> RouterSelectPage(lists: routers,))).then((value){
+                            if(value!=null){
+                              setState(() {
+                                _selectCompanyController.text=value.routerName;
+                              });
+                              RouterUtil.apiServerUrl="http://${value.ip}:${value.port}/visitor/";
+                              RouterUtil.webSocketServerUrl="ws://${value.ip}:${value.port}/visitor/";
+                              RouterUtil.uploadServerUrl="http://${value.ip}:${value.port}/goldccm-imgServer/goldccm/image/gainData";
+                              RouterUtil.imageServerUrl="http://${value.ip}:${value.imagePort}/imgserver/";
+                              RouterUtil.refresh();
+                              RouterUtil.saveServerInfo(value);
+                            }
                           });
-                          RouterUtil.apiServerUrl="http://${value.ip}:${value.port}/visitor/";
-                          RouterUtil.webSocketServerUrl="ws://${value.ip}:${value.port}/visitor/";
-                          RouterUtil.uploadServerUrl="http://${value.ip}:${value.port}/goldccm-imgServer/goldccm/image/gainData";
-                          RouterUtil.imageServerUrl="http://${value.ip}:${value.imagePort}/imgserver/";
-                          RouterUtil.refresh();
-                          RouterUtil.saveServerInfo(value);
                         }
-                      });
-                    }
-                  },
-                ),
+                      },
+                    ),
+                    Positioned(
+                      top: ScreenUtil().setHeight(40),
+                      right: ScreenUtil().setWidth(130),
+                      child: Image(image: AssetImage('assets/images/login_triangle.png'),width: ScreenUtil().setWidth(24),height: ScreenUtil().setHeight(18),),
+                    ),
+                  ],
+                )
               ),
               Container(
                 height: ScreenUtil().setHeight(154),

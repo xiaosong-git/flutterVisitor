@@ -46,7 +46,7 @@ class RouterUtil{
   static String uploadServerUrl=Constant.imageServerApiUrl;
   static init() async {
     RouterList rList=await getServerInfo();
-    if(rList!=null){
+    if(rList!=null&&rList.ip!=null&&rList.port!=null&&rList.imagePort!=null){
       RouterUtil.apiServerUrl="http://${rList.ip}:${rList.port}/visitor/";
       RouterUtil.webSocketServerUrl="ws://${rList.ip}:${rList.port}/visitor/";
       RouterUtil.uploadServerUrl="http://${rList.ip}:${rList.port}/goldccm-imgServer/goldccm/image/gainData";

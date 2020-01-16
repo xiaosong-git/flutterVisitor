@@ -223,82 +223,91 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                        ],
                      )
                  ),
-                 Container(
-                   height: ScreenUtil().setHeight(154),
-                   padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(80), ScreenUtil().setWidth(112), 0),
-                   child: Row(
-                     children: <Widget>[
-                       Expanded(
-                         flex: 17,
-                         child:Image(image: AssetImage('assets/images/login_account.png'),width: ScreenUtil().setWidth(67),height: ScreenUtil().setHeight(67),),
-                       ),
-                       Expanded(
-                         flex: 109,
-                         child:Container(
-                             padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(35)),
-                             child: TextField(
-                               maxLines: 1,
-                               textAlign: TextAlign.left,
-                               textAlignVertical: TextAlignVertical.bottom,
-                               keyboardType: TextInputType.phone,
-                               controller: _userNameController,
-                               inputFormatters: [LengthLimitingTextInputFormatter(11)],
-                               maxLengthEnforced: true,
-                               decoration: isPhoneEditing?InputDecoration(
-                                   hintText: '请输入手机号',
-                                   border: InputBorder.none,
-                                   hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-                                   suffix: GestureDetector(
-                                     child: Container(
-                                       child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
-                                       padding: EdgeInsets.only(right: ScreenUtil().setWidth(18)),
-                                     ),
-                                     onTap: (){
+                 Stack(
+                   children: <Widget>[
+                     Positioned(
+                       child: Container(
+                         height: ScreenUtil().setHeight(80),
+                         padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112),0, ScreenUtil().setWidth(112), 0),
+                         margin: EdgeInsets.only(top: ScreenUtil().setHeight(80)),
+                         child: Row(
+                           children: <Widget>[
+                             Expanded(
+                               flex: 17,
+                               child:Center(
+                                 child: Image(image: AssetImage('assets/images/login_account.png'),width: ScreenUtil().setWidth(67),height: ScreenUtil().setHeight(67),),
+                               ),
+                             ),
+                             Expanded(
+                               flex: 109,
+                               child:Container(
+                                 padding: EdgeInsets.only(left: ScreenUtil().setWidth(24)),
+                                 child: TextField(
+                                   maxLines: 1,
+                                   textAlign: TextAlign.left,
+                                   textAlignVertical: TextAlignVertical.bottom,
+                                   keyboardType: TextInputType.phone,
+                                   controller: _userNameController,
+                                   inputFormatters: [LengthLimitingTextInputFormatter(11)],
+                                   maxLengthEnforced: true,
+                                   decoration: InputDecoration(
+                                     border: InputBorder.none,
+                                     hintText: '请输入手机号',
+                                     hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                                   ),
+                                   onChanged: (value){
+                                     if(value!=null&&value.length>0){
+                                       if(checkLoginStatus()){
+                                         setState(() {
+                                           isCompleted=true;
+                                         });
+                                       }else{
+                                         setState(() {
+                                           isCompleted=false;
+                                         });
+                                       }
                                        setState(() {
-                                         _userNameController.text="";
+                                         isPhoneEditing=true;
+                                       });
+                                     }else{
+                                       setState(() {
                                          isPhoneEditing=false;
                                        });
-                                     },
-                                   )
-                               ):InputDecoration(
-                                 border: InputBorder.none,
-                                 hintText: '请输入手机号',
-                                 hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-                               ),
-                               onChanged: (value){
-                                 if(value!=null&&value.length>0){
-                                   if(checkLoginStatus()){
-                                     setState(() {
-                                       isCompleted=true;
-                                     });
-                                   }else{
-                                     setState(() {
-                                       isCompleted=false;
-                                     });
-                                   }
-                                   setState(() {
-                                     isPhoneEditing=true;
-                                   });
-                                 }else{
-                                   setState(() {
-                                     isPhoneEditing=false;
-                                   });
-                                 }
-                               },
-                             ),
-                             decoration:BoxDecoration(
-                               border:Border(
-                                 bottom: BorderSide(
-                                   color: Color(0xFFECECEC),
-                                   width: ScreenUtil().setHeight(2),
-                                   style: BorderStyle.solid,
+                                     }
+                                   },
+                                 ),
+                                 decoration:BoxDecoration(
+                                   border:Border(
+                                     bottom: BorderSide(
+                                       color: Color(0xFFECECEC),
+                                       width: ScreenUtil().setHeight(2),
+                                       style: BorderStyle.solid,
+                                     ),
+                                   ),
+//                               color: Colors.green,
                                  ),
                                ),
                              ),
+                           ],
                          ),
                        ),
-                     ],
-                   ),
+                     ),
+                     Positioned(
+                       right: ScreenUtil().setWidth(120),
+                       top: ScreenUtil().setHeight(100),
+                       child:GestureDetector(
+                         child: isPhoneEditing?Container(
+                           child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
+                         ):Container(),
+                         onTap: (){
+                           setState(() {
+                             _userNameController.text="";
+                             isPhoneEditing=false;
+                           });
+                         },
+                       ),
+                     ),
+                   ],
                  ),
                  Offstage(
                    offstage: _loginType!=_loginPass,
@@ -306,8 +315,9 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                      children: <Widget>[
                        Positioned(
                          child:   Container(
-                           height: ScreenUtil().setHeight(108),
-                           padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                           height: ScreenUtil().setHeight(88),
+                           padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), 0, ScreenUtil().setWidth(112), 0),
+                           margin: EdgeInsets.only(top:ScreenUtil().setHeight(40)),
                            child: Row(
                              children: <Widget>[
                                Expanded(
@@ -319,7 +329,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                                Expanded(
                                  flex: 109,
                                  child: Container(
-                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(24)),
                                      child: TextField(
                                        maxLines: 1,
                                        textAlign: TextAlign.left,
@@ -371,7 +381,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                        ),
                        Positioned(
                          right: ScreenUtil().setWidth(180),
-                         top: ScreenUtil().setHeight(50),
+                         top: ScreenUtil().setHeight(65),
                          child: GestureDetector(
                            child: isPwdEditing?Container(
                              child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
@@ -386,7 +396,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                        ),
                        Positioned(
                          right: ScreenUtil().setWidth(120),
-                         top: ScreenUtil().setHeight(50),
+                         top: ScreenUtil().setHeight(65),
                          child: GestureDetector(
                            child: isPwdEditing?Container(
                              child: Image(image: isSeen?AssetImage('assets/images/login_visiable.png'):AssetImage('assets/images/login_secret.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
@@ -404,8 +414,9 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                  Offstage(
                    offstage: _loginType!=_loginCode,
                    child: Container(
-                     height: ScreenUtil().setHeight(108),
-                     padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), ScreenUtil().setHeight(40), ScreenUtil().setWidth(112), 0),
+                     height: ScreenUtil().setHeight(88),
+                     padding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(112), 0, ScreenUtil().setWidth(112), 0),
+                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
                      child: Row(
                        children: <Widget>[
                          Expanded(
@@ -420,7 +431,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                              children: <Widget>[
                                Positioned(
                                  child:  Container(
-                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(24),top:ScreenUtil().setHeight(30)),
+                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(24)),
                                      child: TextField(
                                        maxLines: 1,
                                        textAlign: TextAlign.left,
@@ -460,7 +471,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                                ),
                                Positioned(
                                  right: ScreenUtil().setWidth(0),
-                                 bottom: ScreenUtil().setHeight(-16),
+                                 bottom: ScreenUtil().setHeight(0),
                                  child: FlatButton(
                                    child: Text(_verifyStr,style: TextStyle(color: msgColor,fontSize: ScreenUtil().setSp(24)),),
                                    onPressed: () async {

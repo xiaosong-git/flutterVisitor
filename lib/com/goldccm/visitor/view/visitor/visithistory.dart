@@ -12,6 +12,7 @@ import 'package:visitor/com/goldccm/visitor/util/QrcodeHandler.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/emptyPage.dart';
+import 'package:visitor/com/goldccm/visitor/view/visitor/visitDetail.dart';
 /*
  * 访问记录
  * 展示可用于访问的访问二维码
@@ -27,7 +28,6 @@ class VisitHistory extends StatefulWidget{
 
 class VisitHistoryState extends State<VisitHistory>{
   int count = 1;
-  int _totalNum=-1;
   List<VisitInfo> _visitLists = <VisitInfo>[];
   bool isPerformingRequest = false;
   bool notEmpty=true;
@@ -53,28 +53,50 @@ class VisitHistoryState extends State<VisitHistory>{
         itemCount: _visitLists.length,
         itemBuilder: (BuildContext context, int index) {
             return ListTile(
-              title: Text(_visitLists[index].realName!=null?_visitLists[index].realName:"",textScaleFactor: 1.0,),
+              title: RichText(text: TextSpan(
+                text: '访问对象  ',
+                style: TextStyle(fontSize: 16,color: Colors.black),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: _visitLists[index].realName != null
+                        ? _visitLists[index].realName
+                        : "",
+                    style: TextStyle(fontSize: 16,color: Colors.grey),
+                  ),
+                ],
+              ),textScaleFactor: 1.0,),
               subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(_visitLists[index].startDate!=null?_visitLists[index].startDate:"",textScaleFactor: 1.0,),
-                    Text(_visitLists[index].endDate!=null?"至 ${_visitLists[index].endDate}":"",textScaleFactor: 1.0,),
-                  ]
-              ),
-              trailing: Text(_visitLists[index].cstatus!=null?(_visitLists[index].cstatus=="applyConfirm"?"审核中":_visitLists[index].cstatus=="applySuccess"?"已通过":"未通过"):"",textScaleFactor: 1.0,),
+                    RichText(text: TextSpan(
+                      text: '开始时间  ',
+                      style: TextStyle(fontSize: 16,color: Colors.black),
+                      children: <TextSpan>[
+                        TextSpan(
+                          text:_visitLists[index].startDate != null ? _visitLists[index].startDate : "",
+                          style: TextStyle(fontSize: 16,color: Colors.grey),
+                        ),
+                      ],
+                    ),textScaleFactor: 1.0,),
+                    RichText(text: TextSpan(
+                      text: '结束时间  ',
+                      style: TextStyle(fontSize: 16,color: Colors.black),
+                      children: <TextSpan>[
+                        TextSpan(
+                          text:_visitLists[index].endDate != null ? "${_visitLists[index].endDate}" : "",
+                          style: TextStyle(fontSize: 16,color: Colors.grey),
+                        ),
+                      ],
+                    ),textScaleFactor: 1.0,),
+                  ]),
+              trailing: _visitLists[index].cstatus != null ?_visitLists[index].cstatus == "applyConfirm"?DateTime.parse(_visitLists[index].endDate).isBefore(DateTime.now())?Text("过期",style: TextStyle( color: Colors.red),):Text("审核",style: TextStyle(),): _visitLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
               onTap: () {
-                if(_visitLists[index].cstatus=="applySuccess") {
-                  QrcodeMode model = new QrcodeMode(userInfo: widget.userInfo,
-                      totalPages: 1,
-                      bitMapType: 2,
-                      visitInfo: _visitLists[index]);
-                  List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
-                  Navigator.push(context,
-                      new MaterialPageRoute(builder: (BuildContext context) {
-                        return new Qrcode(qrCodecontent: qrMsg);
-                      }));
+                if(DateTime.parse(_visitLists[index].endDate).isBefore(DateTime.now())){
+                  ToastUtil.showShortClearToast("访问已过期");
                 }else{
-                  ToastUtil.showShortClearToast("您的访问还没有通过申请哦");
+                  Navigator.push(context,
+                      MaterialPageRoute(
+                          builder: (context) => VisitDetail(visitInfo: _visitLists[index],)));
                 }
               },
             );
@@ -89,30 +111,85 @@ class VisitHistoryState extends State<VisitHistory>{
         padding: EdgeInsets.all(8),
       ),
       onRefresh: ()async{
+        _refresh();
       },
       onLoad: ()async{
         _getMoreData();
       },
       controller: _easyRefreshController,
       enableControlFinishLoad: true,
-//      enableControlFinishRefresh: true,
-      firstRefresh: true,
+      enableControlFinishRefresh: true,
+      firstRefresh: false,
       firstRefreshWidget: LoadingDialog(text: '加载中',),
       emptyWidget: notEmpty!=true?EmptyPage():null,
     );
   }
+  _refresh() async {
+    _visitLists.clear();
+    count=1;
+    String url = "visitorRecord/visitorList";
+    String threshold = await CommonUtil.calWorkKey(userInfo:widget.userInfo);
+    var res = await Http().post(url,
+        queryParameters: ({
+          "pageNum":count,
+          "pageSize":10,
+          "token": widget.userInfo.token,
+          "factor": CommonUtil.getCurrentTime(),
+          "threshold": threshold,
+          "requestVer": await CommonUtil.getAppVersion(),
+          "userId": widget.userInfo.id,
+          "condition":"userId",
+          "recordType":1,
+        }),debugMode: true,userCall: false);
+    if (res is String) {
+      Map map = jsonDecode(res);
+      if(map['verify']['sign']=="success"){
+        if(map['data']['total']==0){
+          setState(() {
+            notEmpty = false;
+          });
+        }else{
+          for (var data in map['data']['rows']) {
+            VisitInfo visitInfo = new VisitInfo(
+              realName:data['realName'],
+              visitDate: data['visitDate'],
+              visitTime: data['visitTime'],
+              userId: data['userId'].toString(),
+              visitorId: data['visitorId'].toString(),
+              reason: data['reason'],
+              cstatus: data['cstatus'],
+              dateType: data['dateType'],
+              endDate: data['endDate'],
+              startDate: data['startDate'],
+              id: data['id'].toString(),
+              visitorRealName: widget.userInfo.realName,
+              phone: widget.userInfo.phone,
+            );
+            _visitLists.add(visitInfo);
+          }
+          setState(() {
+            count++;
+          });
+          _easyRefreshController.finishRefresh(success: true);
+        }
+      }
+    }
+  }
   //加载更多数据
   _getMoreData() async {
-      Future.delayed(Duration(seconds: 1), () async {
-        String url = "visitorRecord/visitRecord/$count/10";
+        String url = "visitorRecord/visitorList";
         String threshold = await CommonUtil.calWorkKey(userInfo:widget.userInfo);
         var res = await Http().post(url,
             queryParameters: ({
+              "pageNum":count,
+              "pageSize":10,
               "token": widget.userInfo.token,
               "factor": CommonUtil.getCurrentTime(),
               "threshold": threshold,
               "requestVer": await CommonUtil.getAppVersion(),
               "userId": widget.userInfo.id,
+              "condition":"userId",
+              "recordType":1,
             }),debugMode: true,userCall: false);
         if (res is String) {
           Map map = jsonDecode(res);
@@ -142,7 +219,6 @@ class VisitHistoryState extends State<VisitHistory>{
               }
               setState(() {
                 count++;
-                _totalNum+=10;
               });
               if (map['data']['rows'].length < 10) {
                 setState(() {
@@ -155,7 +231,6 @@ class VisitHistoryState extends State<VisitHistory>{
             }
           }
         }
-      });
   }
 
   Widget _visitFuture(BuildContext context, AsyncSnapshot snapshot) {

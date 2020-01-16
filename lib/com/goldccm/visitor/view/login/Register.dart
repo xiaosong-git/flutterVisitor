@@ -92,8 +92,7 @@ class RegisterPageState extends State<RegisterPage> {
               ),
               Container(
                 width: ScreenUtil().setWidth(750),
-                padding: EdgeInsets.only(left: ScreenUtil().setWidth(112),
-                    right: ScreenUtil().setWidth(112)),
+                padding: EdgeInsets.only(left: ScreenUtil().setWidth(112), right: ScreenUtil().setWidth(112)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -116,7 +115,7 @@ class RegisterPageState extends State<RegisterPage> {
                               top: ScreenUtil().setHeight(15)),
                         ),
                         Container(
-                          height: ScreenUtil().setHeight(60),
+                          height: ScreenUtil().setHeight(80),
                           width: ScreenUtil().setWidth(472),
                           padding: EdgeInsets.only(
                               left: ScreenUtil().setWidth(18)),
@@ -218,7 +217,7 @@ class RegisterPageState extends State<RegisterPage> {
 
   void submitPhone() {
     if (isComplete) {
-        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>UserAgreementDealPage(phone: _phoneController.text,)));
+        Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>UserAgreementDealPage(phone: _phoneController.text,)));
     }
   }
 }
@@ -239,74 +238,112 @@ class SetPasswordPageState extends State<SetPasswordPage>{
   TextEditingController _pwdController=TextEditingController();
   bool isEditing=false;
   bool isComplete=false;
+  bool isSeen=false;
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Scaffold(
-      body: Container(
-        width: ScreenUtil().setWidth(750),
-        height: ScreenUtil().setHeight(1334),
-        color: Color(0xFFFFFFFF),
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: ScreenUtil().setHeight(88),
-              width: ScreenUtil().setWidth(750),
-              margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(right: ScreenUtil().setWidth(235),left: 0),
-                    child: IconButton(
-                        icon: Image(image: AssetImage("assets/images/login_back.png"),width: ScreenUtil().setWidth(36),height: ScreenUtil().setHeight(36),color: Color(0xFF0073FE),),
-                        onPressed: () {
-                          setState(() {
-                            Navigator.pop(context);
-                          });
-                        }),
-                  ),
-                  Text('注册',style: TextStyle(color: Color(0xFF0073FE),fontSize: ScreenUtil().setSp(36),),),
-                ],
+      body: SingleChildScrollView(
+        child: Container(
+          width: ScreenUtil().setWidth(750),
+          height: ScreenUtil().setHeight(1334),
+          color: Color(0xFFFFFFFF),
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: ScreenUtil().setHeight(88),
+                width: ScreenUtil().setWidth(750),
+                margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(right: ScreenUtil().setWidth(235),left: 0),
+                      child: IconButton(
+                          icon: Image(image: AssetImage("assets/images/login_back.png"),width: ScreenUtil().setWidth(36),height: ScreenUtil().setHeight(36),color: Color(0xFF0073FE),),
+                          onPressed: () {
+                            setState(() {
+                              Navigator.pop(context);
+                            });
+                          }),
+                    ),
+                    Text('注册',style: TextStyle(color: Color(0xFF0073FE),fontSize: ScreenUtil().setSp(36),),),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              child: Divider(
-                color: Color(0x0F000000),
-                height: ScreenUtil().setHeight(2),
-                thickness: ScreenUtil().setHeight(2),
+              Container(
+                child: Divider(
+                  color: Color(0x0F000000),
+                  height: ScreenUtil().setHeight(2),
+                  thickness: ScreenUtil().setHeight(2),
+                ),
               ),
-            ),
-            Container(
-              height: ScreenUtil().setHeight(50),
-              width: ScreenUtil().setWidth(750),
-              margin: EdgeInsets.only(top: ScreenUtil().setHeight(144),left: ScreenUtil().setWidth(112),bottom: ScreenUtil().setHeight(116)),
-              child: Text('请输入新密码',style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFF373737)),),
-            ),
-            Container(
-              width: ScreenUtil().setWidth(750),
-              padding: EdgeInsets.only(left: ScreenUtil().setWidth(112),right: ScreenUtil().setWidth(112)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    child: Text('新密码',style: TextStyle(color: Color(0xFFA8A8A8),fontSize: ScreenUtil().setSp(28)),),
-                    padding: EdgeInsets.only(bottom: ScreenUtil().setHeight(62)),
-                  ),
-                  Container(
-                    height: ScreenUtil().setHeight(60),
-                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(18)),
-                    child: TextField(
-                      controller: _pwdController,
-                      style: TextStyle(fontSize: ScreenUtil().setSp(32),color: Color(0xFF212121)),
-                      decoration: isEditing?InputDecoration(
-                          hintText: '请输入新密码',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-                          suffix: GestureDetector(
-                            child: Container(
-                              child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
-                              padding: EdgeInsets.only(right: ScreenUtil().setWidth(18)),
+              Container(
+                height: ScreenUtil().setHeight(50),
+                width: ScreenUtil().setWidth(750),
+                margin: EdgeInsets.only(top: ScreenUtil().setHeight(144),left: ScreenUtil().setWidth(112),bottom: ScreenUtil().setHeight(116)),
+                child: Text('请输入新密码',style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFF373737)),),
+              ),
+              Container(
+                width: ScreenUtil().setWidth(750),
+                padding: EdgeInsets.only(left: ScreenUtil().setWidth(112),right: ScreenUtil().setWidth(112)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      child: Text('新密码',style: TextStyle(color: Color(0xFFA8A8A8),fontSize: ScreenUtil().setSp(28)),),
+                      padding: EdgeInsets.only(bottom: ScreenUtil().setHeight(62)),
+                    ),
+                    Stack(
+                      children: <Widget>[
+                        Positioned(
+                          child: Container(
+                            height: ScreenUtil().setHeight(80),
+                            padding: EdgeInsets.only(left: ScreenUtil().setWidth(18)),
+                            child: TextField(
+                              obscureText: !isSeen,
+                              controller: _pwdController,
+                              style: TextStyle(fontSize: ScreenUtil().setSp(32),color: Color(0xFF212121)),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                              ),
+                              onChanged:(value){
+                                if(value!=null&&value!=""){
+                                  isEditing=true;
+                                  if(RegExpUtil().verifyPassWord(value)){
+                                    setState(() {
+                                      isComplete=true;
+                                    });
+                                  }else{
+                                    setState(() {
+                                      isComplete=false;
+                                    });
+                                  }
+                                }else{
+                                  setState(() {
+                                    isEditing=false;
+                                  });
+                                }
+                              },
                             ),
+                            decoration: BoxDecoration(
+                              border:Border(
+                                bottom: BorderSide(
+                                  color: Color(0xFFECECEC),
+                                  width: ScreenUtil().setHeight(2),
+                                  style: BorderStyle.solid,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: ScreenUtil().setWidth(100),
+                          top: ScreenUtil().setHeight(25),
+                          child: GestureDetector(
+                            child: isEditing?Container(
+                              child: Image(image: AssetImage('assets/images/login_cancel.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
+                            ):Container(),
                             onTap: (){
                               setState(() {
                                 _pwdController.text="";
@@ -314,73 +351,58 @@ class SetPasswordPageState extends State<SetPasswordPage>{
                                 isEditing=false;
                               });
                             },
-                          )
-                      ):InputDecoration(
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
-                      ),
-                      onChanged:(value){
-                        if(value!=null&&value!=""){
-                          isEditing=true;
-                          if(RegExpUtil().verifyPassWord(value)){
-                            setState(() {
-                              isComplete=true;
-                            });
-                          }else{
-                            setState(() {
-                              isComplete=false;
-                            });
-                          }
-                        }else{
-                          setState(() {
-                            isEditing=false;
-                          });
-                        }
-                      },
-                    ),
-                    decoration: BoxDecoration(
-                      border:Border(
-                        bottom: BorderSide(
-                          color: Color(0xFFECECEC),
-                          width: ScreenUtil().setHeight(2),
-                          style: BorderStyle.solid,
+                          ),
                         ),
-                      ),
+                        Positioned(
+                          right: ScreenUtil().setWidth(40),
+                          top: ScreenUtil().setHeight(25),
+                          child: GestureDetector(
+                            child: isEditing?Container(
+                              child: Image(image: isSeen?AssetImage('assets/images/login_visiable.png'):AssetImage('assets/images/login_secret.png'),width: ScreenUtil().setWidth(40),height: ScreenUtil().setHeight(40),),
+                            ):Container(),
+                            onTap: (){
+                              setState(() {
+                                isSeen=!isSeen;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  isEditing?Container(
-                    height: ScreenUtil().setHeight(54),
-                    child: Text('请输入同时包含字母及数字的8-16位密码',style: TextStyle(color: Color(0xFF0095FF),fontSize: ScreenUtil().setSp(24)),),
-                    padding: EdgeInsets.only(top: ScreenUtil().setHeight(12)),
-                  ):Container(
-                    height: ScreenUtil().setHeight(54),
-                    child: Text('',style: TextStyle(color: Color(0xFF0095FF),fontSize: ScreenUtil().setSp(24)),),
-                    padding: EdgeInsets.only(top: ScreenUtil().setHeight(12)),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              height: ScreenUtil().setHeight(170-35),
-              padding: EdgeInsets.only(top:ScreenUtil().setHeight(38),left: ScreenUtil().setWidth(112),right:ScreenUtil().setWidth(112)),
-              decoration: BoxDecoration(
-
-              ),
-              child: SizedBox(
-                width: ScreenUtil().setWidth(520),
-                height: ScreenUtil().setHeight(90),
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  child: Text('完成',style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFFFFFFFF)),textAlign: TextAlign.center,),
-                  onPressed: (){
-                    setPwd();
-                  },
-                  color: isComplete?Color(0xFF0073FE):Color(0xFF79B6FF),
+                    isEditing?Container(
+                      height: ScreenUtil().setHeight(54),
+                      child: Text('请输入同时包含字母及数字的8-16位密码',style: TextStyle(color: Color(0xFF0095FF),fontSize: ScreenUtil().setSp(24)),),
+                      padding: EdgeInsets.only(top: ScreenUtil().setHeight(12)),
+                    ):Container(
+                      height: ScreenUtil().setHeight(54),
+                      child: Text('',style: TextStyle(color: Color(0xFF0095FF),fontSize: ScreenUtil().setSp(24)),),
+                      padding: EdgeInsets.only(top: ScreenUtil().setHeight(12)),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              Container(
+                height: ScreenUtil().setHeight(170-35),
+                padding: EdgeInsets.only(top:ScreenUtil().setHeight(38),left: ScreenUtil().setWidth(112),right:ScreenUtil().setWidth(112)),
+                decoration: BoxDecoration(
+
+                ),
+                child: SizedBox(
+                  width: ScreenUtil().setWidth(520),
+                  height: ScreenUtil().setHeight(90),
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0)),
+                    child: Text('完成',style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFFFFFFFF)),textAlign: TextAlign.center,),
+                    onPressed: (){
+                      setPwd();
+                    },
+                    color: isComplete?Color(0xFF0073FE):Color(0xFF79B6FF),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

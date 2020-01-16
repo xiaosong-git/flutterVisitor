@@ -49,15 +49,19 @@ class InviteListState extends State<InviteList>
 
   //获取我的邀约列表
   getSentInviteLists() async {
-    String url =  "visitorRecord/inviteRecord/1/100";
+    String url =  "visitorRecord/visitorList";
     String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
     var res = await Http().post(url,
         queryParameters: ({
+          "pageNum":1,
+          "pageSize":100,
           "token": widget.userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
           "requestVer": await CommonUtil.getAppVersion(),
           "userId": widget.userInfo.id,
+          "condition":"visitorId",
+          "recordType":2,
         }),
         userCall: false);
     if (res is String) {
@@ -93,15 +97,19 @@ class InviteListState extends State<InviteList>
 
   //获取审核邀约列表
   getReceivedInviteLists() async {
-    String url = "visitorRecord/inviteMine/1/100";
+    String url = "visitorRecord/visitorList";
     String threshold = await CommonUtil.calWorkKey(userInfo: widget.userInfo);
     var res = await Http().post(url,
         queryParameters: ({
+          "pageNum":1,
+          "pageSize":100,
           "token": widget.userInfo.token,
           "factor": CommonUtil.getCurrentTime(),
           "threshold": threshold,
           "requestVer": await CommonUtil.getAppVersion(),
           "userId": widget.userInfo.id,
+          "condition":"userId",
+          "recordType":2,
         }),
         userCall: false);
     if (res is String) {

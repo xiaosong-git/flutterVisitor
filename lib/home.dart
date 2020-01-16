@@ -16,7 +16,7 @@ import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/addresspage.dart';
 import 'package:visitor/com/goldccm/visitor/view/contract/chatListItem.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/homepage.dart';
-import 'package:visitor/com/goldccm/visitor/view/visitor/minepage.dart';
+import 'package:visitor/com/goldccm/visitor/view/minepage/minepage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'com/goldccm/visitor/eventbus/FriendCountChangeEvent.dart';

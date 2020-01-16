@@ -202,6 +202,12 @@ class MinePageState extends State<MinePage> {
    */
   Future getPrivilege() async {
     _list.clear();
+    setState(() {
+      //基础权限
+      for (int i = 0; i < _baseList.length; i++) {
+        _list.add(_baseList[i]);
+      }
+    });
     UserInfo userInfo = await LocalStorage.load("userInfo");
     String url = "userAppRole/getRoleMenu";
     String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
@@ -227,14 +233,7 @@ class MinePageState extends State<MinePage> {
           }
         }
       }
-    } else {}
-
-    setState(() {
-      //基础权限
-      for (int i = 0; i < _baseList.length; i++) {
-        _list.add(_baseList[i]);
-      }
-    });
+    }
   }
 
   @override

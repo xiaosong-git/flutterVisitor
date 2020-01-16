@@ -24,7 +24,6 @@ void main() {
   Provider.debugCheckInvalidValueType = null;
   final UserModel userModel = UserModel();
   final BadgeModel badgeModel = BadgeModel();
-//  FlutterArcface.active();
   userModel.init(null);
   badgeModel.init();
   NPush().init();

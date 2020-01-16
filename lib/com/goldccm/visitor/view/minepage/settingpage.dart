@@ -341,16 +341,17 @@ class SettingPageState extends State<SettingPage> {
       "threshold": threshold,
       "requestVer": await CommonUtil.getAppVersion(),
     },userCall: true);
-    if(res != null){
+    if(res != null&&res!=""){
       if(res is String){
         Map map = jsonDecode(res);
         if(map['verify']['sign']=="success"){
-          SharedPreferences sp = await SharedPreferences.getInstance();sp.setBool("isLogin", false);
-          MessageUtils.closeChannel();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+
         }
       }
     }
+    SharedPreferences sp = await SharedPreferences.getInstance();sp.setBool("isLogin", false);
+    MessageUtils.closeChannel();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
   }
   //获取缓存的大小
   getCacheSize() async {
