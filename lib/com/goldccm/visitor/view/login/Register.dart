@@ -196,28 +196,16 @@ class RegisterPageState extends State<RegisterPage> {
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         value: 'policy',
                         groupValue: activeRadioValue,
-                        activeColor: Colors.blue,
+                        activeColor: Color(0xFF79B6FF),
                         onChanged:(value){
-                          print(value);
                           setState(() {
                             activeRadioValue='policy';
                           });
                         },
                       ),
-//                    RichText(
-//                      text: TextSpan(
-//                        text: '我已阅读并接受',style: TextStyle(color:Colors.black,fontSize: ScreenUtil().setSp(26)),
-//                        children: <TextSpan>[
-//                          TextSpan(
-//                            text: '《朋悦比邻隐私政策》',
-//                            style: TextStyle(color:Colors.blue,fontSize: ScreenUtil().setSp(26)),
-//                          ),
-//                        ],
-//                      ),
-//                    ),
-                    Text('我已阅读并接受',style: TextStyle(color:Colors.black,fontSize: ScreenUtil().setSp(26)),),
+                    Text('我已阅读并接受',style: TextStyle(color:Color(0xFF373737),fontSize: ScreenUtil().setSp(26)),),
                     GestureDetector(
-                      child: Text('《朋悦比邻隐私政策》',style: TextStyle(color:Colors.blue,fontSize: ScreenUtil().setSp(26))),
+                      child: Text('《朋悦比邻隐私政策》',style: TextStyle(color:Color(0xFF0073FE),fontSize: ScreenUtil().setSp(26))),
                       onTap: (){
                         callPolicy();
                       },

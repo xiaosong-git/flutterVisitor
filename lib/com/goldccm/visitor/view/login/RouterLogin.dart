@@ -2,17 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-import 'package:city_pickers/city_pickers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
+import 'package:visitor/com/goldccm/visitor/meta/province.dart';
 import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
+import 'package:visitor/com/goldccm/visitor/model/ProvinceInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/RouterList.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
+import 'package:visitor/com/goldccm/visitor/model/result.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
@@ -130,7 +132,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                child: Row(
                  children: <Widget>[
                    Container(
-                       padding: EdgeInsets.only(right: ScreenUtil().setWidth(165),left: 0),
+                       padding: EdgeInsets.only(right: ScreenUtil().setWidth(155),left: ScreenUtil().setWidth(10)),
                        child: IconButton(
                            icon: Image(image: AssetImage("assets/images/login_back.png"),width: ScreenUtil().setWidth(36),height: ScreenUtil().setHeight(36),color: Color(0xFF0073FE),),
                            onPressed: () {
@@ -456,7 +458,8 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                       ),
                       readOnly: true,
                       onTap: () async {
-                        Result result = await CityPickers.showFullPageCityPicker(context: context);
+//                        Result result = await CityPickers.showFullPageCityPicker(context: context);
+                        Result result= await Navigator.push(context,MaterialPageRoute(builder: (context)=>SelectAddressPage(provincesData: provincesData,citiesData: citiesData,)));
                         if(result!=null&&result.provinceName!=null){
                           setState(() {
                             routers.clear();
@@ -465,13 +468,12 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                             getRouters();
                           });
                         }
-//                        Navigator.push(context,MaterialPageRoute(builder: (context)=>SelectAddressPage()));
                       },
                     ),
                     Positioned(
                       top: ScreenUtil().setHeight(40),
                       right: ScreenUtil().setWidth(115),
-                      child: Image(image: AssetImage('assets/images/login_triangle.png'),width: ScreenUtil().setWidth(24),height: ScreenUtil().setHeight(18),),
+                      child: _selectAddressController.text==""?Image(image: AssetImage('assets/images/login_triangle.png'),width: ScreenUtil().setWidth(24),height: ScreenUtil().setHeight(18),):Container(),
                     ),
                   ],
                 ),
@@ -496,6 +498,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                       textAlignVertical: TextAlignVertical.center,
                       maxLengthEnforced: true,
                       controller: _selectCompanyController,
+                      style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF212121)),
                       maxLines: 1,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -524,7 +527,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                     Positioned(
                       top: ScreenUtil().setHeight(40),
                       right: ScreenUtil().setWidth(130),
-                      child: Image(image: AssetImage('assets/images/login_triangle.png'),width: ScreenUtil().setWidth(24),height: ScreenUtil().setHeight(18),),
+                      child: _selectCompanyController.text==""?Image(image: AssetImage('assets/images/login_triangle.png'),width: ScreenUtil().setWidth(24),height: ScreenUtil().setHeight(18),):Container(),
                     ),
                   ],
                 )
