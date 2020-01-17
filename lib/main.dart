@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-//import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'com/goldccm/visitor/model/BadgeModel.dart';
 import 'com/goldccm/visitor/model/UserModel.dart';
-import 'com/goldccm/visitor/util/PremissionHandlerUtil.dart';
-import 'com/goldccm/visitor/view/login/Login.dart';
 import 'splash.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-/*
- * 启动方法
- * userModel 用户信息
- * badgeModel 消息数量
- * FlutterArcFace 虹软人脸识别插件激活
- * UMPush 友盟推送
- */
+
+ // userModel 用户信息
+ // badgeModel 消息数量
+ // NPush().init() 个推推送
+ // RouterUtil.init() 服务器地址初始化
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;

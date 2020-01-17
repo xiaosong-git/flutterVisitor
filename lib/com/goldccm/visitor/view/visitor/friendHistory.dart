@@ -50,7 +50,12 @@ class FriendHistoryState extends State<FriendHistory>{
                 child: CachedNetworkImage(
                   imageUrl:  RouterUtil.imageServerUrl + _friendLists[index].virtualImageUrl,
                   placeholder: (context, url) =>
-                      CircularProgressIndicator(),
+                      Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  width: 10,
+                  height: 10,
+                  alignment: Alignment.center,
+                ),
                   errorWidget: (context, url, error) =>
                       Icon(Icons.error),
                   fit: BoxFit.cover,

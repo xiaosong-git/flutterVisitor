@@ -10,7 +10,7 @@ import 'BaseDBProvider.dart';
 
 class FriendDao extends BaseDBProvider {
   //存储表明
-  String table_name = "tbl_Friends";
+  String table_name = "tbl_Friend";
 
   //主键
   String primary_Key = "F_ID";
@@ -36,7 +36,8 @@ class FriendDao extends BaseDBProvider {
     imageServerUrl text,
     applyType int,
     userId int,
-    lastMessageId int
+    lastMessageId int,
+    belongId int
     )
     ''';
   }
@@ -62,9 +63,9 @@ class FriendDao extends BaseDBProvider {
     return null;
   }
   //获取好友列表
-  Future<List<FriendInfo>> getFriendInfo() async {
+  Future<List<FriendInfo>> getFriendInfo(int belongId) async {
     Database db = await getDataBase();
-    List<Map<String, dynamic>> listRes = await db.query(table_name);
+    List<Map<String, dynamic>> listRes = await db.query(table_name,where: 'belongId = ? ',whereArgs: [belongId]);
     if (listRes.length > 0) {
       List<FriendInfo> msgs =
       listRes.map((item) => FriendInfo.fromJson(item)).toList();
@@ -85,19 +86,20 @@ class FriendDao extends BaseDBProvider {
   //消息转map
   Map<String, dynamic> toMap(FriendInfo info) {
     Map<String, dynamic> map = {
-    'realName':info.name,
-    'nickName':info.nickname,
-    'phone':info.phone,
-    'realImgUrl':info.realImageUrl,
-    'virtualImageUrl':info.virtualImageUrl,
-    'companyName':info.companyName,
-    'notice':info.notice,
-    'firstZiMu':info.firstZiMu,
-    'orgId':info.orgId,
-    'imageServerUrl':info.imageServerUrl,
-    'applyType':info.applyType,
-    'userId':info.userId,
-    'lastMessageId':info.lastMessageId,
+      'realName':info.name,
+      'nickName':info.nickname,
+      'phone':info.phone,
+      'realImgUrl':info.realImageUrl,
+      'virtualImageUrl':info.virtualImageUrl,
+      'companyName':info.companyName,
+      'notice':info.notice,
+      'firstZiMu':info.firstZiMu,
+      'orgId':info.orgId,
+      'imageServerUrl':info.imageServerUrl,
+      'applyType':info.applyType,
+      'userId':info.userId,
+      'lastMessageId':info.lastMessageId,
+      'belongId':info.belongId,
     };
     return map;
   }

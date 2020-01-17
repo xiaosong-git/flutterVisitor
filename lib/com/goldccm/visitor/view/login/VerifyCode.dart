@@ -152,7 +152,7 @@ class VerifyCodePageState extends State<VerifyCodePage>{
   @override
   void initState() {
     super.initState();
-//    sendCode();
+    sendCode();
   }
 
   @override

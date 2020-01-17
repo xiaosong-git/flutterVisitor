@@ -2,6 +2,7 @@
  * 路由地址配置
  * 用于切换企业版和通用版
  */
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/RouterList.dart';
@@ -21,6 +22,7 @@ class RouterUtil{
   static final String serverProvince="serverProvince";
   static final String serverCity="serverCity";
   static final String serverArea="serverArea";
+  static final String serverStatus="serverStatus";
 
   factory RouterUtil() => _rUtil();
 
@@ -45,13 +47,26 @@ class RouterUtil{
   static String webSocketServerUrl=Constant.webSocketServerUrl;
   static String uploadServerUrl=Constant.imageServerApiUrl;
   static init() async {
+    SharedPreferences sp;
+    await SharedPreferences.getInstance().then((value) {
+      sp = value;
+    });
+    String status=sp.getString(serverStatus);
     RouterList rList=await getServerInfo();
-    if(rList!=null&&rList.ip!=null&&rList.port!=null&&rList.imagePort!=null){
+    if(rList!=null&&rList.ip!=null&&rList.port!=null&&rList.imagePort!=null&&status=="local"){
       RouterUtil.apiServerUrl="http://${rList.ip}:${rList.port}/visitor/";
       RouterUtil.webSocketServerUrl="ws://${rList.ip}:${rList.port}/visitor/";
       RouterUtil.uploadServerUrl="http://${rList.ip}:${rList.port}/goldccm-imgServer/goldccm/image/gainData";
       RouterUtil.imageServerUrl="http://${rList.ip}:${rList.imagePort}/imgserver/";
     }
+    debugPrint(apiServerUrl);
+  }
+  static remote() async {
+    SharedPreferences sp;
+    await SharedPreferences.getInstance().then((value) {
+      sp = value;
+    });
+    await sp.setString(serverStatus, "remote");
   }
   static refresh(){
      Http.modifyChange(apiServerUrl);
@@ -85,9 +100,10 @@ class RouterUtil{
     if(routerList.city!=null){
       await sp.setString(serverCity,routerList.city);
     }
-    if(routerList.area!=null){
+    if(routerList.area!=null) {
       await sp.setString(serverArea, routerList.area);
     }
+    await sp.setString(serverStatus, "local");
   }
   static Future<RouterList> getServerInfo()async{
     SharedPreferences sp;

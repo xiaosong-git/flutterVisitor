@@ -286,7 +286,12 @@ class NewFriendPageState extends State<NewFriendPage> {
             leading: Container(
               child: CachedNetworkImage(
                 imageUrl: RouterUtil.imageServerUrl + _friends[index].imageUrl,
-                placeholder: (context, url) => CircularProgressIndicator(),
+                placeholder: (context, url) => Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  width: 10,
+                  height: 10,
+                  alignment: Alignment.center,
+                ),
                 errorWidget: (context, url, error) => CircleAvatar(
                   backgroundImage: AssetImage("assets/icons/ic_launcher.png"),
                   radius: 100,

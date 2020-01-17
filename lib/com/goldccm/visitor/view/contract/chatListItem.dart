@@ -142,7 +142,9 @@ class ChatListState extends State<ChatList> {
         }
       }
     }
-    setState(() {});
+    if(mounted){
+      setState(() {});
+    }
   }
 
   //手动刷新聊天栏
@@ -155,7 +157,7 @@ class ChatListState extends State<ChatList> {
   void dispose() {
     _timer?.cancel();
     _timer = null;
-    _refreshSub.cancel();
+    _refreshSub?.cancel();
     super.dispose();
   }
 

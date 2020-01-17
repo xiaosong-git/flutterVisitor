@@ -16,6 +16,7 @@ class FriendInfo {
   int applyType;
   int userId;
   int lastMessageId;
+  int belongId;
 
   FriendInfo(
       {this.name,
@@ -31,7 +32,8 @@ class FriendInfo {
       this.imageServerUrl,
       this.applyType,
       this.userId,
-      this.lastMessageId});
+      this.lastMessageId,
+      this.belongId});
 
   FriendInfo.fromJson(Map map) {
     this.userId = map['userId'];
@@ -48,10 +50,13 @@ class FriendInfo {
     this.imageServerUrl = map['imageServerUrl'];
     this.applyType = map['applyType'];
     this.lastMessageId = map['lastMessageId'];
+    this.belongId = map['belongId'];
   }
 
   @override
   String toString() {
-    return 'FriendInfo{name: $name, nickname: $nickname, remarkName: $remarkName, phone: $phone, realImageUrl: $realImageUrl, virtualImageUrl: $virtualImageUrl, companyName: $companyName, notice: $notice, firstZiMu: $firstZiMu, orgId: $orgId, imageServerUrl: $imageServerUrl, applyType: $applyType, userId: $userId, lastMessageId: $lastMessageId}';
+    return 'FriendInfo{name: $name, nickname: $nickname, remarkName: $remarkName, phone: $phone, realImageUrl: $realImageUrl, virtualImageUrl: $virtualImageUrl, companyName: $companyName, notice: $notice, firstZiMu: $firstZiMu, orgId: $orgId, imageServerUrl: $imageServerUrl, applyType: $applyType, userId: $userId, lastMessageId: $lastMessageId, belongId: $belongId}';
   }
+
+
 }

@@ -31,7 +31,10 @@ class LoadingDialog extends Dialog {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                new CircularProgressIndicator(),
+                new Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  alignment: Alignment.center,
+                ),
                 new Padding(
                   padding: const EdgeInsets.only(
                     top: 20.0,

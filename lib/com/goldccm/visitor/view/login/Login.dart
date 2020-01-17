@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/JsonResult.dart';
+import 'package:visitor/com/goldccm/visitor/model/RouterList.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
@@ -777,6 +778,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
         RouterUtil.webSocketServerUrl=Constant.webSocketServerUrl;
         RouterUtil.uploadServerUrl=Constant.imageServerApiUrl;
         RouterUtil.imageServerUrl=Constant.imageServerUrl;
+        RouterUtil.remote();
         RouterUtil.refresh();
         return true;
       } else {

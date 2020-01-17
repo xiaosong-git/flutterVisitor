@@ -97,19 +97,19 @@ class SecurityPageState extends State<SecurityPage> {
                           ChangePwdPage(userInfo: widget.userInfo)));
             },
           ),
-          Divider(height: 0.0),
-          ListTile(
-            title: Text('设置手势密码',
-                style: TextStyle(
-                    fontSize: Constant.normalFontSize,
-                    fontWeight: FontWeight.w600),
-                textScaleFactor: 1.0),
-            trailing: Image.asset('assets/icons/app_more.png', scale: 2.0),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ChangeGesturePage()));
-            },
-          ),
+//          Divider(height: 0.0),
+//          ListTile(
+//            title: Text('设置手势密码',
+//                style: TextStyle(
+//                    fontSize: Constant.normalFontSize,
+//                    fontWeight: FontWeight.w600),
+//                textScaleFactor: 1.0),
+//            trailing: Image.asset('assets/icons/app_more.png', scale: 2.0),
+//            onTap: () {
+//              Navigator.push(context,
+//                  MaterialPageRoute(builder: (context) => ChangeGesturePage()));
+//            },
+//          ),
         ],
       ),
     );

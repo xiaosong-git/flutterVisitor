@@ -76,18 +76,16 @@ class ForgetPasswordPageState extends State<ForgetPasswordPage>{
                       child: Text('手机号码',style: TextStyle(color: Color(0xFFA8A8A8),fontSize: ScreenUtil().setSp(28)),),
                       padding: EdgeInsets.only(bottom: ScreenUtil().setHeight(62)),
                     ),
-                    Row(
+                    Stack(
                       children: <Widget>[
-                        Container(
-                          child: Text('+86',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF6C6C6C)),),
-                          width: ScreenUtil().setWidth(52),
-                          height: ScreenUtil().setHeight(40),
-                          padding: EdgeInsets.only(top: ScreenUtil().setHeight(15)),
+                        Positioned(
+                          top: ScreenUtil().setWidth(40),
+                          child:Text('+86',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF6C6C6C)),) ,
                         ),
                         Container(
                           height: ScreenUtil().setHeight(80),
-                          width: ScreenUtil().setWidth(472),
-                          padding: EdgeInsets.only(left: ScreenUtil().setWidth(18)),
+                          width: ScreenUtil().setWidth(442),
+                          margin: EdgeInsets.only(left: ScreenUtil().setWidth(70)),
                           child: TextField(
                             controller: _phoneController,
                             style: TextStyle(fontSize: ScreenUtil().setSp(32),color: Color(0xFF212121)),
@@ -171,9 +169,21 @@ class ForgetPasswordPageState extends State<ForgetPasswordPage>{
       ),
     );
   }
-  void submitPhone(){
+  Future<void> submitPhone() async {
     if(isComplete){
-      Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>VerifyCodePage(phone: _phoneController.text,title: '忘记密码',)));
+      String url ="user/checkPhone";
+      var response = await Http().post(url,queryParameters: {
+        "phone":_phoneController.text,
+      });
+      if(response!=""&&response!=null){
+        Map map = jsonDecode(response);
+        if(map['verify']['sign']=="fail"){
+          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>VerifyCodePage(phone: _phoneController.text,title: '忘记密码',)));
+        }else{
+          ToastUtil.showShortClearToast("手机号未注册");
+        }
+      }
+
     }
   }
 }

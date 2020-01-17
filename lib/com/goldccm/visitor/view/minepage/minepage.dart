@@ -319,7 +319,12 @@ class MinePageState extends State<MinePage> {
                                           imageUrl: RouterUtil.imageServerUrl +
                                               userProvider.info.headImgUrl,
                                           placeholder: (context, url) =>
-                                              CircularProgressIndicator(),
+                                              Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  width: 10,
+                  height: 10,
+                  alignment: Alignment.center,
+                ),
                                           errorWidget: (context, url, error) =>
                                               Icon(Icons.error),
                                           imageBuilder: (context,imageProvider)=>CircleAvatar(

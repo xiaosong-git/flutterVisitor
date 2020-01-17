@@ -42,11 +42,11 @@ class MoreFunctionState extends State<MoreFunction> {
         iconName: '打卡')
   ];
   List<FunctionLists> _activeLists = [
-    FunctionLists(
-      iconImage: 'assets/icons/app_attend.png',
-      iconTitle: '打卡',
-      iconType: '_attendance',
-      iconName: '打卡')
+//    FunctionLists(
+//      iconImage: 'assets/icons/app_attend.png',
+//      iconTitle: '打卡',
+//      iconType: '_attendance',
+//      iconName: '打卡')
   ];
 
   @override

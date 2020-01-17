@@ -132,6 +132,9 @@ class SettingPageState extends State<SettingPage> {
                                               CacheUtils cacheUtils = new CacheUtils();
                                               if (size != "0.00B") {
                                                 cacheUtils.clearCache();
+                                                setState(() {
+                                                  size = "0.00B";
+                                                });
                                               }
                                               ToastUtil.showShortToast("            清除完毕            ");
                                             },

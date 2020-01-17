@@ -34,7 +34,6 @@ class NewsView extends StatelessWidget {
                   height: 10,
                   alignment: Alignment.center,
                 ),
-
                 errorWidget: (context, url, error) =>
                     Icon(Icons.error),
                 fit: BoxFit.cover,

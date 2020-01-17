@@ -50,36 +50,7 @@ class AddressPageState extends State<AddressPage> {
   List<FriendInfo> _userLists = new List<FriendInfo>();
   UserModel _userModel;
   bool initFlag = false;
-  var alphabet = [
-    '☀',
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-    'K',
-    'L',
-    'M',
-    'N',
-    'O',
-    'P',
-    'Q',
-    'R',
-    'S',
-    'T',
-    'U',
-    'V',
-    'W',
-    'X',
-    'Y',
-    'Z',
-    '#'
-  ];
+  var alphabet = ['☀','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q', 'R','S','T','U', 'V','W','X','Y', 'Z','#'];
   @override
   void initState() {
     super.initState();
@@ -90,13 +61,15 @@ class AddressPageState extends State<AddressPage> {
       _handleRefresh();
     });
   }
-
+  //初始化好友列表
   initAddress() async {
     await _presenter.loadUserList();
+    UserInfo userInfo = await LocalStorage.load("userInfo");
     FriendDao friendDao = FriendDao();
-    List<FriendInfo> lists = await friendDao.getFriendInfo();
-    print(lists);
+    //读取本地好友列表
+    List<FriendInfo> lists = await friendDao.getFriendInfo(userInfo.id);
     if (lists != null && lists.length > 0) {
+      //读取网络好友列表
       List<FriendInfo> onlineLists = _presenter.userlists;
       if (onlineLists.length > 0 && onlineLists != null) {
         setState(() {
@@ -110,9 +83,17 @@ class AddressPageState extends State<AddressPage> {
         });
       }
     } else {
-      setState(() {
-        initFlag = true;
-      });
+      List<FriendInfo> onlineLists = _presenter.userlists;
+      if (onlineLists.length > 0 && onlineLists != null) {
+        setState(() {
+          _userLists = _presenter.userlists;
+          initFlag = _presenter.initFlag;
+        });
+      }else{
+        setState(() {
+          initFlag = true;
+        });
+      }
     }
   }
 
@@ -174,67 +155,33 @@ class AddressPageState extends State<AddressPage> {
                                       ),
                                       child: new Column(
                                         children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 0, bottom: 0),
+                                          Padding(padding: const EdgeInsets.only(top: 0, bottom: 0),
                                             child: FlatButton(
                                               onPressed: () async {
-                                                if (_userModel.info.isAuth ==
-                                                    "T") {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              AddFriendPage(
-                                                                userInfo:
-                                                                    _userModel
-                                                                        .info,
-                                                              )));
+                                                if (_userModel.info.isAuth == "T") {
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                                              AddFriendPage(userInfo: _userModel.info,)));
                                                 } else {
-                                                  ToastUtil.showShortClearToast(
-                                                      "请先实名认证");
+                                                  ToastUtil.showShortClearToast("请先实名认证");
                                                 }
                                               },
                                               child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width -
-                                                      30,
+                                                  width: MediaQuery.of(context).size.width - 30,
                                                   child: Stack(
                                                     children: <Widget>[
                                                       Positioned(
                                                         child: Container(
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height /
-                                                              15,
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child: Text('添加好友',
-                                                              style: TextStyle(
-                                                                fontSize: 18.0,
-                                                              ),
-                                                              textScaleFactor:
-                                                                  1.0),
-                                                        ),
+                                                          height: MediaQuery.of(context).size.height / 15,
+                                                          alignment: Alignment.center,
+                                                          child: Text('添加好友', style: TextStyle(fontSize: 18.0,), textScaleFactor: 1.0),),
                                                         left: 30,
                                                       ),
                                                       Positioned(
                                                         child: Container(
                                                           width: 20,
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height /
-                                                              15,
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  top: 5),
-                                                          child: Image.asset(
-                                                            'assets/icons/app_add.png',
-                                                            scale: 2.0,
-                                                          ),
+                                                          height: MediaQuery.of(context).size.height / 15,
+                                                          padding: EdgeInsets.only(top: 5),
+                                                          child: Image.asset('assets/icons/app_add.png', scale: 2.0,),
                                                         ),
                                                       ),
                                                     ],
@@ -249,61 +196,32 @@ class AddressPageState extends State<AddressPage> {
                                                 top: 0, bottom: 0),
                                             child: FlatButton(
                                               onPressed: () async {
-                                                if (_userModel.info.isAuth ==
-                                                    "T") {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              NewFriendPage(
-                                                                userInfo:
-                                                                    _userModel
-                                                                        .info,
-                                                              ))).then((value) {
+                                                if (_userModel.info.isAuth == "T") {
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((value) {
                                                     Navigator.pop(context);
                                                     _handleRefresh();
                                                   });
                                                 } else {
-                                                  ToastUtil.showShortClearToast(
-                                                      "请先实名认证");
+                                                  ToastUtil.showShortClearToast("请先实名认证");
                                                 }
                                               },
                                               child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width -
-                                                      30,
+                                                  width: MediaQuery.of(context).size.width - 30,
                                                   child: Stack(
                                                     children: <Widget>[
                                                       Positioned(
                                                         child: Container(
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height /
-                                                              15,
-                                                          alignment:
-                                                              Alignment.center,
+                                                          height: MediaQuery.of(context).size.height /15,
+                                                          alignment: Alignment.center,
                                                           child: Text('新的朋友',
-                                                              style: TextStyle(
-                                                                fontSize: 18.0,
-                                                              ),
-                                                              textScaleFactor:
-                                                                  1.0),
-                                                        ),
+                                                              style: TextStyle(fontSize: 18.0,), textScaleFactor:1.0),),
                                                         left: 30,
                                                       ),
                                                       Positioned(
                                                         child: Container(
                                                           width: 20,
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height /
-                                                              15,
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  top: 5),
+                                                          height: MediaQuery.of(context).size.height / 15,
+                                                          padding: EdgeInsets.only(top: 5),
                                                           child: Image.asset(
                                                             'assets/icons/app_newfriend.png',
                                                             scale: 2.0,
@@ -403,32 +321,15 @@ class AddressPageState extends State<AddressPage> {
                           child: new Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              SizedBox(
-                                width: 5.0,
-                              ),
-                              Icon(
-                                Icons.search,
-                                color: Colors.grey,
-                              ),
+                              SizedBox(width: 5.0,),
+                              Icon(Icons.search, color: Colors.grey,),
                               Expanded(
                                 child: Container(
                                   alignment: Alignment.center,
-                                  child: TextField(
-                                    textAlign: TextAlign.center,
-                                    cursorWidth: 0.0,
-                                    decoration: new InputDecoration(
-                                        contentPadding:
-                                            EdgeInsets.only(top: 0.0),
-                                        hintText: '查找',
-                                        border: InputBorder.none),
+                                  child: TextField(textAlign: TextAlign.center, cursorWidth: 0.0,
+                                    decoration: new InputDecoration(contentPadding: EdgeInsets.only(top: 0.0), hintText: '查找', border: InputBorder.none),
                                     onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  FriendSearch(
-                                                    userList: _userLists,
-                                                  )));
+                                      Navigator.push(context,MaterialPageRoute(builder: (context) => FriendSearch(userList: _userLists,)));
                                     },
                                   ),
                                 ),
@@ -446,28 +347,15 @@ class AddressPageState extends State<AddressPage> {
               Container(
                 child: ListTile(
                   title: Text('新的朋友', textScaleFactor: 1.0),
-                  leading: Provider.of<BadgeModel>(context)
-                              .badgeInfo
-                              .newFriendRequestCount >
-                          0
-                      ? Badge(
-                          child: Container(
-                            width: 40,
+                  leading: Provider.of<BadgeModel>(context).badgeInfo.newFriendRequestCount > 0 ? Badge(
+                          child: Container(width: 40,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.orange,
                             ),
-                            child: Image.asset(
-                              "assets/icons/user_addfriend.png",
-                              color: Colors.white,
-                              scale: 1.7,
-                            ),
+                            child: Image.asset("assets/icons/user_addfriend.png", color: Colors.white, scale: 1.7,),
                           ),
-                          badgeContent: Text(
-                            Provider.of<BadgeModel>(context)
-                                .badgeInfo
-                                .newFriendRequestCount
-                                .toString(),
+                          badgeContent: Text(Provider.of<BadgeModel>(context).badgeInfo.newFriendRequestCount.toString(),
                             style: TextStyle(color: Colors.white),
                             textScaleFactor: 1.0,
                           ),
@@ -479,21 +367,12 @@ class AddressPageState extends State<AddressPage> {
                             shape: BoxShape.circle,
                             color: Colors.orange,
                           ),
-                          child: Image.asset(
-                            "assets/icons/user_addfriend.png",
-                            color: Colors.white,
-                            scale: 1.7,
-                          ),
+                          child: Image.asset("assets/icons/user_addfriend.png", color: Colors.white, scale: 1.7,),
                         ),
                   trailing:
                       Image.asset('assets/icons/app_more.png', scale: 1.7),
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => NewFriendPage(
-                                  userInfo: _userModel.info,
-                                ))).then((val) {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((val) {
                       _handleRefresh();
                     });
                   },
@@ -525,9 +404,7 @@ class AddressPageState extends State<AddressPage> {
                   child: Container(
                       height: 58.0,
                       child: new Card(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 10.0),
-                          color: Colors.white70,
+                          margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0), color: Colors.white70,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                           ),
@@ -554,13 +431,7 @@ class AddressPageState extends State<AddressPage> {
                                           hintText: '查找',
                                           border: InputBorder.none),
                                       onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    FriendSearch(
-                                                      userList: _userLists,
-                                                    )));
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => FriendSearch(userList: _userLists,)));
                                       },
                                     ),
                                   ),
@@ -578,13 +449,9 @@ class AddressPageState extends State<AddressPage> {
                 Container(
                   child: ListTile(
                     title: Text('新的朋友', textScaleFactor: 1.0),
-                    leading: Provider.of<BadgeModel>(context)
-                                .badgeInfo
-                                .newFriendRequestCount >
-                            0
+                    leading: Provider.of<BadgeModel>(context).badgeInfo.newFriendRequestCount > 0
                         ? Badge(
-                            child: Container(
-                              width: 40,
+                            child: Container(width: 40,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.orange,
@@ -620,12 +487,7 @@ class AddressPageState extends State<AddressPage> {
                     trailing:
                         Image.asset('assets/icons/app_more.png', scale: 1.7),
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NewFriendPage(
-                                    userInfo: _userModel.info,
-                                  ))).then((val) {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((val) {
                         _handleRefresh();
                       });
                     },
@@ -644,47 +506,46 @@ class AddressPageState extends State<AddressPage> {
                 Container(
                   color: Colors.white,
                   child: ListTile(
-                    title: Text(_userLists[index].notice != null &&
-                            _userLists[index].notice != ""
-                        ? _userLists[index].notice
-                        : _userLists[index].name),
-                    leading: _userLists[index].virtualImageUrl != null &&
-                            _userLists[index].virtualImageUrl != ""
-                        ? CachedNetworkImage(
-                            imageUrl: RouterUtil.imageServerUrl +
-                                _userLists[index].virtualImageUrl,
+                    title: Text(_userLists[index].notice != null && _userLists[index].notice != "" ? _userLists[index].notice : _userLists[index].name),
+                    leading: _userLists[index].virtualImageUrl != null && _userLists[index].virtualImageUrl != "" ?
+                    CachedNetworkImage(
+                            imageUrl: RouterUtil.imageServerUrl + _userLists[index].virtualImageUrl,
                             imageBuilder: (context, imageProvider) =>
                                 CircleAvatar(backgroundImage: imageProvider),
-                            placeholder: (context, url) =>
-                                CircularProgressIndicator(),
+                            placeholder: (context, url) => Container(
+                              child: CircularProgressIndicator(
+                                backgroundColor: Colors.black,
+                              ),
+                              width: 10,
+                              height: 10,
+                              alignment: Alignment.center,
+                            ),
                             errorWidget: (context, url, error) =>
                                 Icon(Icons.error),
                           )
-                        : _userLists[index].realImageUrl != null &&
-                                _userLists[index].realImageUrl != ""
+                        : _userLists[index].realImageUrl != null && _userLists[index].realImageUrl != ""
                             ? CachedNetworkImage(
-                                imageUrl: RouterUtil.imageServerUrl +
-                                    _userLists[index].realImageUrl,
+                                imageUrl: RouterUtil.imageServerUrl + _userLists[index].realImageUrl,
                                 imageBuilder: (context, imageProvider) =>
-                                    CircleAvatar(
-                                        backgroundImage: imageProvider),
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
+                                    CircleAvatar(backgroundImage: imageProvider),
+                                placeholder: (context, url) => Container(
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Colors.black,
+                                  ),
+                                  width: 10,
+                                  height: 10,
+                                  alignment: Alignment.center,
+                                ),
                                 errorWidget: (context, url, error) =>
                                     Icon(Icons.error),
                               )
                             : CircleAvatar(
-                                backgroundImage: AssetImage(
-                                    "assets/images/visitor_icon_head.png"),
+                                backgroundImage: AssetImage("assets/images/visitor_icon_head.png"),
                               ),
                     onTap: () {
-                      Navigator.push(
-                          context,
+                      Navigator.push(context,
                           MaterialPageRoute(
-                              builder: (context) => FriendDetailPage(
-                                    user: _userLists[index],
-                                    type: widget.type,
-                                  )));
+                              builder: (context) => FriendDetailPage(user: _userLists[index], type: widget.type,)));
                     },
                   ),
                 )
@@ -704,36 +565,24 @@ class AddressPageState extends State<AddressPage> {
                 Container(
                   color: Colors.white,
                   child: ListTile(
-                    title: Text(_userLists[index].notice != null &&
-                            _userLists[index].notice != ""
-                        ? _userLists[index].notice
-                        : _userLists[index].name),
-                    leading: _userLists[index].virtualImageUrl != null &&
-                            _userLists[index].virtualImageUrl != ""
+                    title: Text(_userLists[index].notice != null && _userLists[index].notice != "" ? _userLists[index].notice : _userLists[index].name),
+                    leading: _userLists[index].virtualImageUrl != null && _userLists[index].virtualImageUrl != ""
                         ? CircleAvatar(
                             backgroundImage: NetworkImage(
-                                RouterUtil.imageServerUrl +
-                                    _userLists[index].virtualImageUrl),
+                                RouterUtil.imageServerUrl + _userLists[index].virtualImageUrl),
                           )
-                        : _userLists[index].realImageUrl != null &&
-                                _userLists[index].realImageUrl != ""
+                        : _userLists[index].realImageUrl != null && _userLists[index].realImageUrl != ""
                             ? CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    RouterUtil.imageServerUrl +
-                                        _userLists[index].realImageUrl),
+                                backgroundImage: NetworkImage(RouterUtil.imageServerUrl + _userLists[index].realImageUrl),
                               )
                             : CircleAvatar(
-                                backgroundImage: AssetImage(
-                                    "assets/images/visitor_icon_head.png"),
+                                backgroundImage: AssetImage("assets/images/visitor_icon_head.png"),
                               ),
                     onTap: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => FriendDetailPage(
-                                    user: _userLists[index],
-                                    type: widget.type,
-                                  )));
+                              builder: (context) => FriendDetailPage(user: _userLists[index], type: widget.type,)));
                     },
                   ),
                 )
@@ -743,27 +592,27 @@ class AddressPageState extends State<AddressPage> {
             return Container(
               color: Colors.white,
               child: ListTile(
-                title: Text(_userLists[index].notice != null &&
-                        _userLists[index].notice != ""
-                    ? _userLists[index].notice
-                    : _userLists[index].name),
-                leading: _userLists[index].virtualImageUrl != null &&
-                        _userLists[index].virtualImageUrl != ""
-                    ? CachedNetworkImage(
-                        imageUrl: RouterUtil.imageServerUrl +
-                            _userLists[index].virtualImageUrl,
-                        placeholder: (context, url) =>
-                            CircularProgressIndicator(),
+                title: Text(_userLists[index].notice != null && _userLists[index].notice != "" ? _userLists[index].notice : _userLists[index].name),
+                leading: _userLists[index].virtualImageUrl != null && _userLists[index].virtualImageUrl != ""
+                    ? CachedNetworkImage(imageUrl: RouterUtil.imageServerUrl + _userLists[index].virtualImageUrl, placeholder: (context, url) => Container(child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                          width: 10,
+                          height: 10,
+                          alignment: Alignment.center,
+                        ),
                         errorWidget: (context, url, error) => Icon(Icons.error),
                         fit: BoxFit.cover,
                       )
-                    : _userLists[index].realImageUrl != null &&
-                            _userLists[index].realImageUrl != ""
+                    : _userLists[index].realImageUrl != null && _userLists[index].realImageUrl != ""
                         ? CachedNetworkImage(
-                            imageUrl: RouterUtil.imageServerUrl +
-                                _userLists[index].realImageUrl,
-                            placeholder: (context, url) =>
-                                CircularProgressIndicator(),
+                            imageUrl: RouterUtil.imageServerUrl + _userLists[index].realImageUrl,
+                            placeholder: (context, url) => Container(
+                              child: CircularProgressIndicator(
+                                backgroundColor: Colors.black,
+                              ),
+                              width: 10,
+                              height: 10,
+                              alignment: Alignment.center,
+                            ),
                             errorWidget: (context, url, error) =>
                                 Icon(Icons.error),
                             fit: BoxFit.cover,

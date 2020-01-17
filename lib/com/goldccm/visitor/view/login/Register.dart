@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -107,22 +108,18 @@ class RegisterPageState extends State<RegisterPage> {
                       padding: EdgeInsets.only(
                           bottom: ScreenUtil().setHeight(62)),
                     ),
-                    Row(
+                    Stack(
                       children: <Widget>[
-                        Container(
+                        Positioned(
+                          top: ScreenUtil().setHeight(40),
                           child: Text('+86', style: TextStyle(
                               fontSize: ScreenUtil().setSp(28),
                               color: Color(0xFF6C6C6C)),),
-                          width: ScreenUtil().setWidth(52),
-                          height: ScreenUtil().setHeight(40),
-                          padding: EdgeInsets.only(
-                              top: ScreenUtil().setHeight(15)),
                         ),
                         Container(
                           height: ScreenUtil().setHeight(80),
-                          width: ScreenUtil().setWidth(472),
-                          padding: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(18)),
+                          width: ScreenUtil().setWidth(442),
+                          margin: EdgeInsets.only(left: ScreenUtil().setWidth(70)),
                           child: TextField(
                             controller: _phoneController,
                             style: TextStyle(fontSize: ScreenUtil().setSp(32),
@@ -290,12 +287,23 @@ class RegisterPageState extends State<RegisterPage> {
 //      )
       ..show();
   }
-  void submitPhone() {
+  Future<void> submitPhone() async {
     if(activeRadioValue!='policy'){
       ToastUtil.showShortClearToast("请先同意协议");
     }else{
       if (isComplete) {
-        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> VerifyCodePage(phone: _phoneController.text,title: '注册',)));
+        String url ="user/checkPhone";
+        var response = await Http().post(url,queryParameters: {
+          "phone":_phoneController.text,
+        });
+        if(response!=""&&response!=null){
+          Map map = jsonDecode(response);
+          if(map['verify']['sign']=="fail"){
+            ToastUtil.showShortClearToast("手机号已被注册");
+          }else{
+            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> VerifyCodePage(phone: _phoneController.text,title: '注册',)));
+          }
+        }
       }else{
         ToastUtil.showShortClearToast("电话号码不正确");
       }

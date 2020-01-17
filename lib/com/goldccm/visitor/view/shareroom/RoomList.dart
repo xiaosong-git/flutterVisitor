@@ -194,7 +194,12 @@ class RoomListState extends State<RoomList>{
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    CircularProgressIndicator(),
+                    Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  width: 10,
+                  height: 10,
+                  alignment: Alignment.center,
+                ),
                     Text(
                       '加载中',
                       style: TextStyle(color: Colors.white),textScaleFactor: 1.0,

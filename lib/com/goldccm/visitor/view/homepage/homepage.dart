@@ -49,8 +49,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  List<BannerInfo> bannerList = []; //公告信息
-  List<NoticeInfo> noticeList = []; //消息列表
+  List<BannerInfo> bannerList = []; //头图
+  List<NoticeInfo> noticeList = []; //公告列表
   List<NewsInfo> newsInfoList = []; //新闻列表
   List<String> imageList = [];
   List<String> noticeContentList = [];
@@ -75,7 +75,7 @@ class HomePageState extends State<HomePage> {
         iconTitle: '快捷邀约',
         iconType: '_inviteReq',
         iconName: '快捷邀约',
-        iconShow: false),
+        iconShow: true),
     FunctionLists(
         iconImage: 'assets/icons/visit_fastvisit.png',
         iconTitle: '快捷访问',
@@ -88,24 +88,6 @@ class HomePageState extends State<HomePage> {
         iconType: '_visitorCard',
         iconName: '访问码',
         iconShow: true),
-    FunctionLists(
-        iconImage: 'assets/icons/shareroom_meetingroom.png',
-        iconTitle: '会议室',
-        iconType: '_meetingRoom',
-        iconName: '会议室',
-        iconShow: false),
-    FunctionLists(
-        iconImage: 'assets/icons/shareroom_tearoom.png',
-        iconTitle: '茶室',
-        iconType: '_teaRoom',
-        iconName: '茶室',
-        iconShow: false),
-    FunctionLists(
-        iconImage: 'assets/icons/app_attend.png',
-        iconTitle: '打卡',
-        iconType: '_attendance',
-        iconName: '打卡',
-        iconShow: false)
   ];
   SwiperController _swiperController;
   SwiperController _swipernoticeController;
@@ -124,6 +106,7 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     init();
+    print(RouterUtil.apiServerUrl);
     _swiperController = new SwiperController();
     _swiperController.startAutoplay();
     _swipernoticeController = new SwiperController();
@@ -353,7 +336,7 @@ class HomePageState extends State<HomePage> {
       child: new NewsView(newsinfo, imageServerUrl),
     );
   }
-
+  //头图
   Widget _buildBannerImage() {
     return Container(
       height: 200.0,
@@ -384,7 +367,7 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
-
+  //公告提醒
   Widget _buildSwiperNotice(var userProvider) {
     return Container(
       height: 40.0,
@@ -411,11 +394,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  /*
-  * 获取首页图片
-  *
-  */
-
+  //功能列表
   Widget _buildIconTab(String imageurl, String text, String iconType) {
     return new InkWell(
       onTap: () {
@@ -463,7 +442,12 @@ class HomePageState extends State<HomePage> {
     return CachedNetworkImage(
       imageUrl: RouterUtil.imageServerUrl + imageList[index],
       placeholder: (context, url) =>
-          CircularProgressIndicator(),
+          Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  width: 10,
+                  height: 10,
+                  alignment: Alignment.center,
+                ),
       errorWidget: (context, url, error) =>
           Icon(Icons.error),
       fit: BoxFit.cover,
