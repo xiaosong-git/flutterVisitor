@@ -292,7 +292,7 @@ class RegisterPageState extends State<RegisterPage> {
       ToastUtil.showShortClearToast("请先同意协议");
     }else{
       if (isComplete) {
-        String url ="user/checkPhone";
+        String url =Constant.serverUrl+"user/checkPhone";
         var response = await Http().post(url,queryParameters: {
           "phone":_phoneController.text,
         });

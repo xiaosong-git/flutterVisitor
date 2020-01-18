@@ -12,6 +12,7 @@ import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
 import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserModel.dart';
+import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
@@ -191,7 +192,6 @@ class AddressPageState extends State<AddressPage> {
                                               onPressed: () async {
                                                 if (_userModel.info.isAuth == "T") {
                                                   Navigator.push(context, MaterialPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((value) {
-                                                    Navigator.pop(context);
                                                     _handleRefresh();
                                                   });
                                                 } else {
@@ -500,41 +500,18 @@ class AddressPageState extends State<AddressPage> {
                   color: Colors.white,
                   child: ListTile(
                     title: Text(_userLists[index].notice != null && _userLists[index].notice != "" ? _userLists[index].notice : _userLists[index].name),
-                    leading: _userLists[index].virtualImageUrl != null && _userLists[index].virtualImageUrl != "" ?
-                    CachedNetworkImage(
-                            imageUrl: RouterUtil.imageServerUrl + _userLists[index].virtualImageUrl,
-                            imageBuilder: (context, imageProvider) =>
-                                CircleAvatar(backgroundImage: imageProvider),
-                            placeholder: (context, url) => Container(
-                              child: CircularProgressIndicator(
-                                backgroundColor: Colors.black,
-                              ),
-                              width: 10,
-                              height: 10,
-                              alignment: Alignment.center,
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                          )
+                    leading: _userLists[index].virtualImageUrl != null && _userLists[index].virtualImageUrl != ""
+                        ? CircleAvatar(
+                      backgroundImage: NetworkImage(
+                          RouterUtil.imageServerUrl + _userLists[index].virtualImageUrl),
+                    )
                         : _userLists[index].realImageUrl != null && _userLists[index].realImageUrl != ""
-                            ? CachedNetworkImage(
-                                imageUrl: RouterUtil.imageServerUrl + _userLists[index].realImageUrl,
-                                imageBuilder: (context, imageProvider) =>
-                                    CircleAvatar(backgroundImage: imageProvider),
-                                placeholder: (context, url) => Container(
-                                  child: CircularProgressIndicator(
-                                    backgroundColor: Colors.black,
-                                  ),
-                                  width: 10,
-                                  height: 10,
-                                  alignment: Alignment.center,
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                              )
-                            : CircleAvatar(
-                                backgroundImage: AssetImage("assets/images/visitor_icon_head.png"),
-                              ),
+                        ? CircleAvatar(
+                      backgroundImage: NetworkImage(RouterUtil.imageServerUrl + _userLists[index].realImageUrl),
+                    )
+                        : CircleAvatar(
+                      backgroundImage: AssetImage("assets/images/visitor_icon_head.png"),
+                    ),
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(
@@ -587,33 +564,17 @@ class AddressPageState extends State<AddressPage> {
               child: ListTile(
                 title: Text(_userLists[index].notice != null && _userLists[index].notice != "" ? _userLists[index].notice : _userLists[index].name),
                 leading: _userLists[index].virtualImageUrl != null && _userLists[index].virtualImageUrl != ""
-                    ? CachedNetworkImage(imageUrl: RouterUtil.imageServerUrl + _userLists[index].virtualImageUrl, placeholder: (context, url) => Container(child: CircularProgressIndicator(backgroundColor: Colors.black,),
-                          width: 10,
-                          height: 10,
-                          alignment: Alignment.center,
-                        ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                        fit: BoxFit.cover,
-                      )
+                    ? CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      RouterUtil.imageServerUrl + _userLists[index].virtualImageUrl),
+                )
                     : _userLists[index].realImageUrl != null && _userLists[index].realImageUrl != ""
-                        ? CachedNetworkImage(
-                            imageUrl: RouterUtil.imageServerUrl + _userLists[index].realImageUrl,
-                            placeholder: (context, url) => Container(
-                              child: CircularProgressIndicator(
-                                backgroundColor: Colors.black,
-                              ),
-                              width: 10,
-                              height: 10,
-                              alignment: Alignment.center,
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                            fit: BoxFit.cover,
-                          )
-                        : CircleAvatar(
-                            backgroundImage: AssetImage(
-                                "assets/images/visitor_icon_head.png"),
-                          ),
+                    ? CircleAvatar(
+                  backgroundImage: NetworkImage(RouterUtil.imageServerUrl + _userLists[index].realImageUrl),
+                )
+                    : CircleAvatar(
+                  backgroundImage: AssetImage("assets/images/visitor_icon_head.png"),
+                ),
                 onTap: () {
                   Navigator.push(
                       context,

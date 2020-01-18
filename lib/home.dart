@@ -364,7 +364,6 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     });
     _friendSubscription =
         EventBusUtil().eventBus.on<FriendCountChangeEvent>().listen((event) {
-      print(event.friendCount);
       if (event.friendCount > 0) {
         BadgeInfo badgeInfo = Provider.of<BadgeModel>(context).badgeInfo;
         badgeInfo.newFriendRequestCount=event.friendCount;

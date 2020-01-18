@@ -4,6 +4,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
+import 'package:visitor/com/goldccm/visitor/eventbus/FriendCountChangeEvent.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/BadgeModel.dart';
@@ -16,6 +17,7 @@ import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
+import 'package:visitor/com/goldccm/visitor/view/addresspage/addresspage.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/error.dart';
 
@@ -408,7 +410,7 @@ class NewFriendPageState extends State<NewFriendPage> {
                                       builder: (context) => remarkFriendPage(
                                             userId: _request[index].userId,
                                             userInfo: _userInfo,
-                                          ))).then((val) => {init()});
+                                          ))  );
                             })
                         : Align(
                             child: Text('已添加',
@@ -467,9 +469,10 @@ class remarkFriendPage extends StatelessWidget {
                         textScaleFactor: 1.0),
                     onPressed: () async {
                       formKey.currentState.save();
-                      agreeRequest(userId, remark, userInfo);
-                      Navigator.pop(context);
-                      Navigator.pop(context);
+                      bool result=await agreeRequest(userId, remark, userInfo);
+                      if(result){
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>AddressPage()));
+                      }
                     },
                   ),
                 ),
@@ -527,6 +530,7 @@ class remarkFriendPage extends StatelessWidget {
       ToastUtil.showShortClearToast(map['verify']['desc']);
       if (map['verify']['sign'] == "success") {
         EventBusUtil().eventBus.fire(FriendListEvent(1));
+        EventBusUtil().eventBus.fire(FriendCountChangeEvent(0));
         return true;
       }
       ToastUtil.showShortClearToast(map['verify']['desc']);

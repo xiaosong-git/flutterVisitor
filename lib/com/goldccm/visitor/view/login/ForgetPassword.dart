@@ -171,7 +171,7 @@ class ForgetPasswordPageState extends State<ForgetPasswordPage>{
   }
   Future<void> submitPhone() async {
     if(isComplete){
-      String url ="user/checkPhone";
+      String url =Constant.serverUrl+"user/checkPhone";
       var response = await Http().post(url,queryParameters: {
         "phone":_phoneController.text,
       });

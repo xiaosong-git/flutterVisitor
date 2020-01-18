@@ -80,6 +80,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
   //tabBar控件和相应的监听事件
   @override
   void initState() {
+
     super.initState();
     _tabController = TabController(length: 2,vsync: this);
     _tabController.addListener(() {
