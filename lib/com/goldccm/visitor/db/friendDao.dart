@@ -47,7 +47,7 @@ class FriendDao extends BaseDBProvider {
     Database db = await getDataBase();
     return await db.insert(table_name, toMap(info));
   }
-  //插入单条好友记录
+  //更新单条好友记录
   Future<int> updateFriendInfo(FriendInfo info) async {
     Database db = await getDataBase();
     return await db.update(table_name,toMap(info),where:  'userId = ? ',whereArgs: [info.userId]);

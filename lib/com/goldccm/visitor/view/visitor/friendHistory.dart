@@ -47,22 +47,27 @@ class FriendHistoryState extends State<FriendHistory>{
         itemBuilder: (BuildContext context, int index) {
           return     ListTile(
               leading: Container(
-                child: CachedNetworkImage(
-                  imageUrl:  RouterUtil.imageServerUrl + _friendLists[index].virtualImageUrl,
-                  placeholder: (context, url) =>
-                      Container(
-                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
-                  width: 10,
-                  height: 10,
-                  alignment: Alignment.center,
+                child:  CachedNetworkImage(
+                  imageUrl: RouterUtil.imageServerUrl + _friendLists[index].virtualImageUrl,
+                  placeholder: (context, url) => Container(
+                    child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                    width: 10,
+                    height: 10,
+                    alignment: Alignment.center,
+                  ),
+                  errorWidget: (context, url, error) => CircleAvatar(
+                    backgroundImage: AssetImage("assets/icons/ic_launcher.png"),
+                    radius: 100,
+                  ),
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    backgroundImage: imageProvider,
+                    radius: 100,
+                  ),
+                  fit: BoxFit.fill,
                 ),
-                  errorWidget: (context, url, error) =>
-                      Icon(Icons.error),
-                  fit: BoxFit.cover,
-                ),
-                height: 50,
                 width: 50,
-              ),
+                height: 50,
+               ),
               title: Text( _friendLists[index].name,textScaleFactor: 1.0,),
               subtitle: Text('留言',textScaleFactor: 1.0,),
               trailing: Container(
@@ -134,7 +139,7 @@ class FriendHistoryState extends State<FriendHistory>{
       if (res is String) {
         Map map = jsonDecode(res);
         if(map['verify']['sign']=="success"){
-          if(map['data'].length==0){
+          if(map['verify']['desc']=="暂无数据"){
             setState(() {
               notEmpty = false;
             });
@@ -179,7 +184,7 @@ class FriendHistoryState extends State<FriendHistory>{
         if (res is String) {
           Map map = jsonDecode(res);
           if(map['verify']['sign']=="success"){
-            if(map['data'].length==0){
+            if(map['verify']['desc']=="暂无数据"){
               setState(() {
                 notEmpty = false;
               });

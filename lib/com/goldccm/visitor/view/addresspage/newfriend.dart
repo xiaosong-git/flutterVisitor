@@ -109,15 +109,15 @@ class NewFriendPageState extends State<NewFriendPage> {
     PermissionHandlerUtil().askContactPermission().then((value) async {
       if (value) {
         LoadingDialog().show(context, 'Loading');
-        String _phoneStr = await LocalStorage.load("phoneStr");
-        if (_phoneStr != "" && _phoneStr != null) {
-          await loadAll(_phoneStr);
-          setState(() {
-            Navigator.pop(context);
-          });
-          return;
-        }
-        _phoneStr = "";
+//        String _phoneStr = await LocalStorage.load("phoneStr");
+//        if (_phoneStr != "" && _phoneStr != null) {
+//          await loadAll(_phoneStr);
+//          setState(() {
+//            Navigator.pop(context);
+//          });
+//          return;
+//        }
+        String _phoneStr = "";
         Iterable<Contact> contacts = await ContactsService.getContacts();
         for (Contact contact in contacts) {
           for (var phone in contact.phones) {
@@ -359,12 +359,26 @@ class NewFriendPageState extends State<NewFriendPage> {
         return Column(children: <Widget>[
           ListTile(
               leading: Container(
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                     RouterUtil.imageServerUrl + _request[index].imageUrl),
+                child: CachedNetworkImage(
+                imageUrl: RouterUtil.imageServerUrl + _request[index].imageUrl,
+                placeholder: (context, url) => Container(
+                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                  width: 10,
+                  height: 10,
+                  alignment: Alignment.center,
                 ),
-                height: 50,
+                errorWidget: (context, url, error) => CircleAvatar(
+                  backgroundImage: AssetImage("assets/icons/ic_launcher.png"),
+                  radius: 100,
+                ),
+                imageBuilder: (context, imageProvider) => CircleAvatar(
+                  backgroundImage: imageProvider,
+                  radius: 100,
+                ),
+                  fit: BoxFit.fill,
+               ),
                 width: 50,
+                height: 50,
               ),
               title: Text(
                 _request[index].name,

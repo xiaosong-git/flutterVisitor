@@ -27,6 +27,7 @@ class DataUtils {
   //需保存的提示信息
   static final String SP_NOTICE_TITLE = "TITLE";
   static final String SP_NOTICE_CONTENT = "CONTENT";
+  static final String SP_LOGIN_TIME="LOGINTIME";
 
   static saveLoginInfo(Map data) async {
     if (data != null) {

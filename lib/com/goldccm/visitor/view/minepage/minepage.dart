@@ -89,6 +89,7 @@ class MinePageState extends State<MinePage> {
     super.initState();
     getPrivilege();
     init();
+    print(RouterUtil.imageServerUrl);
     _minescrollController.addListener(() {
       var maxScroll = _minescrollController.position.maxScrollExtent;
       var pixel = _minescrollController.position.pixels;
@@ -246,6 +247,7 @@ class MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserModel>(context);
     var badgeProvider = Provider.of<BadgeModel>(context);
+    print(userProvider.info.headImgUrl);
     return RefreshIndicator(
       onRefresh: freshMine,
       child: Scaffold(
@@ -316,15 +318,15 @@ class MinePageState extends State<MinePage> {
                                 },
                                 child:
                                   CachedNetworkImage(
-                                          imageUrl: RouterUtil.imageServerUrl +
-                                              userProvider.info.headImgUrl,
+                                          imageUrl: userProvider.info.headImgUrl!=null?RouterUtil.imageServerUrl +
+                                              userProvider.info.headImgUrl:"",
                                           placeholder: (context, url) =>
                                               Container(
-                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
-                  width: 10,
-                  height: 10,
-                  alignment: Alignment.center,
-                ),
+                                                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                                                  width: 10,
+                                                   height: 10,
+                                                    alignment: Alignment.center,
+                                              ),
                                           errorWidget: (context, url, error) =>
                                               Icon(Icons.error),
                                           imageBuilder: (context,imageProvider)=>CircleAvatar(

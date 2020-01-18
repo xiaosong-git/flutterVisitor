@@ -66,30 +66,23 @@ class AddressPageState extends State<AddressPage> {
     await _presenter.loadUserList();
     UserInfo userInfo = await LocalStorage.load("userInfo");
     FriendDao friendDao = FriendDao();
-    //读取本地好友列表
-    List<FriendInfo> lists = await friendDao.getFriendInfo(userInfo.id);
-    if (lists != null && lists.length > 0) {
-      //读取网络好友列表
-      List<FriendInfo> onlineLists = _presenter.userlists;
-      if (onlineLists.length > 0 && onlineLists != null) {
-        setState(() {
-          _userLists = _presenter.userlists;
-          initFlag = _presenter.initFlag;
-        });
-      } else {
+    List<FriendInfo> onlineLists = _presenter.userlists;
+    //读取网路列表
+    if (onlineLists.length > 0 && onlineLists != null) {
+      setState(() {
+        _userLists = _presenter.userlists;
+        initFlag = _presenter.initFlag;
+      });
+    }else{
+      //读取本地列表
+      List<FriendInfo> lists = await friendDao.getFriendInfo(userInfo.id);
+      if (lists != null && lists.length > 0) {
         setState(() {
           _userLists = lists;
           initFlag = false;
         });
-      }
-    } else {
-      List<FriendInfo> onlineLists = _presenter.userlists;
-      if (onlineLists.length > 0 && onlineLists != null) {
-        setState(() {
-          _userLists = _presenter.userlists;
-          initFlag = _presenter.initFlag;
-        });
       }else{
+        //数据为空或获取不到
         setState(() {
           initFlag = true;
         });
@@ -682,8 +675,8 @@ class Presenter {
             initFlag = true;
           }
           for (var userInfo in userList) {
-            if (userInfo['realName'] != null && userInfo['phone'] != null) {
-              FriendInfo user = FriendInfo(
+            if (userInfo['realName'] != null && userInfo['phone'] != null && userInfo['realName']!=""&&userInfo['phone']!="") {
+              FriendInfo _user = FriendInfo(
                 name: userInfo['realName'],
                 nickname: userInfo['nickname'],
                 phone: userInfo['phone'],
@@ -701,14 +694,15 @@ class Presenter {
                     : "",
                 applyType: userInfo['applyType'],
                 lastMessageId: null,
+                belongId: user.id,
               );
-
-              userlists.add(user);
-              bool isExist = await friendDao.isExist(user.userId);
+              userlists.add(_user);
+              bool isExist = await friendDao.isExist(_user.userId);
               if (!isExist) {
-                friendDao.insertFriendInfo(user);
+                friendDao.insertFriendInfo(_user);
               } else {
-                friendDao.updateFriendInfo(user);
+                int num = await friendDao.updateFriendInfo(_user);
+                print("update $num");
               }
             }
           }

@@ -37,8 +37,8 @@ class FriendInfo {
 
   FriendInfo.fromJson(Map map) {
     this.userId = map['userId'];
-    this.name = map['name'];
-    this.nickname = map['nickname'];
+    this.name = map['realName'];
+    this.nickname = map['nickName'];
     this.remarkName = map['remarkName'];
     this.phone = map['phone'];
     this.realImageUrl = map['realImgUrl'];

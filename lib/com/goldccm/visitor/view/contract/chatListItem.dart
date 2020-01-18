@@ -39,10 +39,7 @@ class ChatListState extends State<ChatList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        backgroundColor: Theme
-            .of(context)
-            .appBarTheme
-            .color,
+        backgroundColor: Theme.of(context).appBarTheme.color,
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: null,
@@ -71,7 +68,7 @@ class ChatListState extends State<ChatList> {
             EventBusUtil().eventBus.fire(MessageCountChangeEvent(1));
             FriendInfo user = new FriendInfo(
                 userId: message.M_FriendId,
-                name: friend.notice ?? "",
+                name: friend.notice!="" && friend.notice!=null ? friend.notice : friend.name !="" && friend.name!=null ? friend.name:"Unknown",
                 virtualImageUrl: friend.virtualImageUrl,
                 imageServerUrl:RouterUtil.imageServerUrl,
                 orgId: friend.orgId.toString());
@@ -80,7 +77,7 @@ class ChatListState extends State<ChatList> {
           },
           child:MessageCompent(
                 headImgUrl: friend.virtualImageUrl,
-                realName: friend.notice ?? "",
+                realName: friend.notice!="" && friend.notice!=null ? friend.notice : friend.name !="" && friend.name!=null ?friend.name:"Unknown",
                 latestTime: message.M_Time,
                 latestMsg: message.M_MessageContent ?? "",
                 isSend: message.M_IsSend,

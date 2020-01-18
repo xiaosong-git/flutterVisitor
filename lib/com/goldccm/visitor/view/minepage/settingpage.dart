@@ -55,7 +55,7 @@ class SettingPageState extends State<SettingPage> {
             child: new Column(
               children: <Widget>[
                 Center(
-                  child: new Image.asset('assets/icons/ic_launcher.png',
+                  child: new Image.asset('assets/images/login_logo.png',
                       scale: 0.8),
                 ),
                 new Container(
