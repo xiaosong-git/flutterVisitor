@@ -80,8 +80,8 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
   //tabBar控件和相应的监听事件
   @override
   void initState() {
-
     super.initState();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     _tabController = TabController(length: 2,vsync: this);
     _tabController.addListener(() {
       if(_tabController.indexIsChanging){
@@ -129,6 +129,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
             _seconds = widget.countdown;
             msgColor = _availColor;
             _codeBtnflag = true;
+            _verifyStr = '重新发送';
           });
         }
         return;
@@ -162,7 +163,6 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return WillPopScope(
       child: Scaffold(
          body: SingleChildScrollView(
@@ -483,7 +483,9 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                                          _startTimer();
                                          bool res = await getCheckCode();
                                          if(res!=true){
-                                           _seconds=0;
+                                           setState(() {
+                                             _seconds=0;
+                                           });
                                          }
                                        }else{
                                          ToastUtil.showShortClearToast("电话号码不对");
@@ -515,7 +517,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
                            _loginAction().then((value){
                              Navigator.pop(context);
                              if(value){
-                               Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
+                               Navigator.of(context).pushAndRemoveUntil(new CupertinoPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
                              }
                            });
                          }else{
@@ -600,7 +602,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
   void _regisit() {
     setState(() {
       Navigator.push(context,
-          new MaterialPageRoute(builder: (BuildContext context) {
+          new CupertinoPageRoute(builder: (BuildContext context) {
         return new RegisterPage();
       }));
     });
@@ -608,7 +610,7 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
   void _router() {
     setState(() {
       Navigator.push(context,
-          new MaterialPageRoute(builder: (BuildContext context) {
+          new CupertinoPageRoute(builder: (BuildContext context) {
             return new RouterLogin();
           }));
     });
@@ -616,8 +618,8 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
   void _forget() {
     setState(() {
       Navigator.push(context,
-          new MaterialPageRoute(builder: (BuildContext context) {
-            return new ForgetPasswordPage();
+          new CupertinoPageRoute(builder: (BuildContext context) {
+            return new ForgetPasswordPage(text: '忘记密码',outer: true,);
           }));
     });
   }
@@ -654,12 +656,11 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin{
    */
   bool checkLoginStatus(){
     String loginname = _userNameController.text.toString();
-    String password= _passwordController.text.toString();
     String checkcode= _checkCodeController.text.toString();
-    if(RegExpUtil().verifyPhone(loginname)&&RegExpUtil().verifyPassWord(password)&&_loginType==_loginPass){
+    if(RegExpUtil().verifyPhone(loginname)){
       return true;
     }
-    if(RegExpUtil().verifyPhone(loginname)&&RegExpUtil().verifyCode(checkcode)&&_loginType==_loginCode){
+    if(RegExpUtil().verifyPhone(loginname)){
       return true;
     }
     return false;

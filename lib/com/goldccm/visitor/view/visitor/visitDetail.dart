@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
@@ -50,7 +51,7 @@ class VisitDetail extends StatelessWidget{
           List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
           print('$qrMsg[0]');
           Navigator.push(context,
-              new MaterialPageRoute(builder: (BuildContext context) {
+              new CupertinoPageRoute(builder: (BuildContext context) {
                 return new Qrcode(qrCodecontent:qrMsg);
               }));
 

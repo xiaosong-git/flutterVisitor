@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
@@ -14,12 +16,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
  // NPush().init() 个推推送
  // RouterUtil.init() 服务器地址初始化
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;
   final UserModel userModel = UserModel();
   final BadgeModel badgeModel = BadgeModel();
   userModel.init(null);
+  FlutterArcface.active();
   badgeModel.init();
   NPush().init();
   RouterUtil.init();

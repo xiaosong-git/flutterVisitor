@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,12 +21,14 @@ import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/SharedPreferenceUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/selectAddress.dart';
 import '../../../../../home.dart';
+import 'ForgetPassword.dart';
 
 /*
  * 专属用户登录
@@ -55,7 +58,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
   static Color _availColor=Color(0xFF0073FE);
   static Color _unavailColor=Color(0xFFCFCFCF);
   String _selectAddress;
-  int _seconds;
+  int _seconds=60;
   String _verifyStr = '获取验证码';
   bool isPhoneEditing=false;
   bool isPwdEditing=false;
@@ -63,6 +66,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
   @override
   void initState() {
     super.initState();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     _tabController = TabController(length: 2,vsync: this);
     _tabController.addListener(() {
       if(_tabController.indexIsChanging){
@@ -89,6 +93,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
   initLoginData() async {
     List userNameLists = await SharedPreferenceUtil.getUsers();
     RouterList routerList = await RouterUtil.getServerInfo();
+    print(routerList.toString());
     setState(() {
       if (userNameLists.length > 0 && userNameLists[0].loginName != null) {
         _userNameController.text = userNameLists[0].loginName;
@@ -102,6 +107,8 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
           RouterUtil.webSocketServerUrl="ws://${routerList.ip}:${routerList.port}/visitor/";
           RouterUtil.uploadServerUrl="http://${routerList.ip}:${routerList.port}/goldccm-imgServer/goldccm/image/gainData";
           RouterUtil.imageServerUrl="http://${routerList.ip}:${routerList.imagePort}/imgserver/";
+          RouterUtil.refresh();
+          RouterUtil.local();
         }
       }
     });
@@ -115,7 +122,6 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
   }
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Scaffold(
       backgroundColor: Color(0xFFFFFFFF),
       body: SingleChildScrollView(
@@ -412,12 +418,23 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                               child: FlatButton(
                                 child: Text(_verifyStr,style: TextStyle(color: msgColor,fontSize: ScreenUtil().setSp(24)),),
                                 onPressed: () async {
-                                  if(_codeBtnflag){
-                                    _startTimer();
-                                    bool res = await getCheckCode();
-                                    if(res!=true){
-                                      _seconds=0;
+                                  if(_selectAddressController.text!=null&&_selectAddressController.text!=""){
+                                    if(_codeBtnflag){
+                                      if(RegExpUtil().verifyPhone(_userNameController.text)){
+                                        _startTimer();
+                                        bool res = await getCheckCode();
+                                        if(res!=true){
+                                          setState(() {
+                                            _seconds=0;
+                                          });
+                                        }
+                                      }
+                                      else{
+                                        ToastUtil.showShortClearToast("电话号码不对");
+                                      }
                                     }
+                                  }else{
+                                    ToastUtil.showShortClearToast("请先选择地址");
                                   }
                                 },
                               ),
@@ -459,7 +476,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                       readOnly: true,
                       onTap: () async {
 //                        Result result = await CityPickers.showFullPageCityPicker(context: context);
-                        Result result= await Navigator.push(context,MaterialPageRoute(builder: (context)=>SelectAddressPage(provincesData: provincesData,citiesData: citiesData,)));
+                        Result result= await Navigator.push(context,CupertinoPageRoute(builder: (context)=>SelectAddressPage(provincesData: provincesData,citiesData: citiesData,)));
                         if(result!=null&&result.provinceName!=null){
                           setState(() {
                             routers.clear();
@@ -474,7 +491,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                       top: ScreenUtil().setHeight(40),
                       right: ScreenUtil().setWidth(115),
                       child: _selectAddressController.text==""?Image(image: AssetImage('assets/images/login_triangle.png'),width: ScreenUtil().setWidth(24),height: ScreenUtil().setHeight(18),):Container(),
-                    ),
+      ),
                   ],
                 ),
               ),
@@ -508,7 +525,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                       readOnly: true,
                       onTap: (){
                         if(routers!=null){
-                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> RouterSelectPage(lists: routers,))).then((value){
+                          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=> RouterSelectPage(lists: routers,))).then((value){
                             if(value!=null){
                               setState(() {
                                 _selectCompanyController.text=value.routerName;
@@ -550,7 +567,7 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                       _loginAction().then((value){
                         Navigator.pop(context);
                         if(value){
-                          Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
+                          Navigator.of(context).pushAndRemoveUntil(new CupertinoPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
                         }
                       });
                     },
@@ -558,21 +575,25 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
                   ),
                 ),
               ),
-              Container(
-                width: ScreenUtil().setWidth(750),
-                height: ScreenUtil().setHeight(40),
-                margin: EdgeInsets.only(top:ScreenUtil().setHeight(46)),
-                decoration: BoxDecoration(
-
-                ),
-                alignment: Alignment.center,
-                child: GestureDetector(
-                  child: Text('忘记密码',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFFA8A8A8)),),
-                  onTap: (){
-                    ToastUtil.showShortClearToast("请联系所在企业修改");
-                  },
-                ),
-              ),
+//todo 接口实现后再开放
+//              Container(
+//                width: ScreenUtil().setWidth(750),
+//                height: ScreenUtil().setHeight(40),
+//                margin: EdgeInsets.only(top:ScreenUtil().setHeight(46)),
+//                decoration: BoxDecoration(
+//
+//                ),
+//                alignment: Alignment.center,
+//                child: GestureDetector(
+//                  child: Text('忘记密码',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFFA8A8A8)),),
+//                  onTap: (){
+//                    Navigator.push(context,
+//                        new CupertinoPageRoute(builder: (BuildContext context) {
+//                          return new ForgetPasswordPage(text: '忘记密码',outer: false,);
+//                        }));
+//                  },
+//                ),
+//              ),
             ],
           ),
         ),
@@ -629,19 +650,23 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_seconds == 0) {
         _cancelTimer();
-        _seconds =60;
-        msgColor = _availColor;
-        _codeBtnflag = true;
-        setState(() {});
+       if(mounted){
+         setState(() {
+           _seconds =60;
+           msgColor = _availColor;
+           _codeBtnflag = true;
+           _verifyStr = '重新发送';
+         });
+       }
         return;
       }
-      _seconds--;
-      _verifyStr = '$_seconds' + 's后重新获取';
-      msgColor = _unavailColor;
-      _codeBtnflag = false;
-      setState(() {});
-      if (_seconds == 0) {
-        _verifyStr = '重新发送';
+      if(mounted){
+        setState(() {
+          _seconds=_seconds-1;
+          _verifyStr = '$_seconds' + 's后重新获取';
+          msgColor = _unavailColor;
+          _codeBtnflag = false;
+        });
       }
     });
   }
@@ -701,11 +726,29 @@ class RouterLoginState extends State<RouterLogin> with SingleTickerProviderState
     }
     return checkResult;
   }
+  //检查登录地址
+  bool checkAddress(){
+    String _address=_selectCompanyController.text.toString();
+    String _com = _selectAddressController.text.toString();
+    bool checkResult=true;
+    if(_com == null || _com ==""){
+      ToastUtil.showShortToast('省市区未选择');
+      checkResult = false;
+    }else if(_address == null|| _address ==""){
+      ToastUtil.showShortToast('公司未选择');
+      checkResult = false;
+    }
+    return checkResult;
+  }
   /*
    * _loginPass 密码登录
    * _loginCode 验证码登录
    */
   Future _loginAction() async {
+    bool addressCheck = checkAddress();
+    if(!addressCheck){
+      return false;
+    }
     bool userNameCheck = checkLoignUser();
     String _passNum;
     String _codeNum;

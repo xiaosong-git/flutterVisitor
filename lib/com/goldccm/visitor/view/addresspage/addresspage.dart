@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/db/friendDao.dart';
@@ -57,6 +58,7 @@ class AddressPageState extends State<AddressPage> {
     super.initState();
     initAddress();
 //    _handleRefresh();
+
     _friendListSub =
         EventBusUtil().eventBus.on<FriendListEvent>().listen((event) {
       _handleRefresh();
@@ -153,7 +155,7 @@ class AddressPageState extends State<AddressPage> {
                                             child: FlatButton(
                                               onPressed: () async {
                                                 if (_userModel.info.isAuth == "T") {
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                                  Navigator.push(context, CupertinoPageRoute(builder: (context) =>
                                                               AddFriendPage(userInfo: _userModel.info,)));
                                                 } else {
                                                   ToastUtil.showShortClearToast("请先实名认证");
@@ -191,8 +193,7 @@ class AddressPageState extends State<AddressPage> {
                                             child: FlatButton(
                                               onPressed: () async {
                                                 if (_userModel.info.isAuth == "T") {
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((value) {
-                                                    _handleRefresh();
+                                                  Navigator.push(context, CupertinoPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((value) {
                                                   });
                                                 } else {
                                                   ToastUtil.showShortClearToast("请先实名认证");
@@ -322,7 +323,7 @@ class AddressPageState extends State<AddressPage> {
                                   child: TextField(textAlign: TextAlign.center, cursorWidth: 0.0,
                                     decoration: new InputDecoration(contentPadding: EdgeInsets.only(top: 0.0), hintText: '查找', border: InputBorder.none),
                                     onTap: () {
-                                      Navigator.push(context,MaterialPageRoute(builder: (context) => FriendSearch(userList: _userLists,)));
+                                      Navigator.push(context,CupertinoPageRoute(builder: (context) => FriendSearch(userList: _userLists,)));
                                     },
                                   ),
                                 ),
@@ -365,8 +366,7 @@ class AddressPageState extends State<AddressPage> {
                   trailing:
                       Image.asset('assets/icons/app_more.png', scale: 1.7),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((val) {
-                      _handleRefresh();
+                    Navigator.push(context, CupertinoPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((val) {
                     });
                   },
                 ),
@@ -424,7 +424,7 @@ class AddressPageState extends State<AddressPage> {
                                           hintText: '查找',
                                           border: InputBorder.none),
                                       onTap: () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => FriendSearch(userList: _userLists,)));
+                                        Navigator.push(context, CupertinoPageRoute(builder: (context) => FriendSearch(userList: _userLists,)));
                                       },
                                     ),
                                   ),
@@ -480,8 +480,7 @@ class AddressPageState extends State<AddressPage> {
                     trailing:
                         Image.asset('assets/icons/app_more.png', scale: 1.7),
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((val) {
-                        _handleRefresh();
+                      Navigator.push(context, CupertinoPageRoute(builder: (context) => NewFriendPage(userInfo: _userModel.info,))).then((val) {
                       });
                     },
                   ),
@@ -514,7 +513,7 @@ class AddressPageState extends State<AddressPage> {
                     ),
                     onTap: () {
                       Navigator.push(context,
-                          MaterialPageRoute(
+                          CupertinoPageRoute(
                               builder: (context) => FriendDetailPage(user: _userLists[index], type: widget.type,)));
                     },
                   ),
@@ -551,7 +550,7 @@ class AddressPageState extends State<AddressPage> {
                     onTap: () {
                       Navigator.push(
                           context,
-                          MaterialPageRoute(
+                          CupertinoPageRoute(
                               builder: (context) => FriendDetailPage(user: _userLists[index], type: widget.type,)));
                     },
                   ),
@@ -578,7 +577,7 @@ class AddressPageState extends State<AddressPage> {
                 onTap: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      CupertinoPageRoute(
                           builder: (context) => FriendDetailPage(
                                 user: _userLists[index],
                                 type: widget.type,

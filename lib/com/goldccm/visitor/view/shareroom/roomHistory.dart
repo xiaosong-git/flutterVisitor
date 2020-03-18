@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/RoomOrderInfo.dart';
@@ -142,7 +143,7 @@ class RoomHistoryState extends State<RoomHistory> {
     );
   }
   beforeDispose(){
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomeApp(tabIndex: 3,)));
+    Navigator.push(context, CupertinoPageRoute(builder: (context)=>MyHomeApp(tabIndex: 3,)));
   }
   getHistory() async {
     String url =  "meeting/myReserveList/$count/10";
@@ -301,7 +302,7 @@ class RoomHistoryState extends State<RoomHistory> {
             onTap: () {
               (_roomLists[index].recordStatus==1||_roomLists[index].recordStatus==2)?Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  CupertinoPageRoute(
                       builder: (context) => RoomBook(
                             order: _roomLists[index],
                             userInfo: widget.userInfo,

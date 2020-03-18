@@ -25,20 +25,19 @@ class AttendancePageState extends State<AttendancePage>{
   Widget build(BuildContext context) {
     return Scaffold(
      body: _pages[_tabIndex],
-      bottomNavigationBar:
-      BottomNavigationBar(
-        items:<BottomNavigationBarItem>[
-          BottomNavigationBarItem(title: Text(_tabLists[0]),icon: Image.asset(reverseIcon(0),scale: 6.0,)),
-          BottomNavigationBarItem(title: Text(_tabLists[1]),icon: Image.asset(reverseIcon(1),scale: 6.0,)),
-          BottomNavigationBarItem(title: Text(_tabLists[2]),icon: Image.asset(reverseIcon(2),scale: 6.0,)),
-        ],
-          currentIndex: _tabIndex,
-        onTap: (index){
-          setState(() {
-            _tabIndex=index;
-          });
-        },
-      ),
+//      bottomNavigationBar: BottomNavigationBar(
+//        items:<BottomNavigationBarItem>[
+//          BottomNavigationBarItem(title: Text(_tabLists[0]),icon: Image.asset(reverseIcon(0),scale: 6.0,)),
+//          BottomNavigationBarItem(title: Text(_tabLists[1]),icon: Image.asset(reverseIcon(1),scale: 6.0,)),
+//          BottomNavigationBarItem(title: Text(_tabLists[2]),icon: Image.asset(reverseIcon(2),scale: 6.0,)),
+//        ],
+//          currentIndex: _tabIndex,
+//        onTap: (index){
+//          setState(() {
+//            _tabIndex=index;
+//          });
+//        },
+//      ),
     );
   }
   @override
@@ -47,8 +46,8 @@ class AttendancePageState extends State<AttendancePage>{
     super.initState();
     _pages = [
       CheckPointPage(),
-      StatisticalPage(),
-      RulePage(),
+//      StatisticalPage(),
+//      RulePage(),
     ];
   }
   //切换当前页面的图标从未选择到选择

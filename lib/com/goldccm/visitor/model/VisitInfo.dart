@@ -26,10 +26,12 @@ class VisitInfo{
    String companyName;
    String city;
    int companyId;
+   String headUrl;
+   String address;
 
    @override
    String toString() {
-     return 'VisitInfo{id: $id, visitDate: $visitDate, visitTime: $visitTime, userId: $userId, visitorId: $visitorId, reason: $reason, phone: $phone, cstatus: $cstatus, dateType: $dateType, startDate: $startDate, endDate: $endDate, answerContent: $answerContent, orgCode: $orgCode, realName: $realName, userRealName: $userRealName, visitorRealName: $visitorRealName, province: $province, city: $city, orgName: $orgName, companyName: $companyName, companyId: $companyId}';
+     return 'VisitInfo{id: $id, visitDate: $visitDate, visitTime: $visitTime, userId: $userId, visitorId: $visitorId, reason: $reason, phone: $phone, cstatus: $cstatus, dateType: $dateType, startDate: $startDate, endDate: $endDate, answerContent: $answerContent, orgCode: $orgCode, realName: $realName, userRealName: $userRealName, visitorRealName: $visitorRealName, province: $province, city: $city, orgName: $orgName, companyName: $companyName, companyId: $companyId, headUrl: $headUrl}';
    }
 
 
@@ -57,17 +59,19 @@ class VisitInfo{
      this.companyName,
      this.phone,
      this.companyId,
+     this.headUrl,
+     this.address,
 });
 
   VisitInfo.fromJson(Map json) {
-    id = json['id'];
+    id = json['id'].toString();
     visitDate = json['visitDate'];
     visitTime = json['visitTime'];
-    userId = json['userId'];
-    visitorId = json['visitorId'];
+    userId = json['userId'].toString();
+    visitorId = json['visitorId'].toString();
     reason = json['reason'];
     cstatus = json['cstatus'];
-    dateType = json['dateType'];
+    dateType = json['dateType'].toString();
     startDate = json['startDate'];
     endDate = json['endDate'];
     answerContent = json['answerContent'];
@@ -81,6 +85,8 @@ class VisitInfo{
     orgName = json['orgName'];
     companyName = json['companyName'];
     companyId = json['companyId'];
+    headUrl = json['headImgUrl'];
+    address = json['addr'];
   }
 
 }

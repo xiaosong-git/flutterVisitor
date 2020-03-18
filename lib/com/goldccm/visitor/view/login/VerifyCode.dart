@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/ForgetPassword.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/Register.dart';
@@ -18,7 +19,8 @@ import 'package:visitor/com/goldccm/visitor/view/login/Register.dart';
 class VerifyCodePage extends StatefulWidget{
   final String phone;
   final String title;
-  VerifyCodePage({Key key,this.phone,this.title}):super(key:key);
+  final bool outer;
+  VerifyCodePage({Key key,this.phone,this.title,this.outer}):super(key:key);
   @override
   State<StatefulWidget> createState() {
     return VerifyCodePageState();
@@ -33,61 +35,62 @@ class VerifyCodePageState extends State<VerifyCodePage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: ScreenUtil().setWidth(750),
-        height: ScreenUtil().setHeight(1334),
-        color: Color(0xFFFFFFFF),
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: ScreenUtil().setHeight(88),
-              width: ScreenUtil().setWidth(750),
-              margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(right: ScreenUtil().setWidth(235),left: 0),
-                    child: IconButton(
-                        icon: Image(image: AssetImage("assets/images/login_back.png"),width: ScreenUtil().setWidth(36),height: ScreenUtil().setHeight(36),color: Color(0xFF0073FE),),
-                        onPressed: () {
-                          setState(() {
-                            Navigator.pop(context);
-                          });
-                        }),
-                  ),
-                  Text(widget.title,style: TextStyle(color: Color(0xFF0073FE),fontSize: ScreenUtil().setSp(36),),),
-                ],
+      body: SingleChildScrollView(
+        child:Container(
+          width: ScreenUtil().setWidth(750),
+          height: ScreenUtil().setHeight(1334),
+          color: Color(0xFFFFFFFF),
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: ScreenUtil().setHeight(88),
+                width: ScreenUtil().setWidth(750),
+                margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(right: ScreenUtil().setWidth(235),left: 0),
+                      child: IconButton(
+                          icon: Image(image: AssetImage("assets/images/login_back.png"),width: ScreenUtil().setWidth(36),height: ScreenUtil().setHeight(36),color: Color(0xFF0073FE),),
+                          onPressed: () {
+                            setState(() {
+                              Navigator.pop(context);
+                            });
+                          }),
+                    ),
+                    Text(widget.title,style: TextStyle(color: Color(0xFF0073FE),fontSize: ScreenUtil().setSp(36),),),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              child: Divider(
-                color: Color(0x0F000000),
-                height: ScreenUtil().setHeight(2),
-                thickness: ScreenUtil().setHeight(2),
+              Container(
+                child: Divider(
+                  color: Color(0x0F000000),
+                  height: ScreenUtil().setHeight(2),
+                  thickness: ScreenUtil().setHeight(2),
+                ),
               ),
-            ),
-            Container(
-              height: ScreenUtil().setHeight(50),
-              width: ScreenUtil().setWidth(750),
-              margin: EdgeInsets.only(top: ScreenUtil().setHeight(144),left: ScreenUtil().setWidth(112),bottom: ScreenUtil().setHeight(16)),
-              child: Text('验证码已发送至手机',style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFF373737)),),
-            ),
-            Container(
-              padding: EdgeInsets.only(bottom: ScreenUtil().setHeight(60),left: ScreenUtil().setWidth(112)),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    child: Text('+86',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF0073FE)),),
-                    padding: EdgeInsets.only(right: ScreenUtil().setWidth(46)),
-                  ),
-                  Container(
-                    child: Text('${widget.phone}',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF0073FE))),
-                  ),
-                ],
+              Container(
+                height: ScreenUtil().setHeight(50),
+                width: ScreenUtil().setWidth(750),
+                margin: EdgeInsets.only(top: ScreenUtil().setHeight(144),left: ScreenUtil().setWidth(112),bottom: ScreenUtil().setHeight(16)),
+                child: Text('验证码已发送至手机',style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFF373737)),),
               ),
-            ),
-           Container(
+              Container(
+                padding: EdgeInsets.only(bottom: ScreenUtil().setHeight(60),left: ScreenUtil().setWidth(112)),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      child: Text('+86',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF0073FE)),),
+                      padding: EdgeInsets.only(right: ScreenUtil().setWidth(46)),
+                    ),
+                    Container(
+                      child: Text('${widget.phone}',style: TextStyle(fontSize: ScreenUtil().setSp(28),color: Color(0xFF0073FE))),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
                 width: ScreenUtil().setWidth(750),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +108,7 @@ class VerifyCodePageState extends State<VerifyCodePage>{
                           lineHeight: ScreenUtil().setHeight(2),
                         ),
                         controller: _codeController,
-                        autoFocus: false, 
+                        autoFocus: false,
                         textInputAction: TextInputAction.go,
                         keyboardType: TextInputType.phone,
                         onSubmit: (pin) {
@@ -120,30 +123,31 @@ class VerifyCodePageState extends State<VerifyCodePage>{
                     )
                   ],
                 ),
-            ),
-            Container(
-              height: ScreenUtil().setHeight(170),
-              padding: EdgeInsets.only(top:ScreenUtil().setHeight(80),left: ScreenUtil().setWidth(112),right:ScreenUtil().setWidth(112)),
-              decoration: BoxDecoration(
-
               ),
-              child: SizedBox(
-                width: ScreenUtil().setWidth(520),
-                height: ScreenUtil().setHeight(90),
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  child: Text(msg,style: TextStyle(fontSize: ScreenUtil().setSp(36),color:Color(0xFFFFFFFF)),textAlign: TextAlign.center,),
-                  onPressed: (){
-                    if(isWork) {
-                      sendCode();
-                    }
-                  },
-                  color: isWork?Color(0xFF0073FE):Color(0xFF79B6FF),
+              Container(
+                height: ScreenUtil().setHeight(170),
+                padding: EdgeInsets.only(top:ScreenUtil().setHeight(80),left: ScreenUtil().setWidth(112),right:ScreenUtil().setWidth(112)),
+                decoration: BoxDecoration(
+
+                ),
+                child: SizedBox(
+                  width: ScreenUtil().setWidth(520),
+                  height: ScreenUtil().setHeight(90),
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0)),
+                    child: Text(msg,style: TextStyle(fontSize: ScreenUtil().setSp(36),color:Color(0xFFFFFFFF)),textAlign: TextAlign.center,),
+                    onPressed: (){
+                      if(isWork) {
+                        sendCode();
+                      }
+                    },
+                    color: isWork?Color(0xFF0073FE):Color(0xFF79B6FF),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -162,7 +166,10 @@ class VerifyCodePageState extends State<VerifyCodePage>{
   }
   //发送验证码
   Future<void> sendCode() async {
-    String url = Constant.serverUrl+Constant.sendCodeUrl;
+    String url = RouterUtil.apiServerUrl+Constant.sendCodeUrl;
+    if(widget.outer){
+      url =  Constant.serverUrl+Constant.sendCodeUrl;
+    }
     String phone = widget.phone;
     String type = "1";
     url = url + "/" + phone + "/" + type;
@@ -194,8 +201,11 @@ class VerifyCodePageState extends State<VerifyCodePage>{
       }
     });
   }
-  Future<void> verifyCode(String code) async {
-    String url=Constant.serverUrl+"code/verifyCode";
+    Future<void> verifyCode(String code) async {
+    String url=RouterUtil.apiServerUrl+"code/verifyCode";
+    if(widget.outer){
+       url=Constant.serverUrl+"code/verifyCode";
+    }
     var response=await Http().post(url,queryParameters: {
       "phone":widget.phone,
       "code":code,
@@ -207,7 +217,7 @@ class VerifyCodePageState extends State<VerifyCodePage>{
         if(widget.title=="注册"){
           Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>SetPasswordPage(phone: widget.phone,code:code)));
         }else if(widget.title=="忘记密码"){
-          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>ResetPassWord(phone: widget.phone,code:code)));
+          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>ResetPassWord(phone: widget.phone,code:code,outer: widget.outer,)));
         }
       }else{
         ToastUtil.showShortClearToast(resMap['verify']['desc']);

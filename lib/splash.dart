@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'com/goldccm/visitor/util/DataUtils.dart';
@@ -32,7 +33,7 @@ class SplashState extends State<SplashPage> {
         //延时操作启动页面后跳转到主页面
         try {
           Navigator.of(context).pushAndRemoveUntil(
-              new MaterialPageRoute(
+              new CupertinoPageRoute(
                   builder: (BuildContext context) =>
                   isLogin == true ? new MyHomeApp() : new Login()
               ),
@@ -52,11 +53,10 @@ class SplashState extends State<SplashPage> {
     return new Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
-      color:Color.fromRGBO(88, 123, 239, 1.0),
       child: Container(
         child: FittedBox(
-          fit: BoxFit.none,
-          child: Image.asset('assets/icons/visitor_splash.png',scale: 2.0,),
+          fit: BoxFit.cover,
+          child: Image.asset('assets/images/app_splash.png'),
         ),
       ),
     );

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:gesture_password/gesture_password.dart';
@@ -8,6 +10,7 @@ import 'package:gesture_password/mini_gesture_password.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
@@ -15,106 +18,10 @@ import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:visitor/com/goldccm/visitor/view/minepage/minepage.dart';
 import 'package:provider/provider.dart';
 
-/*
- * 安全设置
- * author:ody997<hwk@growingpine.com>
- * create_time:2019/11/28
- */
-class SecurityPage extends StatefulWidget {
-  SecurityPage({Key key, this.userInfo}) : super(key: key);
-  final UserInfo userInfo;
-  @override
-  State<StatefulWidget> createState() {
-    return SecurityPageState();
-  }
-}
+
 
 UserInfo _userInfo;
 
-class SecurityPageState extends State<SecurityPage> {
-  @override
-  void initState() {
-    super.initState();
-    _userInfo = widget.userInfo;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: AppBar(
-        title: Text('安全管理', textScaleFactor: 1.0),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).appBarTheme.color,
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
-      ),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            title: Text('更换手机',
-                textScaleFactor: 1.0,
-                style: TextStyle(
-                    fontSize: Constant.normalFontSize,
-                    fontWeight: FontWeight.w600)),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                widget.userInfo.phone != null
-                    ? Text(
-                        widget.userInfo.phone,
-                        style: TextStyle(
-                          fontSize: Constant.normalFontSize,
-                          color: Colors.black54,
-                        ),
-                        textScaleFactor: 1.0,
-                      )
-                    : Text(""),
-                Image.asset('assets/icons/app_more.png', scale: 2.0),
-              ],
-            ),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ChangePhonePage()));
-            },
-          ),
-          Divider(height: 0.0),
-          ListTile(
-            title: Text('修改登录密码',
-                style: TextStyle(
-                    fontSize: Constant.normalFontSize,
-                    fontWeight: FontWeight.w600),
-                textScaleFactor: 1.0),
-            trailing: Image.asset('assets/icons/app_more.png', scale: 2.0),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ChangePwdPage(userInfo: widget.userInfo)));
-            },
-          ),
-//          Divider(height: 0.0),
-//          ListTile(
-//            title: Text('设置手势密码',
-//                style: TextStyle(
-//                    fontSize: Constant.normalFontSize,
-//                    fontWeight: FontWeight.w600),
-//                textScaleFactor: 1.0),
-//            trailing: Image.asset('assets/icons/app_more.png', scale: 2.0),
-//            onTap: () {
-//              Navigator.push(context,
-//                  MaterialPageRoute(builder: (context) => ChangeGesturePage()));
-//            },
-//          ),
-        ],
-      ),
-    );
-  }
-}
 
 ///修改手机
 class ChangePhonePage extends StatefulWidget {
@@ -156,13 +63,23 @@ class ChangePhonePageState extends State<ChangePhonePage> {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
-          title: Text('更换手机', textScaleFactor: 1.0),
+          title: Text('更换手机',textScaleFactor: 1.0,style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFF373737)),),
           centerTitle: true,
-          backgroundColor: Theme.of(context).appBarTheme.color,
+          backgroundColor: Color(0xFFFFFFFF),
+          elevation: 1,
+          brightness: Brightness.light,
+          automaticallyImplyLeading: false,
           leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios),
+              icon: Image(
+                image: AssetImage("assets/images/login_back.png"),
+                width: ScreenUtil().setWidth(36),
+                height: ScreenUtil().setHeight(36),
+                color: Color(0xFF373737),),
               onPressed: () {
-                Navigator.pop(context);
+                setState(() {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  Navigator.pop(context);
+                });
               }),
         ),
         body: SingleChildScrollView(
@@ -234,7 +151,7 @@ class ChangePhonePageState extends State<ChangePhonePage> {
                             color: Colors.white,
                             textColor: Colors.grey,
                             elevation: 0,
-                            child: Text('$countDown',
+                            child: Text('${countDown}s',
                                 style: TextStyle(
                                     fontSize: Constant.normalFontSize),
                                 textScaleFactor: 1.0),
@@ -296,6 +213,7 @@ class ChangePhonePageState extends State<ChangePhonePage> {
   updatePhone() async {
     String url = Constant.updatePhoneUrl;
     String phone = phoneController.text;
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     String threshold = await CommonUtil.calWorkKey();
     String code = codeController.text;
     if (phone == null || phone == "") {
@@ -305,10 +223,11 @@ class ChangePhonePageState extends State<ChangePhonePage> {
     } else if (code == null || code == "") {
       ToastUtil.showShortClearToast("验证码不能为空");
     } else {
+
       var res = await Http().post(url,
           queryParameters: {
-            "token": _userInfo.token,
-            "userId": _userInfo.id,
+            "token": userInfo.token,
+            "userId": userInfo.id,
             "factor": CommonUtil.getCurrentTime(),
             "threshold": threshold,
             "requestVer": await CommonUtil.getAppVersion(),
@@ -320,8 +239,9 @@ class ChangePhonePageState extends State<ChangePhonePage> {
         Map map = jsonDecode(res);
         if (map['verify']['sign'] == "success") {
           ToastUtil.showShortClearToast('手机更换成功');
-          _userInfo.phone = phone;
-          DataUtils.updateUserInfo(_userInfo);
+          userInfo.phone = phone;
+          DataUtils.updateUserInfo(userInfo);
+          FocusScope.of(context).requestFocus(FocusNode());
           Navigator.pop(context);
         } else {
           ToastUtil.showShortClearToast(map['verify']['desc']);
@@ -607,7 +527,7 @@ class ChangeGesturePageState extends State<ChangeGesturePage> {
                   _value = newValue;
                   if (newValue == true) {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => GesturePage()));
+                        CupertinoPageRoute(builder: (context) => GesturePage()));
                   }
                 });
               },
@@ -629,7 +549,7 @@ Widget showUpdateGesture(BuildContext context) {
           textScaleFactor: 1.0),
       onTap: () {
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => UpdateGesturePage()));
+            CupertinoPageRoute(builder: (context) => UpdateGesturePage()));
       },
     );
   } else {

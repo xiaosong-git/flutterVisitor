@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -78,11 +80,24 @@ class IdentifyPageState extends State<IdentifyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:Text( '实名认证',   style: new TextStyle(
-            fontSize: 17.0, color: Colors.white),textScaleFactor: 1.0),
+        title: Text('实名认证',textScaleFactor: 1.0,style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(36)),),
         centerTitle: true,
-        backgroundColor: Theme.of(context).appBarTheme.color,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context);}),
+        backgroundColor: Color(0xFFFFFFFF),
+        elevation: 1,
+        automaticallyImplyLeading: false,
+        brightness: Brightness.light,
+        leading: IconButton(
+            icon: Image(
+              image: AssetImage("assets/images/back_white.png"),
+              width: ScreenUtil().setWidth(36),
+              height: ScreenUtil().setHeight(36),
+              fit: BoxFit.cover,
+              color: Color(0xFF595959),),
+            onPressed: () {
+              setState(() {
+                Navigator.pop(context);
+              });
+            }),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -91,180 +106,197 @@ class IdentifyPageState extends State<IdentifyPage> {
             children: <Widget>[
               Container(
                 color: Colors.white,
-                child: Column(
+                width: ScreenUtil().setWidth(750),
+                height: ScreenUtil().setHeight(364),
+                alignment: Alignment.center,
+                child: InkWell(
+                  child: Container(
+                    width: ScreenUtil().setWidth(282),
+                    height: ScreenUtil().setHeight(286),
+                    alignment: Alignment.center,
+                    child: Image(
+                      image: _image == null
+                          ? AssetImage('assets/images/mine_identify_photo_background.png',)
+                          : FileImage(
+                        _image,
+                      ),
+                      width: ScreenUtil().setWidth(204),
+                      height: ScreenUtil().setHeight(252),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  onTap: getImage,
+                )
+              ),
+              Container(
+                height: ScreenUtil().setHeight(20),
+              ),
+              Container(
+                color: Colors.white,
+                width: ScreenUtil().setWidth(750),
+                height: ScreenUtil().setHeight(100),
+                child: Stack(
+                  alignment: Alignment.center,
                   children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      height: 100,
-                      width: 100,
-                      child: ClipOval(
-                        child: _image == null
-                            ? Image.asset('assets/images/visitor_icon_head.png',
-                            width: 100, height: 100)
-                            : Image.file(
-                          _image,
-                          fit: BoxFit.cover,
-                          width: 100,
-                          height: 100,
+                    Positioned(
+                      left: ScreenUtil().setWidth(62),
+                      child: Text('姓名',style: TextStyle(color: Color(0xFF787878),fontSize: ScreenUtil().setSp(28)),),
+                    ),
+                    Positioned(
+                      left: ScreenUtil().setWidth(146),
+                      child: Container(
+                        width: ScreenUtil().setWidth(578),
+                        child:TextFormField(
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: '请输入您的真实姓名',
+                              hintStyle: TextStyle(
+                                fontSize: Constant.normalFontSize,
+                              )),
+                          style: TextStyle(
+                            fontSize: Constant.normalFontSize,
+                          ),
+                          onSaved: (value) {
+                            realName = value;
+                          },
                         ),
                       ),
-                    ),
-                    Center(
-                      child: RaisedButton(
-                        color: Colors.blue,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                          child: Text('点击拍摄照片',style: TextStyle(color: Colors.white),textScaleFactor: 1.0), onPressed: getImage),
-                    ),
+                    )
                   ],
                 ),
               ),
-              Container(
-                height: 30,
-                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '身份信息（必填）',
-                  style: TextStyle(fontSize:14.0,color: Colors.black45),textScaleFactor: 1.0
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                color: Colors.white,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '请输入您的真实姓名',
-                      hintStyle: TextStyle(
-                        fontSize: Constant.normalFontSize,
-                      )),
-                  style: TextStyle(
-                    fontSize: Constant.normalFontSize,
-                  ),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return '请填入您的真实姓名';
-                    }
-                  },
-                  onSaved: (value) {
-                    realName = value;
-                  },
-                ),
-              ),
               Divider(
                 height: 0,
               ),
               Container(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                 color: Colors.white,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '请输入您的身份证号码',
-                      hintStyle: TextStyle(
-                        fontSize: Constant.normalFontSize,
-                      )),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return '请输入您的身份证号码';
-                    }
-                  },
-                  style: TextStyle(
-                    fontSize: Constant.normalFontSize,
-                  ),
-                  onSaved: (value) {
-                    idNumber = value;
-                  },
-                ),
-              ),
-              Container(
-                height: 30,
-                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                alignment: Alignment.centerLeft,
-                child: Text('地址信息（选填）',
-                  style: TextStyle(fontSize:14.0,color: Colors.black45),textScaleFactor: 1.0
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                color: Colors.white,
-                child: InkWell(
-                  onTap: () async {
-                    Result result = await CityPickers.showCityPicker(
-                      context: context,
-                    );
-                    setState(() {
-                      print(result);
-                      if (result != null) {
-                        areaController.text = result.provinceName +
-                            "-" +
-                            result.cityName +
-                            "-" +
-                            result.areaName;
-                        address = result.provinceName +
-                            result.cityName +
-                            result.areaName;
-                      }
-                    });
-                  },
-                  child: TextFormField(
-                    enabled: false,
-                    controller: areaController,
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: '请选择所在地区',
-                        hintStyle: TextStyle(
-                          fontSize: Constant.normalFontSize,
-                        )),
-                    style: TextStyle(
-                      fontSize: Constant.normalFontSize,
+                width: ScreenUtil().setWidth(750),
+                height: ScreenUtil().setHeight(100),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Positioned(
+                      left: ScreenUtil().setWidth(34),
+                      child: Text('身份证',style: TextStyle(color: Color(0xFF787878),fontSize: ScreenUtil().setSp(28)),),
                     ),
-                  ),
+                    Positioned(
+                      left: ScreenUtil().setWidth(146),
+                      child: Container(
+                        width: ScreenUtil().setWidth(578),
+                        child:TextFormField(
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: '请输入您的身份证号码',
+                              hintStyle: TextStyle(
+                                fontSize: Constant.normalFontSize,
+                              )),
+                          style: TextStyle(
+                            fontSize: Constant.normalFontSize,
+                          ),
+                          onSaved: (value) {
+                            idNumber = value;
+                          },
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
-              Divider(
-                height: 0,
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                color: Colors.white,
-                child: TextFormField(
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '请输入详细地址信息，如道路、门牌号、小区、楼栋号、单元室等',
-                      hintStyle: TextStyle(
-                        fontSize: Constant.normalFontSize,
-                      )),
-                  style: TextStyle(
-                    fontSize: Constant.normalFontSize,
-                  ),
-                  onSaved: (value) {
-                    detailAddress = value;
-                  },
-                ),
-              ),
+//              Container(
+//                height: 30,
+//                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+//                alignment: Alignment.centerLeft,
+//                child: Text('地址信息（选填）',
+//                  style: TextStyle(fontSize:14.0,color: Colors.black45),textScaleFactor: 1.0
+//                ),
+//              ),
+//              Container(
+//                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+//                color: Colors.white,
+//                child: InkWell(
+//                  onTap: () async {
+//                    Result result = await CityPickers.showCityPicker(
+//                      context: context,
+//                    );
+//                    setState(() {
+//                      print(result);
+//                      if (result != null) {
+//                        areaController.text = result.provinceName +
+//                            "-" +
+//                            result.cityName +
+//                            "-" +
+//                            result.areaName;
+//                        address = result.provinceName +
+//                            result.cityName +
+//                            result.areaName;
+//                      }
+//                    });
+//                  },
+//                  child: TextFormField(
+//                    enabled: false,
+//                    controller: areaController,
+//                    decoration: InputDecoration(
+//                        border: InputBorder.none,
+//                        hintText: '请选择所在地区',
+//                        hintStyle: TextStyle(
+//                          fontSize: Constant.normalFontSize,
+//                        )),
+//                    style: TextStyle(
+//                      fontSize: Constant.normalFontSize,
+//                    ),
+//                  ),
+//                ),
+//              ),
+//              Divider(
+//                height: 0,
+//              ),
+//              Container(
+//                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+//                color: Colors.white,
+//                child: TextFormField(
+//                  maxLines: 3,
+//                  decoration: InputDecoration(
+//                      border: InputBorder.none,
+//                      hintText: '请输入详细地址信息，如道路、门牌号、小区、楼栋号、单元室等',
+//                      hintStyle: TextStyle(
+//                        fontSize: Constant.normalFontSize,
+//                      )),
+//                  style: TextStyle(
+//                    fontSize: Constant.normalFontSize,
+//                  ),
+//                  onSaved: (value) {
+//                    detailAddress = value;
+//                  },
+//                ),
+//              ),
               new Container(
-                padding: EdgeInsets.all(30.0),
+                padding: EdgeInsets.only(top: ScreenUtil().setHeight(100),left: ScreenUtil().setWidth(112),right: ScreenUtil().setWidth(112)),
                 child: new SizedBox(
                   width: 300.0,
                   height: 50.0,
                   child: new RaisedButton(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    child: new Text('提交',textScaleFactor: 1.0),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                    color: Color(0xFF0073FE),
+                    textColor: Color(0xFFFFFFFF),
+                    child: new Text('提交',textScaleFactor: 1.0,style: TextStyle(fontSize: ScreenUtil().setSp(36)),),
                     onPressed: () async {
-                      if (formKey.currentState.validate()) {
                         formKey.currentState.save();
-                        //调用identify
-                        LoadingDialog().show(context, "请求认证中");
-                        identify().then((value){
-                          Navigator.pop(context);
-                          if(value){
+                        if (_image == null) {
+                          ToastUtil.showShortToast("请上传头像");
+                        }else if(realName.trim()==""||realName.trim()==null){
+                          ToastUtil.showShortToast("姓名未填写");
+                        }else if(idNumber.trim()==""||idNumber.trim()==null){
+                          ToastUtil.showShortToast("身份证未填写");
+                        }else{
+                          //调用identify
+                          LoadingDialog().show(context, "请求认证中");
+                          identify().then((value){
                             Navigator.pop(context);
-                          }
-                        });
-                      }
+                            if(value){
+                              Navigator.pop(context);
+                            }
+                          });
+                        }
                     },
                   ),
                 ),
@@ -325,6 +357,7 @@ class IdentifyPageState extends State<IdentifyPage> {
           "files": new UploadFileInfo(_image, filename),
         });
         var  headers = Map<String, String>();
+        print(userInfo.workKey);
         headers['Content-type']="application/x-www-form-urlencoded";
         var imageres = await Http().postExt(imageurl, data: formData,headers: headers,debugMode: true);
         imageMap = jsonDecode(imageres);

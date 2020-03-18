@@ -8,11 +8,15 @@ import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/Md5Util.dart';
 import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/Login.dart';
 import 'package:visitor/com/goldccm/visitor/view/login/VerifyCode.dart';
 
 class ForgetPasswordPage extends StatefulWidget{
+  final String text;
+  final bool outer;
+  ForgetPasswordPage({Key key,this.text,this.outer}):super(key:key);
   @override
   State<StatefulWidget> createState() {
     return ForgetPasswordPageState();
@@ -23,8 +27,12 @@ class ForgetPasswordPageState extends State<ForgetPasswordPage>{
   bool isEditing=false;
   bool isComplete=false;
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  }
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -49,7 +57,7 @@ class ForgetPasswordPageState extends State<ForgetPasswordPage>{
                             });
                           }),
                     ),
-                    Text('忘记密码',style: TextStyle(color: Color(0xFF0073FE),fontSize: ScreenUtil().setSp(36),),),
+                    Text(widget.text!=null?widget.text:"重置密码",style: TextStyle(color: Color(0xFF0073FE),fontSize: ScreenUtil().setSp(36),),),
                   ],
                 ),
               ),
@@ -171,14 +179,17 @@ class ForgetPasswordPageState extends State<ForgetPasswordPage>{
   }
   Future<void> submitPhone() async {
     if(isComplete){
-      String url =Constant.serverUrl+"user/checkPhone";
+      String url = RouterUtil.apiServerUrl+"user/checkPhone";
+      if(widget.outer){
+         url = Constant.serverUrl + "user/checkPhone";
+      }
       var response = await Http().post(url,queryParameters: {
         "phone":_phoneController.text,
       });
       if(response!=""&&response!=null){
         Map map = jsonDecode(response);
         if(map['verify']['sign']=="fail"){
-          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>VerifyCodePage(phone: _phoneController.text,title: '忘记密码',)));
+          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=>VerifyCodePage(phone: _phoneController.text,title: '忘记密码',outer: widget.outer,)));
         }else{
           ToastUtil.showShortClearToast("手机号未注册");
         }
@@ -190,7 +201,8 @@ class ForgetPasswordPageState extends State<ForgetPasswordPage>{
 class ResetPassWord extends StatefulWidget{
   final String phone;
   final String code;
-  ResetPassWord({Key key,this.phone,this.code}):super(key:key);
+  final bool outer;
+  ResetPassWord({Key key,this.phone,this.code,this.outer}):super(key:key);
   @override
   State<StatefulWidget> createState() {
     return ResetPassWordState();
@@ -202,8 +214,12 @@ class ResetPassWordState extends State<ResetPassWord>{
   bool isComplete=false;
   bool isSeen=false;
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  }
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child:Container(
@@ -372,7 +388,10 @@ class ResetPassWordState extends State<ResetPassWord>{
   //重置密码
   Future<void> resetPwd() async {
     if(isComplete){
-      String url = Constant.serverUrl+"user/forget";
+      String url = RouterUtil.apiServerUrl+"user/forget";
+      if(widget.outer){
+        url= Constant.serverUrl+"user/forget";
+      }
       String sysPwd = Md5Util.instance.encryptByMD5ByHex(_pwdController.text.toString());
       var response =await  Http().post(url,queryParameters: {
         "phone":widget.phone,
@@ -383,7 +402,7 @@ class ResetPassWordState extends State<ResetPassWord>{
          Map resMap = jsonDecode(response);
          if(resMap['verify']['sign']=="success"){
            ToastUtil.showShortClearToast("重置密码成功");
-           Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new Login(),), (Route route) => route == null);
+           Navigator.of(context).pushAndRemoveUntil(new CupertinoPageRoute(builder: (BuildContext context) => new Login(),), (Route route) => route == null);
          }else{
            ToastUtil.showShortClearToast(resMap['verify']['desc']);
          }

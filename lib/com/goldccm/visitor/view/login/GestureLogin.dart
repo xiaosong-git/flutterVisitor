@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gesture_password/gesture_password.dart';
 import 'package:flutter/material.dart';
@@ -146,7 +147,7 @@ class GestureLoginState extends State<GestureLogin> {
         Provider.of<UserModel>(context).init(userInfo);
         LocalStorage.save("userInfo",userInfo);
         Navigator.of(context).pushAndRemoveUntil(
-            new MaterialPageRoute(
+            new CupertinoPageRoute(
                 builder: (BuildContext context) => new MyHomeApp()),
             (Route route) => route == null);
         ToastUtil.showShortToast('登录成功');

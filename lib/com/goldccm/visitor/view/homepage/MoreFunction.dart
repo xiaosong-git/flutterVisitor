@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/FunctionLists.dart';
@@ -156,7 +157,7 @@ class MoreFunctionState extends State<MoreFunction> {
     if (userInfo.isAuth == "T") {
       Navigator.push(
           context,
-          MaterialPageRoute(
+          CupertinoPageRoute(
               builder: (context) => RoomList(
                     type: 1,
                   )));
@@ -169,7 +170,7 @@ class MoreFunctionState extends State<MoreFunction> {
     UserInfo userInfo = await LocalStorage.load("userInfo");
     if (userInfo.isAuth == "T") {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => AttendancePage()));
+          context, CupertinoPageRoute(builder: (context) => AttendancePage()));
     } else {
       ToastUtil.showShortClearToast("请先实名认证");
     }
@@ -178,7 +179,7 @@ class MoreFunctionState extends State<MoreFunction> {
     UserInfo userInfo = await LocalStorage.load("userInfo");
     if (userInfo.isAuth == "T") {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => RoomList(type: 0,)));
+          context, CupertinoPageRoute(builder: (context) => RoomList(type: 0,)));
     }else{
       ToastUtil.showShortClearToast("请先实名认证");
     }

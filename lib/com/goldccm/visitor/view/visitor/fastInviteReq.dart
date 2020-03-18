@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -11,6 +14,7 @@ import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/addresspage/visitAddress.dart';
+import 'package:visitor/com/goldccm/visitor/view/visitor/fastvisitreq.dart';
 
 /*
  * 实现非好友快速邀约
@@ -45,6 +49,12 @@ class FastInviteReqState extends State<FastInviteReq> {
   FocusNode _startNode;
   FocusNode _endNode;
   AddressInfo selectedMineAddress;
+  String startDateText;
+  DateTime startDate;
+  String endDateText;
+  DateTime endDate;
+  int selectIndex=0;
+  var dialog;
 
   @override
   void initState() {
@@ -111,276 +121,235 @@ class FastInviteReqState extends State<FastInviteReq> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Color(0xFFF8F8F8),
         appBar: new AppBar(
           centerTitle: true,
-          backgroundColor: Theme.of(context).appBarTheme.color,
+          backgroundColor:  Color(0xFFFFFFFF),
+          title:  Text('快捷邀约',textScaleFactor: 1.0,style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFF787878)),),
+          elevation: 1,
+          automaticallyImplyLeading: false,
           leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios),
+              icon: Image(
+                image: AssetImage("assets/images/login_back.png"),
+                width: ScreenUtil().setWidth(36),
+                height: ScreenUtil().setHeight(36),
+                color: Color(0xFF787878),),
               onPressed: () {
-                Navigator.pop(context);
+                setState(() {
+                  Navigator.pop(context);
+                });
               }),
-          title: new Text(
-            '便捷邀约',
-            textAlign: TextAlign.center,
-            style: new TextStyle(fontSize: 18.0, color: Colors.white),
-            textScaleFactor: 1.0,
-          ),
+          brightness: Brightness.light,
         ),
         body: SingleChildScrollView(
-          child: new Padding(
-            padding: EdgeInsets.only(top: 5.0, left: 10.0, right: 10.0),
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Column(
               children: <Widget>[
-                buildForm('邀约姓名', '请输入真实姓名', true, 25, _inviteNameControl,
-                    TextInputType.text),
-                new Divider(
-                  color: Colors.black54,
-                ),
-                buildForm('邀约手机号', '请输入拜访人手机号', true, 10, _invitePhoneControl,
-                    TextInputType.phone),
-                new Divider(
-                  color: Colors.black54,
-                ),
-                new Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    new Container(
-                      padding: EdgeInsets.all(10.0).copyWith(right: 20.0),
-                      child: new Text(
-                        '邀约地址',
-                        style: _labelStyle,
-                        textScaleFactor: 1.0,
-                      ),
-                    ),
-                    new Expanded(
-                      child: new TextField(
-                        onTap: () {
-                          Navigator.push(context,MaterialPageRoute(builder: (context)=>VisitAddress(lists: _mineAddress,))).then((value){
-                            selectedMineAddress=_mineAddress[value];
-                            setState(() {
-                              _inviteAddrControl.text=selectedMineAddress.companyName;
-                            });
-                          });
-                        },
-                        controller: _inviteAddrControl,
-                        autofocus: false,
-                        readOnly: true,
-                        textInputAction: TextInputAction.next,
-                        style: _hintlStyle,
-                        decoration: InputDecoration(
-                          hintText: '请选择邀约地址',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(left: 30),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                new Divider(
-                  color: Colors.black54,
-                ),
-                new Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    new Container(
-                      padding: EdgeInsets.all(10.0).copyWith(right: 20.0),
-                      child: new Text(
-                        '邀约开始时间',
-                        style: _labelStyle,
-                        textScaleFactor: 1.0,
-                      ),
-                    ),
-                    // 右边部分输入，用Expanded限制子控件的大小
-                    new Expanded(
-                      child: new TextField(
-                        onTap: () {
-                          DatePicker.showDateTimePicker(
-                            context,
-                            locale: LocaleType.zh,
-                            theme: new DatePickerTheme(),
-                            onConfirm: (date) {
-                              print('comfirm$date');
-                              if (date.isBefore(DateTime.now())) {
-                                ToastUtil.showShortToast('开始时间不能小于当前时间');
-                                _inviteStartControl.text = '';
-                                _startNode.unfocus();
-                                return;
-                              }
-                              if (null != _inviteEndControl.text.toString() &&
-                                  _inviteEndControl.text.toString().length ==
-                                      16) {
-                                if (date.isAfter(DateTime.parse(
-                                    _inviteEndControl.text.toString()))) {
-                                  ToastUtil.showShortToast('开始时间不能大于结束时间');
-                                  _inviteStartControl.text = '';
-                                  _startNode.unfocus();
-                                  return;
-                                }
-
-                                if (date.day !=
-                                    (DateTime.parse(
-                                        _inviteEndControl.text.toString())
-                                        .day)) {
-                                  ToastUtil.showShortToast('邀约时间请选择在同一天,请重新选择');
-                                  _inviteStartControl.text = '';
-                                  _endNode.unfocus();
-                                  return;
-                                }
-                              }
-                              _inviteStartControl.text =
-                                  date.toString().substring(0, 16);
-                              _startNode.unfocus();
-                            },
-                          );
-                        },
-                        controller: _inviteStartControl,
-                        focusNode: _startNode,
-                        autofocus: false,
-                        readOnly: true,
-                        textInputAction: TextInputAction.next,
-                        style: _hintlStyle,
-                        decoration: InputDecoration(
-                          hintText: '请选择邀约开始时间',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(left: 10),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                new Divider(
-                  color: Colors.black54,
-                ),
-                new Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    new Container(
-                      padding: EdgeInsets.all(10.0).copyWith(right: 20.0),
-                      child: new Text(
-                        '邀约结束时间',
-                        style: _labelStyle,
-                      ),
-                    ),
-                    new Expanded(
-                      child: new TextField(
-                        onTap: () {
-                          DatePicker.showDateTimePicker(
-                            context,
-                            locale: LocaleType.zh,
-                            theme: new DatePickerTheme(),
-                            onConfirm: (date) {
-                              print('comfirm$date');
-                              if (date.isBefore(DateTime.parse(
-                                  _inviteStartControl.text.toString()))) {
-                                ToastUtil.showShortToast('结束时间不能小于开始时间,请重新选择');
-                                _endNode.unfocus();
-                                return;
-                              }
-
-                              if (date.day !=
-                                  (DateTime.parse(
-                                      _inviteStartControl.text.toString())
-                                      .day)) {
-                                ToastUtil.showShortToast('邀约时间请选择在同一天,请重新选择');
-                                _endNode.unfocus();
-                                return;
-                              }
-                              _inviteEndControl.text =
-                                  date.toString().substring(0, 16);
-                              _endNode.unfocus();
-                            },
-                          );
-                        },
-
-                        controller: _inviteEndControl,
-                        autofocus: false,
-                        focusNode: _endNode,
-                        readOnly: true,
-                        style: _hintlStyle,
-                        decoration: InputDecoration(
-                          hintText: '请选择邀约结束时间',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(left: 10),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                new Divider(
-                  color: Colors.black54,
-                ),
-                Column(
-                  children: <Widget>[
-                    new Container(
-                      padding: EdgeInsets.all(10.0).copyWith(right: 20.0),
-                      child: new Text(
-                        '邀约理由',
-                        style: _labelStyle,
-                        textScaleFactor: 1.0,
-                      ),
-                    ),
-                    Container(
-                      child:Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child:  TextField(
-                          minLines: 5,
-                          maxLines: 5,
-                          controller: _inviteReasonControl,
-//                          autofocus: true,
-                          style: _hintlStyle,
-                          keyboardType: TextInputType.multiline,
-                          decoration: InputDecoration(
-                            hintText: '请输入邀约理由',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            contentPadding: EdgeInsets.all(10.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                new Padding(
-                  padding: new EdgeInsets.only(
-                      top: 30.0, left: 10.0, right: 10.0, bottom: 10.0),
-                  child: new Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Container(
+                  color: Colors.white,
+                  height: ScreenUtil().setHeight(214),
+                  margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(16)),
+                  child: Column(
                     children: <Widget>[
-                      new Expanded(
-                        child: new RaisedButton(
-                          onPressed: () {
-                            fastinvite();
-                          },
-                          child: new Padding(
-                            padding:
-                            new EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
-                            child: new Text(
-                              "发起邀约",
-                              style: new TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              flex: 1,
+                              child: Container(
+                                child:Text('受访人姓名',style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF787878)),),
+                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(60)),
+                              )
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller:_inviteNameControl,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: '请输入姓名',
+                                hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
                               ),
-                              textScaleFactor: 1.0,
                             ),
                           ),
-                          color: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
-                        ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: ScreenUtil().setWidth(236)),
+                        child: Divider(height: 1,),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              flex: 1,
+                              child: Container(
+                                child:Text('受访人手机号',style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF787878)),),
+                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(32)),
+                              )
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: _invitePhoneControl,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: '请输入手机号',
+                                hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
+                Container(
+                  color: Colors.white,
+                  height: ScreenUtil().setHeight(310),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              flex: 1,
+                              child:  Container(
+                                child:Text('开始时间',style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF787878)),),
+                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(88)),
+                              )
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: _inviteStartControl,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: '请选择开始时间',
+                                hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                                suffixIcon: Image(
+                                  image: AssetImage('assets/images/mine_next.png'),
+                                ),
+                              ),
+                              readOnly: true,
+                              onTap: (){
+                                DatePicker.showDateTimePicker(context, showTitleActions: true,minTime: DateTime.now(),maxTime: DateTime.now().add(Duration(days: 14)), onConfirm: (date) {
+                                  DateTime currentDate=DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day);
+                                  if (date.compareTo(currentDate)>=0) {
+                                    setState(() {
+                                      startDate = date;
+                                      startDateText = DateFormat('yyyy-MM-dd HH:mm').format(date);
+                                      _inviteStartControl.text=startDateText;
+                                    });
+                                  }else{
+                                    ToastUtil.showShortClearToast("时间选择错误");
+                                  }
+                                }, currentTime: DateTime.now(), locale: LocaleType.zh,
 
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: ScreenUtil().setWidth(236)),
+                        child: Divider(height: 1,),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              flex:1,
+                              child:  Container(
+                                child:Text('时长(小时)',style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF787878)),),
+                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(68)),
+                              )
+                          ),
+                          Expanded(
+                            flex:2,
+                            child: TextField(
+                              controller: _inviteEndControl,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: '请选择时长',
+                                hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                                suffixIcon: Image(
+                                  image: AssetImage('assets/images/mine_next.png'),
+                                ),
+                              ),
+                              readOnly: true,
+                              onTap: (){
+                                if(startDate==null){
+                                  ToastUtil.showShortClearToast("开始时间未选择");
+                                }else{
+                                  DatePicker.showPicker(context,pickerModel:CustomPicker(currentTime: startDate),locale: LocaleType.zh,onConfirm: (date){
+                                    setState(() {
+                                      endDate=date;
+                                      endDateText=(date.hour-startDate.hour).toString()+".0";
+                                      _inviteEndControl.text=endDateText;
+                                    });
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: ScreenUtil().setWidth(236)),
+                        child: Divider(height: 1,),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              flex:1,
+                              child:  Container(
+                                child:Text('来访地址',style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF787878)),),
+                                padding: EdgeInsets.only(left: ScreenUtil().setWidth(88)),
+                              )
+                          ),
+                          Expanded(
+                            flex:2,
+                            child: TextField(
+                              controller: _inviteAddrControl,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: '请选择来访地址',
+                                hintStyle: TextStyle(color: Color(0xFFCFCFCF),fontSize: ScreenUtil().setSp(28)),
+                                suffixIcon: Image(
+                                  image: AssetImage('assets/images/mine_next.png'),
+                                ),
+                              ),
+                              readOnly: true,
+                              onTap: (){
+                                if(_mineAddress.length>0){
+                                  callAddress();
+                                }else{
+                                  ToastUtil.showShortClearToast("您没有所属公司");
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                    margin: EdgeInsets.only(top: ScreenUtil().setHeight(82)),
+                    color: Colors.white,
+                    child: SizedBox(
+                      width: ScreenUtil().setWidth(458),
+                      height: ScreenUtil().setHeight(90),
+                      child: RaisedButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        child: Text('提交',style: TextStyle(color: Color(0xFFFFFFFF),fontSize: ScreenUtil().setSp(32)),),
+                        color: Color(0xFF0073FE),
+                        onPressed: (){
+                          fastinvite();
+                        },
+                      ),
+                    )
+                ),
               ],
-            ),
-          ),
+            )
         ));
   }
 
@@ -419,24 +388,25 @@ class FastInviteReqState extends State<FastInviteReq> {
    */
   Future<bool> fastinvite() async {
     if(_inviteNameControl.text.toString()==null||_inviteNameControl.text.toString()==""){
-      ToastUtil.showShortToast('姓名不能为空');
+      ToastUtil.showShortToast('姓名未填写');
       return false;
     }
     if(!RegExpUtil().verifyPhone(_invitePhoneControl.text.toString())){
-      ToastUtil.showShortToast('电话不对哦');
+      ToastUtil.showShortToast('电话格式不正确');
       return false;
     }
     if(_inviteStartControl.text.toString()==""||_inviteStartControl.text.toString()==""){
-      ToastUtil.showShortToast('邀约开始时间未选择');
+      ToastUtil.showShortToast('开始时间不正确');
       return false;
     }
     if(_inviteEndControl.text.toString()==""||_inviteEndControl.text.toString()==""){
-      ToastUtil.showShortToast('邀约结束时间未选择');
+      ToastUtil.showShortToast('时长不正确');
       return false;
     }
     UserInfo userInfo = await LocalStorage.load("userInfo");
     String httpUrl="visitorRecord/inviteStranger";
     String threshold=await CommonUtil.calWorkKey(userInfo: userInfo);
+    String end=  DateFormat('yyyy-MM-dd HH:mm').format(endDate);
     var parameters={
       "userId": userInfo.id,
       "token": userInfo.token,
@@ -446,7 +416,7 @@ class FastInviteReqState extends State<FastInviteReq> {
       "phone":_invitePhoneControl.text.toString(),
       "realName":_inviteNameControl.text.toString(),
       "startDate":_inviteStartControl.text.toString(),
-      "endDate":_inviteEndControl.text.toString(),
+      "endDate":end,
       "reason":_inviteReasonControl.text.toString(),
       "companyId":selectedMineAddress.companyId,
     };
@@ -462,5 +432,69 @@ class FastInviteReqState extends State<FastInviteReq> {
         }
       }
     }
+  }
+  callAddress(){
+    return dialog=YYDialog().build(context)
+      ..gravity = Gravity.bottom
+      ..gravityAnimationEnable = true
+      ..backgroundColor = Colors.transparent
+      ..widget(Container(
+        width: 350,
+        height: double.parse((45*_mineAddress.length+1*_mineAddress.length-1).toString()),
+        margin: EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          color: Colors.white,
+        ),
+        child: Column(
+          children: <Widget>[
+            ListView.separated(itemBuilder: (context,index){
+              return InkWell(
+                child: Container(
+                  width: 300,
+                  height: 45,
+                  child: Center(
+                    child: Text(_mineAddress[index].companyName,style: TextStyle(fontSize: ScreenUtil().setSp(32),color:selectIndex==index?Colors.blue:Colors.black),textScaleFactor: 1.0,),
+                  ),
+                ),
+                onTap: (){
+                  setState(() {
+                    selectIndex=index;
+                    _inviteAddrControl.text=_mineAddress[index].companyName;
+                    dialog.dismiss();
+                    selectedMineAddress=_mineAddress[index];
+                  });
+                },
+              );
+            },  separatorBuilder: (context,index){
+              return Container(
+                child: Divider(
+                  height: 1,
+                ),
+              );
+            }, itemCount: _mineAddress.length,shrinkWrap: true,padding: EdgeInsets.all(0),)
+          ],
+        ),
+      ))
+      ..widget(InkWell(
+        child: Container(
+          width: 350,
+          height: 45,
+          margin: EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+            color: Colors.white,
+          ),
+          child: Center(
+            child: Text(
+              "取消",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),onTap: (){
+        dialog.dismiss();
+      },
+      ))
+      ..show();
   }
 }

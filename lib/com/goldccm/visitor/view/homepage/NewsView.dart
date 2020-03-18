@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:visitor/com/goldccm/visitor/model/NewsInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
@@ -12,89 +13,72 @@ class NewsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Padding(
       padding: const EdgeInsets.only(
-        left: 5.0,
-        right: 5.0,
-        top: 3.0,
-        bottom: 3.0,
+        top: 10,
+        left: 14,
+        right: 14,
       ),
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           new Expanded(
-            flex: 3,
-            child: new Container(
-              height: 120,
-              padding: EdgeInsets.all(10),
-              child:CachedNetworkImage(
-                imageUrl: RouterUtil.imageServerUrl + newsInfo.newsImageUrl,
-                placeholder: (context, url) =>Container(
-                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
-                  width: 10,
-                  height: 10,
-                  alignment: Alignment.center,
+            flex: 4,
+            child: Container(
+                height: ScreenUtil().setHeight(196),
+//              padding: EdgeInsets.only(left: ScreenUtil().setWidth(32)),
+                child:ClipRRect(
+                  borderRadius: BorderRadius.circular(5.0),
+                  child:  CachedNetworkImage(
+                    imageUrl: RouterUtil.imageServerUrl + newsInfo.newsImageUrl,
+                    placeholder: (context, url) => Container(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.black,
+                      ),
+                      width: 10,
+                      height: 10, alignment: Alignment.center,),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                errorWidget: (context, url, error) =>
-                    Icon(Icons.error),
-                fit: BoxFit.cover,
-              )
             ),
           ),
           new Expanded(
               flex: 4,
               child: new Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     new Container(
-                      child: new Padding(
-                          padding: const EdgeInsets.only(
-                            top: 10.0,
-                            left: 10.0,
-                          ),
-                          child: new RichText(
-                            text: new TextSpan(
-                                text: newsInfo.newsName,
-                                style: new TextStyle(
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,)),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis, textScaleFactor: 1.0
-                          )
-                          // child:new Text(newsInfo.newsName,overflow: TextOverflow.ellipsis,style: new TextStyle(fontSize: 15.0,color: Colors.black,fontFamily: '楷体_GB2312' )),
-                          ),
-                    ),
-                    new Container(
-                        height: 75,
-                        child: (new Padding(
-                            padding: const EdgeInsets.only(
-                              top: 5.0,
-                              left: 10.0,
-                            ),
-                            child: new RichText(
+                      height: ScreenUtil().setHeight(142),
+                        padding: EdgeInsets.only(left: ScreenUtil().setWidth(22)),
+                        child:new RichText(
                               text: new TextSpan(
-                                  text: newsInfo.newsDetail,
+                                  text: newsInfo.newsName,
                                   style: new TextStyle(
-                                      fontSize: 12.0,
-                                      color: Colors.grey,
+                                    fontSize: ScreenUtil().setSp(32),
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
                                   )),
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis, textScaleFactor: 1.0
-                            )))),
-                    new Row(children: <Widget>[
-                      new Padding(
-                          padding: const EdgeInsets.only(
-                            top: 5.0,
-                            left: 10.0,
-                          ),
-                          child: new Text(newsInfo.newsDate,
-                              style: new TextStyle(
-                                  fontSize: 12.0,
-                                  color: Colors.grey,
-                              ),textScaleFactor: 1.0))
-                    ])
-                  ])),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              textScaleFactor: 1.0)
+                          // child:new Text(newsInfo.newsName,overflow: TextOverflow.ellipsis,style: new TextStyle(fontSize: 15.0,color: Colors.black,fontFamily: '楷体_GB2312' )),
+                    ),
+                     Container(
+                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(280),top: ScreenUtil().setHeight(20)),
+                       child: Text(
+                           newsInfo.newsDate.substring(5),
+                           style: new TextStyle(
+                             fontSize: ScreenUtil().setSp(24),
+                             color: Color(0xFFC5C5C5),
+                           ),
+                           textScaleFactor: 1.0,
+                         overflow: TextOverflow.ellipsis,
+                       ),
+                     ),
+                  ]
+              )
+          ),
         ],
       ),
     );

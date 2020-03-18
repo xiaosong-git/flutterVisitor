@@ -1,4 +1,12 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
+import 'package:visitor/com/goldccm/visitor/model/RuleInfo.dart';
+import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
+import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/view/attendance/editrule.dart';
 /*
  * 规则界面
@@ -19,6 +27,7 @@ class RulePage extends StatefulWidget{
 class RulePageState extends State<RulePage> with SingleTickerProviderStateMixin{
   var _tabLists=['上下班','外出'];
   TabController _tabController;
+  List<RuleInfo> ruleLists=List();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +47,20 @@ class RulePageState extends State<RulePage> with SingleTickerProviderStateMixin{
       ),
       body: TabBarView(children: <Widget>[
         Container(
-          child: ListTile(title: Text('规则1'),onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>EditRulePage()));
+          color: Colors.grey[200],
+          padding: EdgeInsets.only(top: 10),
+          child: ListView.separated(itemBuilder: (context,index){
+            return Container(
+              child: ListTile(
+                title: Text(ruleLists[index].groupName??""),
+                onTap: (){
+                  Navigator.push(context,CupertinoPageRoute(builder: (context)=>EditRulePage(ruleInfo: ruleLists[index],)));
+                },
+              ),
+              color: Colors.white,
+            );
+          },itemCount:ruleLists.length,separatorBuilder: (context,index){
+            return Divider(height: 10,);
           },),
         ),
         Container(
@@ -51,16 +72,44 @@ class RulePageState extends State<RulePage> with SingleTickerProviderStateMixin{
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabLists.length, vsync: this);
+    getRules();
   }
   //添加新打卡规则
   settingRule(){
     //当前类型
     int currentIndex=_tabController.index;
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>EditRulePage(type: currentIndex,)));
+    Navigator.push(context, CupertinoPageRoute(builder: (context)=>EditRulePage(type: currentIndex,ruleInfo: RuleInfo(),)));
   }
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+  //获取现有打卡规则
+  getRules() async {
+    UserInfo userInfo = await LocalStorage.load("userInfo");
+    String url="work/gainGroupIndex";
+    String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
+    var res = await Http().post(url,
+        queryParameters: {
+          "token": userInfo.token,
+          "userId": userInfo.id,
+          "factor": CommonUtil.getCurrentTime(),
+          "threshold": threshold,
+          "requestVer": await CommonUtil.getAppVersion(),
+          "companyId": userInfo.companyId,
+        },
+        userCall: false);
+    if(res is String){
+      Map map = jsonDecode(res);
+      if(map['verify']['sign']=="success"){
+        for(var res in map['data']){
+          RuleInfo _rule=RuleInfo.fromJson(res);
+          setState(() {
+            ruleLists.add(_rule);
+          });
+        }
+      }
+    }
   }
 }

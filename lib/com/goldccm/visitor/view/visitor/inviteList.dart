@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -358,7 +359,7 @@ class InviteListState extends State<InviteList>
             }else{
               Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  CupertinoPageRoute(
                       builder: (context) => VisitDetail(
                         visitInfo: _mineInviteLists[index],
                       )));
@@ -563,7 +564,7 @@ class InviteListState extends State<InviteList>
             } else {
               Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  CupertinoPageRoute(
                       builder: (context) => VisitDetail(
                             visitInfo: _whoInviteMeLists[index],
                           )));

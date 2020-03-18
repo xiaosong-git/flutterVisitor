@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
+import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 
 class UserModel with ChangeNotifier{
   UserInfo _userInfo = new UserInfo();
@@ -10,7 +11,7 @@ class UserModel with ChangeNotifier{
     if(userInfo!=null) {
       _userInfo = userInfo;
     }else{
-      var user = await DataUtils.getUserInfo();
+      var user = await LocalStorage.load("userInfo");
       if(user!=null){
         _userInfo=user;
       }

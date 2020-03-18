@@ -232,7 +232,6 @@ class SelectAddressPageState extends State<SelectAddressPage>{
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(ScreenUtil().setHeight(88)),

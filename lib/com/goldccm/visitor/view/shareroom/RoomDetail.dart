@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -165,6 +166,16 @@ class RoomDetailState extends State<RoomDetail> {
     }
   }
 
+  removePast() async{
+      for (int i = 0; i < _stateList[0].getList().length; i++) {
+        if (_stateList[0].getList()[i].value <= double.parse(DateTime.now().hour.toString())) {
+          setState(() {
+            _stateList[0].changeStatus(i, -1);
+          });
+        }
+      }
+  }
+
   getRoomStatus() async {
     String url ="meeting/roomStatus";
     String threshold = await CommonUtil.calWorkKey();
@@ -210,13 +221,13 @@ class RoomDetailState extends State<RoomDetail> {
     super.initState();
     getUserInfo();
     getRoomStatus();
-    print(widget.roomInfo);
     _stateList.add(_listState1);
     _stateList.add(_listState2);
     _stateList.add(_listState3);
     _stateList.add(_listState4);
     _stateList.add(_listState5);
     removeUnused();
+    removePast();
     _scrollController.addListener(() {
       var maxScroll = _scrollController.position.maxScrollExtent;
       var pixel = _scrollController.position.pixels;
@@ -423,7 +434,7 @@ class RoomDetailState extends State<RoomDetail> {
                     ),
                     child: Text(
                       '开放时间：${room.roomOpenTime}-${room.roomCloseTime}',
-                      style: TextStyle(fontSize: 12.0, color: Colors.blue[700]),textScaleFactor: 1.0,
+                      style: TextStyle(fontSize: 10.0, color: Colors.blue[700]),textScaleFactor: 1.0,
                     ),
                   ),
                   top: 68,
@@ -440,23 +451,23 @@ class RoomDetailState extends State<RoomDetail> {
                           ? Text(
                               '容纳约1-10人',
                               style: TextStyle(
-                                  fontSize: 12.0, color: Colors.orange[700]),textScaleFactor: 1.0,
+                                  fontSize: 10.0, color: Colors.orange[700]),textScaleFactor: 1.0,
                             )
                           : room.roomType == 2
                               ? Text(
                                   '容纳约10-20人',
                                   style: TextStyle(
-                                      fontSize: 12.0,
+                                      fontSize: 10.0,
                                       color: Colors.orange[700]),textScaleFactor: 1.0,
                                 )
                               : Text(
                                   '容纳约30人以上',
                                   style: TextStyle(
-                                      fontSize: 12.0,
+                                      fontSize: 10.0,
                                       color: Colors.orange[700]),textScaleFactor: 1.0,
                                 )),
                   top: 68,
-                  left: 130,
+                  left: 120,
                 ),
               ],
             ),
@@ -512,7 +523,7 @@ class RoomDetailState extends State<RoomDetail> {
           roomInfo.roomPrice=(double.parse(roomInfo.roomPrice)/2).toString();
           Navigator.push(
               context,
-              MaterialPageRoute(
+              CupertinoPageRoute(
                   builder: (context) => RoomCheckOut(
                     userInfo: _userInfo,
                     roomInfo: widget.roomInfo,
@@ -524,7 +535,7 @@ class RoomDetailState extends State<RoomDetail> {
                     count: splits.length,
                     roomOrderInfo: roomOrderInfo,
                   )));
-//      Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory(userInfo:_userInfo,)));
+//      Navigator.push(context, CupertinoPageRoute(builder: (context)=>RoomHistory(userInfo:_userInfo,)));
         } else {
           ToastUtil.showShortToast(map['verify']['desc']);
         }

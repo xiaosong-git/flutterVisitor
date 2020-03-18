@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/component/MessageCompent.dart';
 import 'package:visitor/com/goldccm/visitor/db/friendDao.dart';
@@ -73,7 +74,7 @@ class ChatListState extends State<ChatList> {
                 imageServerUrl:RouterUtil.imageServerUrl,
                 orgId: friend.orgId.toString());
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ChatPage(user: user)));
+                CupertinoPageRoute(builder: (context) => ChatPage(user: user)));
           },
           child:MessageCompent(
                 headImgUrl: friend.virtualImageUrl,

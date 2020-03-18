@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -416,7 +417,7 @@ class VisitRequestState extends State<VisitRequest> {
                             if (_visitInfo.cstatus == "applyConfirm") {
                               Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                       builder: (context) => VisitAddress(
                                             lists: _mineAddress,
                                           ))).then((value) {

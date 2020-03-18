@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:badges/badges.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
@@ -94,7 +95,6 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     checkVersion();
-    checkDevice();
     initWebSocket();
     initBadge();
     initData();
@@ -111,35 +111,6 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
   initBadge() async {
     BadgeInfo badgeInfo = await BadgeUtil().init();
     Provider.of<BadgeModel>(context).set(badgeInfo);
-  }
-
-  //检测当前设备的合法性
-  Future checkDevice() async {
-    UserInfo userInfo = await DataUtils.getUserInfo();
-    if (userInfo == null || userInfo.id == null) {
-      userInfo = await LocalStorage.load("userInfo");
-    }
-    String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
-    var result = await Http().post(Constant.getUserInfoUrl,
-        queryParameters: {
-          "token": userInfo.token,
-          "factor": CommonUtil.getCurrentTime(),
-          "threshold": threshold,
-          "requestVer": await CommonUtil.getAppVersion(),
-          "userId": userInfo.id,
-        },
-        userCall: false);
-    if (result != null) {
-      if (!(result is String)) {
-        if (result['verify']['sign'] == "tokenFail") {
-          ToastUtil.showShortToast("您的账号已在另一台设备登录");
-          MessageUtils.closeChannel();
-          DataUtils.clearLoginInfo();
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Login()));
-        }
-      }
-    }
   }
 
   //检查版本更新
@@ -323,20 +294,20 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
      */
     tabImages = [
       [
-        getTabImage('assets/images/visitor_tab_homepage_normal.png'),
-        getTabImage('assets/images/visitor_tab_homepage_selected.png')
+        getTabImage('assets/images/bottom_home_unselected.png'),
+        getTabImage('assets/images/bottom_home_selected.png')
       ],
       [
-        getTabImage('assets/images/visitor_tab_visitors_normal.png'),
-        getTabImage('assets/images/visitor_tab_visitors_selected.png')
+        getTabImage('assets/images/bottom_message_unselected.png'),
+        getTabImage('assets/images/bottom_message_selected.png')
       ],
       [
-        getTabImage('assets/images/visitor_tab_friends_normal.png'),
-        getTabImage('assets/images/visitor_tab_friends_selected.png')
+        getTabImage('assets/images/bottom_address_unselected.png'),
+        getTabImage('assets/images/bottom_address_selected.png')
       ],
       [
-        getTabImage('assets/images/visitor_tab_profile_center_normal.png'),
-        getTabImage('assets/images/visitor_tab_profile_center_selected.png')
+        getTabImage('assets/images/bottom_mine_unselected.png'),
+        getTabImage('assets/images/bottom_mine_selected.png')
       ]
     ];
     //四个主要页面

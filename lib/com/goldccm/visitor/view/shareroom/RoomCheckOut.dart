@@ -5,11 +5,10 @@ import 'package:visitor/com/goldccm/visitor/model/RoomInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/RoomOrderInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/shareroom/RoomAfterOrder.dart';
 import 'package:visitor/com/goldccm/visitor/view/shareroom/roomHistory.dart';
-import 'package:tobias/tobias.dart' as tobias;
+//import 'package:tobias/tobias.dart';
 /*
  * 收银台
  * 显示订单信息和支付渠道
@@ -112,8 +111,8 @@ class RoomCheckoutState extends State<RoomCheckOut>{
                           bottom: 20.0
                       ),
                       child: new Text(
-                        '您的订单尚未支付，确认离开？',
-                        style: new TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold),textScaleFactor: 1.0
+                          '您的订单尚未支付，确认离开？',
+                          style: new TextStyle(fontSize: 16.0,fontWeight: FontWeight.bold),textScaleFactor: 1.0
                       ),
                     ),
                     left: 10,
@@ -142,54 +141,54 @@ class RoomCheckoutState extends State<RoomCheckOut>{
   }
   Widget _buildOrder(){
     return Column(
-          children: <Widget>[
-            Container(
-              color: Colors.grey[200],
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.only(top: 10.0,bottom: 10.0,left: 20.0),
-              child:   Text('订单详情',style: TextStyle(color: Colors.black45),textScaleFactor: 1.0,),
-            ),
-            Divider(height: 0,),
-            ListTile(title: Text('名称'),trailing: Text(widget.roomInfo.roomName,textScaleFactor: 1.0,),),
-            Divider(height: 0,),
-            ListTile(title: Text('时间'),trailing: Text(widget.startTime.replaceAll("\.5", ":30").replaceAll("\.0", ":00")+"-"+widget.endTime.replaceAll("\.5", ":30").replaceAll("\.0", ":00"),textScaleFactor: 1.0,),),
-            Divider(height: 0,),
-            ListTile(title: Text('费用'),trailing: Text(amount,textScaleFactor: 1.0,),),
-            Divider(height: 0,),
-          ],
+      children: <Widget>[
+        Container(
+          color: Colors.grey[200],
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.only(top: 10.0,bottom: 10.0,left: 20.0),
+          child:   Text('订单详情',style: TextStyle(color: Colors.black45),textScaleFactor: 1.0,),
+        ),
+        Divider(height: 0,),
+        ListTile(title: Text('名称'),trailing: Text(widget.roomInfo.roomName,textScaleFactor: 1.0,),),
+        Divider(height: 0,),
+        ListTile(title: Text('时间'),trailing: Text(widget.startTime.replaceAll("\.5", ":30").replaceAll("\.0", ":00")+"-"+widget.endTime.replaceAll("\.5", ":30").replaceAll("\.0", ":00"),textScaleFactor: 1.0,),),
+        Divider(height: 0,),
+        ListTile(title: Text('费用'),trailing: Text(amount,textScaleFactor: 1.0,),),
+        Divider(height: 0,),
+      ],
     );
   }
   Widget _buildCashier(){
     return Column(
-        children: <Widget>[
-          Container(
-            color: Colors.grey[200],
-            padding: EdgeInsets.only(top: 10.0,bottom: 10.0,left: 20.0),
-            width: MediaQuery.of(context).size.width,
-            child:   Text('选择支付方式',style: TextStyle(color: Colors.black45),textScaleFactor: 1.0,),
+      children: <Widget>[
+        Container(
+          color: Colors.grey[200],
+          padding: EdgeInsets.only(top: 10.0,bottom: 10.0,left: 20.0),
+          width: MediaQuery.of(context).size.width,
+          child:   Text('选择支付方式',style: TextStyle(color: Colors.black45),textScaleFactor: 1.0,),
+        ),
+        Divider(height: 0,),
+        CheckboxListTile(
+          secondary: Container(
+            width: 50,
+            child: Image.asset("assets/icons/app_alipay_logo.png"),
           ),
-          Divider(height: 0,),
-          CheckboxListTile(
-            secondary: Container(
-              width: 50,
-              child: Image.asset("assets/icons/app_alipay_logo.png"),
-            ),
-            title: Text('支付宝',style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),textScaleFactor: 1.0,),
-            subtitle: Text('数亿用户都在用，安全可托付',textScaleFactor: 1.0,),
-            value: _alipay,
-            activeColor: Colors.orange,
-            onChanged: (value){
-              setState(() {
-                _alipay=value;
-              });
-            },
-          ),
-          Divider(height: 0,),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 30.0),
-            child:  SizedBox(
-                height: 50.0,
-                width: MediaQuery.of(context).size.width,
+          title: Text('支付宝',style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold),textScaleFactor: 1.0,),
+          subtitle: Text('数亿用户都在用，安全可托付',textScaleFactor: 1.0,),
+          value: _alipay,
+          activeColor: Colors.orange,
+          onChanged: (value){
+            setState(() {
+              _alipay=value;
+            });
+          },
+        ),
+        Divider(height: 0,),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 30.0),
+          child:  SizedBox(
+              height: 50.0,
+              width: MediaQuery.of(context).size.width,
               child: RaisedButton(
                 color: Colors.blue,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
@@ -202,47 +201,48 @@ class RoomCheckoutState extends State<RoomCheckOut>{
                   }
                 },
               )
-            ),
           ),
-        ],
+        ),
+      ],
     );
   }
   createOrder() async {
-      String url = "pay/createOrder";
-      String threshold = await CommonUtil.calWorkKey();
-      var res = await Http().post(url,queryParameters:({
-        "token": widget.userInfo.token,
-        "factor": CommonUtil.getCurrentTime(),
-        "threshold": threshold,
-        "requestVer": await CommonUtil.getAppVersion(),
-        "userId": widget.userInfo.id,
-        "subject": widget.roomInfo.roomName,
-        "body": widget.roomInfo.roomName+","+widget.roomInfo.roomAddress+","+widget.startTime+"-"+widget.endTime,
-        "total_amount":(double.parse(widget.roomInfo.roomPrice)*widget.count).toString(),
+    String url = "pay/createOrder";
+    String threshold = await CommonUtil.calWorkKey();
+    var res = await Http().post(url,queryParameters:({
+      "token": widget.userInfo.token,
+      "factor": CommonUtil.getCurrentTime(),
+      "threshold": threshold,
+      "requestVer": await CommonUtil.getAppVersion(),
+      "userId": widget.userInfo.id,
+      "subject": widget.roomInfo.roomName,
+      "body": widget.roomInfo.roomName+","+widget.roomInfo.roomAddress+","+widget.startTime+"-"+widget.endTime,
+      "total_amount":(double.parse(widget.roomInfo.roomPrice)*widget.count).toString(),
 //        "total_amount":"0.01",
-        "user_id":widget.userInfo.id,
-        "apply_id":widget.roomOrderInfo.id,
-      }));
-      if(res is String){
-        if(res !=null){
-          print(res);
-          Map map = jsonDecode(res);
-          if(map['verify']['sign']=="success"){
-            print(map['data']);
-            var result=await tobias.pay(map['data']);
-            print(result);
-            if(result['resultStatus']=="9000") {
-              ToastUtil.showShortClearToast("支付成功");
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomAfterOrder(roomInfo: widget.roomInfo,userInfo: widget.userInfo,timeLines: widget.timeLines,day: widget.day,)));
-            }else if(result['resultStatus']=="6001"){
-              ToastUtil.showShortClearToast("您取消了支付");
-            } else{
-              ToastUtil.showShortClearToast("支付遇到了点问题");
-            }
-          }
-        }else{
-          ToastUtil.showShortClearToast("支付失败");
+      "user_id":widget.userInfo.id,
+      "apply_id":widget.roomOrderInfo.id,
+    }));
+    if(res is String){
+      if(res !=null){
+        print(res);
+        Map map = jsonDecode(res);
+        if(map['verify']['sign']=="success"){
+          print(map['data']);
+//          var result=await aliPay(map['data']);
+//          print(result);
+//          if(result['resultStatus']=="9000") {
+//            ToastUtil.showShortClearToast("支付成功");
+//            Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomAfterOrder(roomInfo: widget.roomInfo,userInfo: widget.userInfo,timeLines: widget.timeLines,day: widget.day,)));
+//          }else if(result['resultStatus']=="6001"){
+//            ToastUtil.showShortClearToast("您取消了支付");
+//          } else{
+//            ToastUtil.showShortClearToast("支付遇到了点问题");
+//          }
+        ToastUtil.showShortClearToast("暂时不能支付");
         }
+      }else{
+        ToastUtil.showShortClearToast("支付失败");
       }
+    }
   }
 }

@@ -15,9 +15,7 @@
         android:label="朋悦比邻"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
-        <meta-data android:name="com.amap.api.v2.apikey" android:value="e5c38f34ff4a8f7fdbaae51a19660dd8">
-
-        </meta-data>
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="8b6f8015e63508ef0362934d43eae78c"></meta-data>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

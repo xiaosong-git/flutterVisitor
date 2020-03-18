@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:async';
 
 class Qrcode extends StatefulWidget {
   final List<String> qrCodecontent;
-  Qrcode({Key key, this.qrCodecontent}) : super(key: key);
+  final String title;
+  Qrcode({Key key, this.qrCodecontent,this.title}) : super(key: key);
 
   @override
   QrcodeState createState() => QrcodeState();
@@ -21,45 +24,68 @@ class QrcodeState extends State<Qrcode> with SingleTickerProviderStateMixin {
 
   Widget build(BuildContext context) {
     _timer();
+//    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return new Scaffold(
-      backgroundColor: Colors.white,
-      appBar: new AppBar(
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
-        title: new Text(
-          '二维码',
-          textAlign: TextAlign.center,
-          style: new TextStyle(
-            fontSize: 18.0,
-            color: Colors.white,
-          ),
-          textScaleFactor: 1.0,
-        ),
-      ),
-      body: new Center(
-        child: Container(
-          margin: EdgeInsets.all(20.0),
-          child:Card(
-            elevation: 10.0,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 350,
-              color: Colors.white,
-              alignment: Alignment.center,
-              child: new QrImage(
-                data: data,
-                size: 300,
-                version: 10,
-                padding: EdgeInsets.all(20),
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-              ),
+      backgroundColor:Color(0xFFFFFFFF),
+      body: Container(
+        width: ScreenUtil().setWidth(750),
+        height: ScreenUtil().setHeight(1334),
+        child:  Stack(
+          children: <Widget>[
+            Positioned(
+              top:ScreenUtil().setHeight(94),
+              left: ScreenUtil().setWidth(66),
+              child:IconButton(
+                  icon: Image(
+                    image: AssetImage("assets/images/login_back.png"),
+                    width: ScreenUtil().setWidth(36),
+                    height: ScreenUtil().setHeight(36),
+                    color: Colors.white,),
+                  onPressed: () {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  }
+                  ),
             ),
+            Positioned(
+              top:ScreenUtil().setHeight(114),
+              left: ScreenUtil().setWidth(322),
+              child: Text(widget.title!=null?widget.title:'门禁卡',style: TextStyle(color: Colors.white,fontSize: ScreenUtil().setSp(36),fontWeight: FontWeight.w600),),
+            ),
+            Positioned(
+              child: Container(
+                width: ScreenUtil().setWidth(584),
+                height: ScreenUtil().setHeight(666),
+                child: Card(
+                  elevation: 10.0,
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(42),vertical: ScreenUtil().setHeight(84)),
+                    padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
+                    child: QrImage(
+                      data: data,
+                      size: 500,
+                      version: 10,
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white,
+                    ),
+                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                ),
+              ),
+              left: ScreenUtil().setWidth(84),
+              top: ScreenUtil().setHeight(248),
+            ),
+          ],
+        ),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/home_card_background.png"),
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -72,7 +98,6 @@ class QrcodeState extends State<Qrcode> with SingleTickerProviderStateMixin {
       timer = Timer.periodic(Duration(milliseconds: 200), (as) {
         setState(() {
           data = widget.qrCodecontent[currentContent];
-          print('$data');
           currentContent++;
           if (currentContent == widget.qrCodecontent.length) {
             currentContent = 0;

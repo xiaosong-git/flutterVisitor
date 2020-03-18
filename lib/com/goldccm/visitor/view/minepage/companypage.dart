@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -8,6 +9,7 @@ import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
+import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 
 var _keys = null;
@@ -36,10 +38,24 @@ class CompanyPageState extends State<CompanyPage>{
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
-        title: Text('公司管理',textScaleFactor: 1.0),
+        title: Text('公司管理',textScaleFactor: 1.0,style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(36)),),
         centerTitle: true,
-        backgroundColor: Theme.of(context).appBarTheme.color,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context);}),
+        backgroundColor: Color(0xFFFFFFFF),
+        elevation: 1,
+        automaticallyImplyLeading: false,
+        brightness: Brightness.light,
+        leading: IconButton(
+            icon: Image(
+              image: AssetImage("assets/images/back_white.png"),
+              width: ScreenUtil().setWidth(36),
+              height: ScreenUtil().setHeight(36),
+              fit: BoxFit.fill,
+              color: Color(0xFF595959),),
+            onPressed: () {
+              setState(() {
+                Navigator.pop(context);
+              });
+            }),
       ),
       body:_buildInfo(),
     );
@@ -49,90 +65,184 @@ class CompanyPageState extends State<CompanyPage>{
       return ListView.builder(
           itemCount: _keys.length != null ? _keys.length : 0,
           itemBuilder: (BuildContext context, int index) {
-            return Card(
-              margin: EdgeInsets.symmetric(horizontal: 20.0,vertical: 10.0),
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)
-              ),
-              child:
-              Stack(
-                children: <Widget>[
-                  Container(
-                    height: 200,
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                          child: RichText(
-                              text: TextSpan(
-                                  text: '公司名称    ',
-                                  style: TextStyle(fontSize: 16.0,color: Colors.black),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: _keys[index]['companyName'],
-                                      style: TextStyle(color: Colors.black45),
-                                    ),
-                                  ]
-                              )
-                              ,textScaleFactor: 1.0),
+            return index==groupValue?
+              Container(
+                height: ScreenUtil().setHeight(310),
+                width: ScreenUtil().setWidth(710),
+                margin: EdgeInsets.only(left: ScreenUtil().setWidth(20),top: ScreenUtil().setHeight(40),right:ScreenUtil().setWidth(20)),
+                child: Card(
+                  elevation: 5.0,
+                  semanticContainer: true,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)
+                  ),
+                  child: Stack(
+                    children: <Widget>[
+                      Image.asset("assets/images/mine_company_background.png",fit: BoxFit.cover,width: ScreenUtil().setWidth(710),height:ScreenUtil().setHeight(310)),
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                              child: RichText(
+                                  text: TextSpan(
+                                      text: '公司名称    ',
+                                      style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text: _keys[index]['companyName'],
+                                          style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                        ),
+                                      ]
+                                  )
+                                  ,textScaleFactor: 1.0),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                              child:   RichText(
+                                  text: TextSpan(
+                                      text: '部门名称    ',
+                                      style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text: _keys[index]['sectionName'],
+                                          style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                        ),
+                                      ]
+                                  )
+                                  ,textScaleFactor: 1.0 ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                              child:RichText(
+                                  text: TextSpan(
+                                      text: '用户姓名    ',
+                                      style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text: _keys[index]['userName'],
+                                          style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                        ),
+                                      ]
+                                  )
+                                  ,textScaleFactor: 1.0),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                              child: RichText(
+                                  text: TextSpan(
+                                      text: '入职时间    ',
+                                      style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text: _keys[index]['createDate'],
+                                          style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                        ),
+                                      ]
+                                  )
+                                  ,textScaleFactor: 1.0),
+                            ),
+                          ],
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                          child:   RichText(
-                              text: TextSpan(
-                                  text: '部门名称    ',
-                                  style: TextStyle(fontSize: 16.0,color: Colors.black),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: _keys[index]['sectionName'],
-                                      style: TextStyle(color: Colors.black45),
-                                    ),
-                                  ]
-                              )
-                              ,textScaleFactor: 1.0 ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                          child:RichText(
-                              text: TextSpan(
-                                  text: '用户姓名    ',
-                                  style: TextStyle(fontSize: 16.0,color: Colors.black),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: _keys[index]['userName'],
-                                      style: TextStyle(color: Colors.black45),
-                                    ),
-                                  ]
-                              )
-                              ,textScaleFactor: 1.0),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                          child: RichText(
-                              text: TextSpan(
-                                  text: '入职时间    ',
-                                  style: TextStyle(fontSize: 16.0,color: Colors.black),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: _keys[index]['createDate'],
-                                      style: TextStyle(color: Colors.black45),
-                                    ),
-                                  ]
-                              )
-                              ,textScaleFactor: 1.0),
-                        ),
-                      ],
+                      ),
+                      Positioned(
+                        child: Radio(value:index, groupValue: groupValue, onChanged: (T){updateGroupValue(T);},activeColor: Colors.blue,),
+                        right: 10.0,
+                        top:50.0,
+                      ),
+                    ],
+                  ),
+                ),
+              ):Container(
+              height: ScreenUtil().setHeight(310),
+              width: ScreenUtil().setWidth(710),
+              margin: EdgeInsets.only(left: ScreenUtil().setWidth(20),top: ScreenUtil().setHeight(40),right:ScreenUtil().setWidth(20)),
+              child: Card(
+                elevation: 5.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)
+                ),
+                child:
+                Stack(
+                  children: <Widget>[
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                            child: RichText(
+                                text: TextSpan(
+                                    text: '公司名称    ',
+                                    style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: _keys[index]['companyName'],
+                                        style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                      ),
+                                    ]
+                                )
+                                ,textScaleFactor: 1.0),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                            child:   RichText(
+                                text: TextSpan(
+                                    text: '部门名称    ',
+                                    style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: _keys[index]['sectionName'],
+                                        style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                      ),
+                                    ]
+                                )
+                                ,textScaleFactor: 1.0 ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                            child:RichText(
+                                text: TextSpan(
+                                    text: '用户姓名    ',
+                                    style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: _keys[index]['userName'],
+                                        style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                      ),
+                                    ]
+                                )
+                                ,textScaleFactor: 1.0),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(32),vertical: ScreenUtil().setHeight(10)),
+                            child: RichText(
+                                text: TextSpan(
+                                    text: '入职时间    ',
+                                    style: TextStyle(fontSize: ScreenUtil().setSp(30),color:Color(0xFFCFCFCF)),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: _keys[index]['createDate'],
+                                        style: TextStyle(color: Color(0xFF373737),fontSize: ScreenUtil().setSp(32)),
+                                      ),
+                                    ]
+                                )
+                                ,textScaleFactor: 1.0),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    child: Radio(value:index, groupValue: groupValue, onChanged: (T){updateGroupValue(T);},activeColor: Colors.blue,),
-                    right: 10.0,
-                    top:60.0,
-                  ),
-                ],
+                    Positioned(
+                      child: Radio(value:index, groupValue: groupValue, onChanged: (T){updateGroupValue(T);},activeColor: Colors.blue,),
+                      right: 10.0,
+                      top:50.0,
+                    ),
+                  ],
+                ),
               ),
             );
           });
@@ -151,6 +261,7 @@ class CompanyPageState extends State<CompanyPage>{
   }
   //获取公司信息
   getCompanyInfo() async {
+    print(await RouterUtil.getStatus());
     _keys=null;
     String url = Constant.findApplySucUrl;
     String threshold = await CommonUtil.calWorkKey();

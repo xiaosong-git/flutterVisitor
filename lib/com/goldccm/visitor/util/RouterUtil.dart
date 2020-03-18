@@ -46,6 +46,7 @@ class RouterUtil{
   static String imageServerUrl=Constant.imageServerUrl;
   static String webSocketServerUrl=Constant.webSocketServerUrl;
   static String uploadServerUrl=Constant.imageServerApiUrl;
+
   static init() async {
     SharedPreferences sp;
     await SharedPreferences.getInstance().then((value) {
@@ -67,6 +68,20 @@ class RouterUtil{
       sp = value;
     });
     await sp.setString(serverStatus, "remote");
+  }
+  static local() async {
+    SharedPreferences sp;
+    await SharedPreferences.getInstance().then((value) {
+      sp = value;
+    });
+    await sp.setString(serverStatus, "local");
+  }
+  static Future<String>getStatus() async {
+    SharedPreferences sp;
+    await SharedPreferences.getInstance().then((value) {
+      sp = value;
+    });
+    return sp.getString(serverStatus);
   }
   static refresh(){
      Http.modifyChange(apiServerUrl);

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
@@ -177,12 +178,10 @@ class ChatPageState extends State<ChatPage> {
     super.initState();
     countDown();
     init();
-    print(widget.user.toString());
     _messageBuilderFuture = getMessage();
   }
   init() async {
     UserInfo user=await LocalStorage.load("userInfo");
-    print(user);
     setState(() {
       _userInfo=user;
     });
@@ -268,7 +267,10 @@ class ChatPageState extends State<ChatPage> {
         appBar: AppBar(
           title: Text('${widget.user.name}',style:TextStyle(fontSize: 17.0),),
           backgroundColor: Theme.of(context).appBarTheme.color,
-          leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context);}),
+          leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){
+            FocusScope.of(context).requestFocus(FocusNode());
+            Navigator.pop(context);
+          }),
           centerTitle: true,
         ),
         body: Column(
@@ -368,7 +370,7 @@ class ChatPageState extends State<ChatPage> {
                                                       borderSide: BorderSide(
                                                           color: Colors.grey),
                                                       onPressed: () {
-                                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>VisitAddress(lists: _mineAddress,))).then((value){
+                                                        Navigator.push(context,CupertinoPageRoute(builder: (context)=>VisitAddress(lists: _mineAddress,))).then((value){
                                                           selectedMineAddress=_mineAddress[value];
                                                         });
                                                       },
@@ -877,7 +879,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
                           ),
                         ),
                         onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>VisitRequest(id:widget.id,chatMessage: widget.message,userInfo: widget.userInfo,mineAddress: widget.mineAddress,)));
+                          Navigator.push(context, CupertinoPageRoute(builder: (context)=>VisitRequest(id:widget.id,chatMessage: widget.message,userInfo: widget.userInfo,mineAddress: widget.mineAddress,)));
                         },
                       )
                   ),
@@ -939,7 +941,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
                           ),
                         ),
                         onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>VisitRequest(id:widget.id,chatMessage: widget.message,userInfo: widget.userInfo,mineAddress: widget.mineAddress,)));
+                          Navigator.push(context, CupertinoPageRoute(builder: (context)=>VisitRequest(id:widget.id,chatMessage: widget.message,userInfo: widget.userInfo,mineAddress: widget.mineAddress,)));
                         },
                       )
                   ),
@@ -997,7 +999,7 @@ class ChatMessageState extends State<ChatMessageWidget>{
                           ),
                         ),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(
+                          Navigator.push(context, CupertinoPageRoute(
                               builder: (context) =>
                                   VisitRequest(id:widget.id,chatMessage: widget.message,userInfo: widget.userInfo,mineAddress:widget.mineAddress,)));
                         },

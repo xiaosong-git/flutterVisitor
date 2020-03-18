@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -98,7 +99,7 @@ class RoomBookState extends State<RoomBook> {
                     print(applyDate);
                     var diff= DateTime.parse(applyDate).difference(DateTime.now());
                     if(diff.inDays<=6&&diff.inDays>=0){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomCheckOut(userInfo: widget.userInfo,timeLines: widget.order.timeInterval,startTime: widget.order.applyStartTime,endTime: widget.order.applyEndTime,count: widget.order.timeInterval.split(",").length,roomInfo: _roomInfo,day: diff.inDays,roomOrderInfo: widget.order,)));
+                      Navigator.push(context, CupertinoPageRoute(builder: (context)=>RoomCheckOut(userInfo: widget.userInfo,timeLines: widget.order.timeInterval,startTime: widget.order.applyStartTime,endTime: widget.order.applyEndTime,count: widget.order.timeInterval.split(",").length,roomInfo: _roomInfo,day: diff.inDays,roomOrderInfo: widget.order,)));
                     }else{
                       ToastUtil.showShortClearToast("超过支付时间");
                     }
@@ -150,7 +151,7 @@ class RoomBookState extends State<RoomBook> {
           List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
           print('$qrMsg[0]');
           Navigator.push(context,
-              new MaterialPageRoute(builder: (BuildContext context) {
+              new CupertinoPageRoute(builder: (BuildContext context) {
                 return new Qrcode(qrCodecontent:qrMsg);
               }));
 

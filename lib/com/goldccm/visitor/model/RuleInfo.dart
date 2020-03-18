@@ -1,28 +1,34 @@
 class RuleInfo{
 
-  List<int> userList;
+  String userList;
   int companyId;
   int groupType;
   String groupName;
-  String syncHolidays;
-  String needPhoto;
-  String noteCanUseLocalPic;
-  String allowCheckInOffWorkDay;
-  String allowApplyOffWorkDay;
-  List<String> locInfo;
-  List<String> checkInDate;
-  List<int> whiteLists;
-  int remind;
-  List<String> speWorkDay;
+  int groupId;
+  int dateId;
+  int dateCount;
+  int locCount;
+  String timeStr;
+  String workDays;
+  String time;
+  String locTitle;
 
   RuleInfo({this.userList, this.companyId, this.groupType, this.groupName,
-      this.syncHolidays, this.needPhoto, this.noteCanUseLocalPic,
-      this.allowCheckInOffWorkDay, this.allowApplyOffWorkDay, this.locInfo,
-      this.checkInDate, this.whiteLists, this.remind, this.speWorkDay});
+      this.groupId,this.dateCount,this.dateId,this.locCount,this.time,this.workDays,this.locTitle,this.timeStr});
 
   @override
   String toString() {
-    return 'RuleInfo{userList: $userList, companyId: $companyId, groupType: $groupType, groupName: $groupName, syncHolidays: $syncHolidays, needPhoto: $needPhoto, noteCanUseLocalPic: $noteCanUseLocalPic, allowCheckInOffWorkDay: $allowCheckInOffWorkDay, allowApplyOffWorkDay: $allowApplyOffWorkDay, locInfo: $locInfo, checkInDate: $checkInDate, whiteLists: $whiteLists, remind: $remind, speWorkDay: $speWorkDay}';
+    return 'RuleInfo{userList: $userList, companyId: $companyId, groupType: $groupType, groupName: $groupName, groupId: $groupId, dateId: $dateId, dateCount: $dateCount, locCount: $locCount, workDays: $workDays, time: $time}';
   }
-
+  RuleInfo.fromJson(Map json){
+    this.groupId=json['groupId'];
+    this.groupName=json['groupName'];
+    this.dateId=json['dateId'];
+    this.workDays=json['worddays'];
+    this.time=json['time'];
+    this.locTitle=json['locTitle'];
+    this.dateCount=json['dateCount'];
+    this.locCount=json['locCount'];
+    this.timeStr=json['wk'];
+  }
 }

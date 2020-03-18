@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -87,7 +88,7 @@ class FriendHistoryState extends State<FriendHistory>{
                         onPressed: () async {
                           Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              CupertinoPageRoute(
                                   builder: (context) => remarkFriendPage(
                                       userId:  _friendLists[index].userId,
                                       userInfo:widget.userInfo
@@ -153,7 +154,7 @@ class FriendHistoryState extends State<FriendHistory>{
                   virtualImageUrl: data['idHandleImgUrl'],
                   userId: data['userId']
               );
-              if(info.userId!=widget.userInfo.id&&data['realName']!=null){
+              if(data['userId']!=widget.userInfo.id&&data['realName']!=null){
                 _friendLists.add(info);
               }
             }

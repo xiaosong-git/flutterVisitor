@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/QrcodeMode.dart';
@@ -53,51 +56,51 @@ class VisitHistoryState extends State<VisitHistory>{
         itemCount: _visitLists.length,
         itemBuilder: (BuildContext context, int index) {
             return ListTile(
-              title: RichText(text: TextSpan(
-                text: '访问对象  ',
-                style: TextStyle(fontSize: 16,color: Colors.black),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: _visitLists[index].realName != null
-                        ? _visitLists[index].realName
-                        : "",
-                    style: TextStyle(fontSize: 16,color: Colors.grey),
-                  ),
-                ],
-              ),textScaleFactor: 1.0,),
+              contentPadding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(24),horizontal: ScreenUtil().setWidth(24)),
+              title: RichText(
+                text: TextSpan(
+                text: _visitLists[index].realName != null ? _visitLists[index].realName : "",
+                style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF212121)),
+                ),
+                textScaleFactor: 1.0,
+              ),
               subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     RichText(text: TextSpan(
-                      text: '开始时间  ',
-                      style: TextStyle(fontSize: 16,color: Colors.black),
+                      text:_visitLists[index].startDate != null ? _visitLists[index].startDate.substring(0,10): "",
+                      style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF6C6C6C)),
                       children: <TextSpan>[
                         TextSpan(
-                          text:_visitLists[index].startDate != null ? _visitLists[index].startDate : "",
-                          style: TextStyle(fontSize: 16,color: Colors.grey),
+                          text:"         ",
+                          style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF6C6C6C)),
+                        ),
+                        TextSpan(
+                          text:_visitLists[index].startDate != null ? "${_visitLists[index].startDate.substring(11,16)}" : "",
+                          style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF6C6C6C)),
+                        ),
+                        TextSpan(
+                          text:_visitLists[index].endDate != null ? "-${_visitLists[index].endDate.substring(11,16)}" : "",
+                          style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF6C6C6C)),
                         ),
                       ],
                     ),textScaleFactor: 1.0,),
                     RichText(text: TextSpan(
-                      text: '结束时间  ',
-                      style: TextStyle(fontSize: 16,color: Colors.black),
-                      children: <TextSpan>[
-                        TextSpan(
-                          text:_visitLists[index].endDate != null ? "${_visitLists[index].endDate}" : "",
-                          style: TextStyle(fontSize: 16,color: Colors.grey),
-                        ),
-                      ],
+                      text:_visitLists[index].address != null ? "${_visitLists[index].address}" : "暂无访问地址",
+                      style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF6C6C6C)),
                     ),textScaleFactor: 1.0,),
-                  ]),
-              trailing: _visitLists[index].cstatus != null ?_visitLists[index].cstatus == "applyConfirm"?DateTime.parse(_visitLists[index].endDate).isBefore(DateTime.now())?Text("过期",style: TextStyle( color: Colors.red),):Text("审核",style: TextStyle(),): _visitLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
+                  ]
+              ),
+              trailing: Text('获取二维码',style: TextStyle(fontSize: ScreenUtil().setSp(30),color: Color(0xFF0073FE)),),
               onTap: () {
-                if(DateTime.parse(_visitLists[index].endDate).isBefore(DateTime.now())){
-                  ToastUtil.showShortClearToast("访问已过期");
-                }else{
-                  Navigator.push(context,
-                      MaterialPageRoute(
-                          builder: (context) => VisitDetail(visitInfo: _visitLists[index],)));
-                }
+//                Navigator.push(context, CupertinoPageRoute(builder: (context) => VisitDetail(visitInfo: _visitLists[index],)));
+                QrcodeMode model = new QrcodeMode(userInfo: null,totalPages: 1,bitMapType: 2,visitInfo: _visitLists[index]);
+                List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
+                print('$qrMsg[0]');
+                Navigator.push(context,
+                    new CupertinoPageRoute(builder: (BuildContext context) {
+                      return new Qrcode(qrCodecontent:qrMsg,title: '通行码',);
+                    }));
               },
             );
           },
@@ -127,7 +130,7 @@ class VisitHistoryState extends State<VisitHistory>{
   _refresh() async {
     _visitLists.clear();
     count=1;
-    String url = "visitorRecord/visitorList";
+    String url = "visitorRecord/visitorSucList";
     String threshold = await CommonUtil.calWorkKey(userInfo:widget.userInfo);
     var res = await Http().post(url,
         queryParameters: ({
@@ -138,8 +141,6 @@ class VisitHistoryState extends State<VisitHistory>{
           "threshold": threshold,
           "requestVer": await CommonUtil.getAppVersion(),
           "userId": widget.userInfo.id,
-          "condition":"userId",
-          "recordType":1,
         }),debugMode: true,userCall: false);
     if (res is String) {
       Map map = jsonDecode(res);
@@ -162,6 +163,8 @@ class VisitHistoryState extends State<VisitHistory>{
               endDate: data['endDate'],
               startDate: data['startDate'],
               id: data['id'].toString(),
+              companyName: data['companyName'],
+              address:  data['addr'],
               visitorRealName: widget.userInfo.realName,
               phone: widget.userInfo.phone,
             );
@@ -170,14 +173,16 @@ class VisitHistoryState extends State<VisitHistory>{
           setState(() {
             count++;
           });
-          _easyRefreshController.finishRefresh(success: true);
         }
       }
     }
+    _easyRefreshController.finishRefresh(success: true);
+    _easyRefreshController.finishLoad(success: true);
   }
   //加载更多数据
   _getMoreData() async {
-        String url = "visitorRecord/visitorList";
+    print("get");
+        String url = "visitorRecord/visitorSucList";
         String threshold = await CommonUtil.calWorkKey(userInfo:widget.userInfo);
         var res = await Http().post(url,
             queryParameters: ({
@@ -188,8 +193,6 @@ class VisitHistoryState extends State<VisitHistory>{
               "threshold": threshold,
               "requestVer": await CommonUtil.getAppVersion(),
               "userId": widget.userInfo.id,
-              "condition":"userId",
-              "recordType":1,
             }),debugMode: true,userCall: false);
         if (res is String) {
           Map map = jsonDecode(res);
@@ -213,17 +216,17 @@ class VisitHistoryState extends State<VisitHistory>{
                   startDate: data['startDate'],
                   id: data['id'].toString(),
                   visitorRealName: widget.userInfo.realName,
+                  companyName: data['companyName'],
+                  address:  data['addr'],
                   phone: widget.userInfo.phone,
                 );
                 _visitLists.add(visitInfo);
               }
+              print("count++");
               setState(() {
                 count++;
               });
               if (map['data']['rows'].length < 10) {
-                setState(() {
-                  count--;
-                });
                 _easyRefreshController.finishLoad(success: true,noMore: true);
               }else{
                 _easyRefreshController.finishLoad(success: true);
@@ -256,10 +259,25 @@ class VisitHistoryState extends State<VisitHistory>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFFFFFF),
       appBar: AppBar(
-        title: Text('访问记录',textScaleFactor: 1.0,),
+        title: Text('访问码',textScaleFactor: 1.0,style: TextStyle(fontSize: ScreenUtil().setSp(36),color: Color(0xFF787878)),),
         centerTitle: true,
-        backgroundColor: Theme.of(context).appBarTheme.color,
+        backgroundColor: Color(0xFFFFFFFF),
+        elevation: 1,
+        brightness: Brightness.light,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+            icon: Image(
+              image: AssetImage("assets/images/login_back.png"),
+              width: ScreenUtil().setWidth(36),
+              height: ScreenUtil().setHeight(36),
+              color: Color(0xFF787878),),
+            onPressed: () {
+              setState(() {
+                Navigator.pop(context);
+              });
+            }),
       ),
       body: notEmpty==true?
       FutureBuilder(

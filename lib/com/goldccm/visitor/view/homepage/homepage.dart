@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:core';
 import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
@@ -26,6 +29,7 @@ import 'package:visitor/com/goldccm/visitor/model/BannerInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/NoticeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/NewsInfo.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:visitor/com/goldccm/visitor/view/attendance/attendance.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/MoreFunction.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/NewsView.dart';
 import 'package:visitor/com/goldccm/visitor/view/homepage/notice.dart';
@@ -55,39 +59,51 @@ class HomePageState extends State<HomePage> {
   List<String> imageList = [];
   List<String> noticeContentList = [];
   String imageServerUrl; //图片服务器地址
-  List<FunctionLists> _baseLists = [
-    FunctionLists(
-        iconImage: 'assets/icons/more_function.png',
-        iconTitle: '全部',
-        iconType: '_more',
-        iconName: '全部')
-  ];
+  List<FunctionLists> _baseLists = [];
   List<FunctionLists> _lists = [];
   List<FunctionLists> _flists = [
     FunctionLists(
-        iconImage: 'assets/icons/visitor_person_card.png',
+        iconImage: 'assets/images/home_card.png',
         iconTitle: '门禁卡',
         iconType: '_mineCard',
         iconName: '门禁卡',
         iconShow: false),
     FunctionLists(
-        iconImage: 'assets/icons/visit_invite.png',
+        iconImage: 'assets/images/home_invite.png',
         iconTitle: '快捷邀约',
         iconType: '_inviteReq',
         iconName: '快捷邀约',
         iconShow: true),
     FunctionLists(
-        iconImage: 'assets/icons/visit_fastvisit.png',
+        iconImage: 'assets/images/home_visit.png',
         iconTitle: '快捷访问',
         iconType: '_visitReq',
         iconName: '快捷访问',
         iconShow: true),
     FunctionLists(
-        iconImage: 'assets/icons/visit_qrcode.png',
+        iconImage: 'assets/images/home_more.png',
         iconTitle: '访问二维码',
         iconType: '_visitorCard',
         iconName: '访问码',
         iconShow: true),
+    FunctionLists(
+        iconImage: 'assets/images/home_tearoom.png',
+        iconTitle: '茶室',
+        iconType: '_teaRoom',
+        iconName: '茶室',
+        iconShow: false),
+    FunctionLists(
+        iconImage: 'assets/images/home_meetingroom.png',
+        iconTitle: '会议室',
+        iconType: '_meetingRoom',
+        iconName: '会议室',
+        iconShow: false),
+    FunctionLists(
+        iconImage: 'assets/images/home_att.png',
+        iconTitle: '打卡',
+        iconType: '_attendance',
+        iconName: '打卡',
+        iconShow: false),
   ];
   SwiperController _swiperController;
   SwiperController _swipernoticeController;
@@ -106,7 +122,7 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     init();
-    print(RouterUtil.apiServerUrl);
+    checkDevice();
     _swiperController = new SwiperController();
     _swiperController.startAutoplay();
     _swipernoticeController = new SwiperController();
@@ -130,20 +146,47 @@ class HomePageState extends State<HomePage> {
       }
     });
   }
-
+  //检测当前设备的合法性
+  Future checkDevice() async {
+    UserInfo userInfo = await LocalStorage.load("userInfo");
+    if (userInfo == null || userInfo.id == null) {
+      userInfo = await LocalStorage.load("userInfo");
+    }
+    String threshold = await CommonUtil.calWorkKey(userInfo: userInfo);
+    var result = await Http().post(Constant.getUserInfoUrl,
+        queryParameters: {
+          "token": userInfo.token,
+          "factor": CommonUtil.getCurrentTime(),
+          "threshold": threshold,
+          "requestVer": await CommonUtil.getAppVersion(),
+          "userId": userInfo.id,
+        },
+        userCall: false);
+    if (result != null) {
+      if (!(result is String)) {
+        if (result['verify']['sign'] == "tokenFail") {
+          ToastUtil.showShortToast("您的账号已在另一台设备登录");
+          MessageUtils.closeChannel();
+          DataUtils.clearLoginInfo();
+          Navigator.push(
+              context, CupertinoPageRoute(builder: (context) => Login()));
+        }
+      }
+    }
+  }
   init() async {
     await PermissionHandlerUtil().initPermission();
     PermissionHandlerUtil().askStoragePermission();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     UserInfo user = await LocalStorage.load("userInfo");
     getImageServerUrl();
     getBanner();
     getNoticeInfo();
     getPrivilege(user);
     getNewsInfoList();
-    setState(() {
-      swiperLoop = true;
-    });
+    updateContacts();
+//    setState(() {
+//      swiperLoop = true;
+//    });
   }
 
   @override
@@ -165,149 +208,208 @@ class HomePageState extends State<HomePage> {
     }
     return res;
   }
-
+  updateContacts() async {
+    if(PermissionHandlerUtil.contact==2){
+      String _phoneStr = "";
+      Iterable<Contact> contacts = await ContactsService.getContacts();
+      for (Contact contact in contacts) {
+        for (var phone in contact.phones) {
+          if (phone != null && phone.value != null) {
+            String str = "";
+            var cuts = phone.value.split(" ");
+            for (var cut in cuts) {
+              str = str + cut;
+            }
+            RegExp exp = RegExp('\^[0-9]*\$');
+            if (exp.hasMatch(str)) {
+              _phoneStr += str + ",";
+            }
+          }
+        }
+      }
+      LocalStorage.save("phoneStr", _phoneStr);
+      return _phoneStr;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserModel>(context);
     return WillPopScope(
       child: Scaffold(
-          backgroundColor: Theme.of(context).backgroundColor,
+          backgroundColor:Color(0xFFFFFFFF),
           body: new Stack(
             children: <Widget>[
               new CustomScrollView(controller: _scrollController, slivers: <
                   Widget>[
                 SliverAppBar(
-                  title: Text("首页",
-                      textAlign: TextAlign.center,
-                      style: new TextStyle(fontSize: 18.0, color: Colors.white),
-                      textScaleFactor: 1.0),
-                  expandedHeight: 200.0,
+//                  title: Text("首页",
+//                      textAlign: TextAlign.center,
+//                      style: new TextStyle(fontSize: 18.0, color: Colors.white),
+//                      textScaleFactor: 1.0),
+                  expandedHeight: ScreenUtil().setHeight(375),
                   flexibleSpace: FlexibleSpaceBar(
                     background: _buildBannerImage(),
                   ),
                   backgroundColor: Theme.of(context).appBarTheme.color,
                   centerTitle: true,
                   leading: null,
+                  brightness: Brightness.dark,
                   automaticallyImplyLeading: false,
-                  actions: <Widget>[
-                    noticeSize > 0
-                        ? Badge(
-                            child: new IconButton(
-                                icon: Image.asset(
-                                  "assets/images/visitor_icon_message.png",
-                                  height: 25,
-                                ),
-                                onPressed: () {
-                                  if (userProvider.info.orgId != null ||
-                                      userProvider.info.companyId != null) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                NoticePage()));
-                                  } else {
-                                    ToastUtil.showShortClearToast(
-                                        "公告暂时只针对非访客开放");
-                                  }
-                                }),
-                            badgeContent: Text(
-                              '',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            position: BadgePosition(top: 0, right: 5),
-                          )
-                        : new IconButton(
-                            icon: Image.asset(
-                              "assets/images/visitor_icon_message.png",
-                              height: 25,
-                            ),
-                            onPressed: () {
-                              if (userProvider.info.orgId != null ||
-                                  userProvider.info.companyId != null) {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => NoticePage()));
-                              } else {
-                                ToastUtil.showShortClearToast("公告暂时只针对非访客开放");
-                              }
-                            }),
-                  ],
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(0, 40, 0, 20),
-                  sliver: new SliverGrid(
-                    //Grid
-                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                    ),
-                    delegate: new SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        return _buildIconTab(_lists[index].iconImage,
-                            _lists[index].iconName, _lists[index].iconType);
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Color(0xFFFFFFFF),
+                    padding: EdgeInsets.only(top:ScreenUtil().setHeight(24)),
+                    height: ScreenUtil().setHeight(204),
+                    child:Swiper(
+                      scrollDirection: Axis.horizontal, // 横向
+                      itemCount: imageList.length, // 数量
+                      autoplay: false, // 自动翻页
+                      loop: false,
+                      itemBuilder: (BuildContext context,int index){
+                        return GridView.count(
+                          crossAxisCount: 5,
+                          children: _getFunctionItem(index+1, 5),
+                          padding: EdgeInsets.all(0),
+                        );
                       },
-                      childCount: _lists.length,
+//                      controller: _swiperController,
+                      onTap: (index) {
+                        print('点击了第${index}');
+                      }, // 点击事件 onTap
+                      pagination: SwiperPagination(
+                        // 分页指示器
+                          alignment: Alignment.bottomCenter, // 位置 Alignment.bottomCenter 底部中间
+                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 5), // 距离调整
+                          builder: DotSwiperPaginationBuilder(
+                            // 指示器构建
+                              space: 3, // 点之间的间隔
+                              size: 8, // 没选中时的
+                              activeSize: 8, // 选中时的大小
+                              color: Color(0xFFECF5FF), // 没选中时的颜色
+                              activeColor: Color(0xFF177FFF),
+                          )
+                      ), // 选中时的颜色
+                      //control: new SwiperControl(color: Colors.pink), // 页面控制器 左右翻页按钮
+                      scale: 1, // 两张图片之间的间隔
                     ),
                   ),
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.only(left: 16.0),
-                  sliver: new SliverToBoxAdapter(
-                    child: new Text('新闻公告',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 2),
-                        textScaleFactor: 1.0),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Color(0xFFF9F9F9),
+                    height: ScreenUtil().setHeight(16),
                   ),
                 ),
-                new SliverFixedExtentList(
-                  itemExtent: 140,
-                  delegate: new SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      //创建列表项
-                      if (index == newsInfoList.length) {
-                        return _buildProgressMoreIndicator();
-                      } else {
-                        return buildJobItem(context, index);
-                      }
-                    },
-                    childCount: newsInfoList.length,
-                  ),
-                ),
-              ]),
-              Positioned(
-                top: top,
-                width: MediaQuery.of(context).size.width,
-                height: 44,
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: RaisedButton(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    onPressed: () => print('message press'),
+                SliverToBoxAdapter(
+                  child:  Container(
+                    color: Color(0xFFFFFFFF),
+                    height: ScreenUtil().setHeight(88),
                     child: _buildSwiperNotice(userProvider),
                   ),
                 ),
-              ),
-              Positioned(
-                top: top + 12,
-                left: 30,
-                height: 21,
-                width: 21,
-                child: Container(
-                    child: Image.asset("assets/icons/notice_message.png")),
-              ),
-              Positioned(
-                top: top + 17,
-                right: 35,
-                height: 10,
-                child: Container(
-                  child: Image.asset("assets/icons/gengduo@2x.png"),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Color(0xFFF9F9F9),
+                    height: ScreenUtil().setHeight(16),
+                  ),
                 ),
-              ),
+                SliverPadding(
+                  padding: EdgeInsets.only(left: ScreenUtil().setHeight(32),top: ScreenUtil().setHeight(32)),
+                  sliver: new SliverToBoxAdapter(
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                          child:   Text('新闻中心',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 2),
+                              textScaleFactor: 1.0),
+                        ),
+                        Positioned(
+                          right: ScreenUtil().setWidth(66),
+                          top: ScreenUtil().setHeight(10),
+                          child: InkWell(
+                            child: Text('更多',style: TextStyle(color: Color(0xFF737373),fontSize: ScreenUtil().setSp(28)),),
+                            onTap: (){
+
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                  ),
+                ),
+                newsInfoList.length>0?SliverToBoxAdapter(
+                  child: InkWell(
+                    child:Container(
+                      height: ScreenUtil().setHeight(358),
+                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(32)),
+                      child:Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                              padding: EdgeInsets.only(top: ScreenUtil().setHeight(24),bottom: ScreenUtil().setHeight(16)),
+                              child:CachedNetworkImage(
+                                imageUrl: RouterUtil.imageServerUrl + newsInfoList[0].newsImageUrl,
+                                placeholder: (context, url) =>Container(
+                                  child: CircularProgressIndicator(backgroundColor: Colors.black,),
+                                  width: 10,
+                                  height: 10,
+                                  alignment: Alignment.center,
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                                fit: BoxFit.cover,
+                                width: ScreenUtil().setWidth(686),
+                                height: ScreenUtil().setHeight(234),
+                              )
+                          ),
+                          Container(
+                            child: RichText(
+                                text: new TextSpan(
+                                    text: newsInfoList[0].newsName,
+                                    style: new TextStyle(
+                                      fontSize: ScreenUtil().setSp(32),
+                                      fontWeight: FontWeight.w600,
+                                      color:Color(0xFF373737),)),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis, textScaleFactor: 1.0
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          new CupertinoPageRoute(
+                              builder: (context) => new NewsWebPage(
+                                  news_url: newsInfoList[0].newsUrl, title: newsInfoList[0].newsName)));
+                    },
+                  )
+                ):SliverToBoxAdapter(
+                  child: Container(
+                    height: ScreenUtil().setHeight(358),
+                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(32)),
+                  ),
+                ),
+                new SliverFixedExtentList(
+                  itemExtent: 130,
+                  delegate: new SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                     if (index == newsInfoList.length-1) {
+                        return _buildProgressMoreIndicator();
+                      }else{
+                        return buildJobItem(context, index+1);
+                      }
+                    },
+                    childCount: newsInfoList.length-1,
+                  ),
+                ),
+              ]),
             ],
           )),
     );
@@ -329,39 +431,50 @@ class HomePageState extends State<HomePage> {
       onTap: () {
         Navigator.push(
             context,
-            new MaterialPageRoute(
+            new CupertinoPageRoute(
                 builder: (context) => new NewsWebPage(
                     news_url: newsinfo.newsUrl, title: newsinfo.newsName)));
       },
       child: new NewsView(newsinfo, imageServerUrl),
     );
   }
+  List<Widget> _getFunctionItem(int index,int page){
+    List<Widget> list = List();
+    for(var i=0;i<_lists.length;i++){
+      if((index-1)*page<=i&&i<index*page){
+        list.add(
+        _buildIconTab(_lists[i].iconImage,
+        _lists[i].iconName, _lists[i].iconType)
+        );
+      }
+    }
+    return list;
+  }
   //头图
   Widget _buildBannerImage() {
     return Container(
-      height: 200.0,
+      height:ScreenUtil().setHeight(375),
       child: Swiper(
-        scrollDirection: Axis.horizontal, // 横向
-        itemCount: imageList.length, // 数量
-        autoplay: false, // 自动翻页
+        scrollDirection: Axis.horizontal,
+        itemCount: imageList.length<=7?imageList.length:7,
+        autoplay: false,
         loop: swiperLoop,
-        itemBuilder: _buildItemImage, // 构建
+        itemBuilder: _buildItemImage,
         controller: _swiperController,
-        autoplayDelay: 6000,
+        autoplayDelay: 8000,
         onTap: (index) {
           print('点击了第${index}');
-        }, // 点击事件 onTap
+        },
         pagination: SwiperPagination(
-            // 分页指示器
-            alignment: Alignment.bottomCenter, // 位置 Alignment.bottomCenter 底部中间
-            margin: const EdgeInsets.fromLTRB(0, 0, 0, 5), // 距离调整
+            alignment: Alignment.bottomCenter,
+            margin: const EdgeInsets.fromLTRB(0, 0, 0, 5),
             builder: DotSwiperPaginationBuilder(
-                // 指示器构建
-                space: 5, // 点之间的间隔
-                size: 10, // 没选中时的
-                activeSize: 12, // 选中时的大小
-                color: Colors.black54, // 没选中时的颜色
-                activeColor: Colors.white)), // 选中时的颜色
+                space: 3,
+                size: 8,
+                activeSize: 8,
+                color: Colors.white12,
+                activeColor: Colors.white)
+        ),
         //control: new SwiperControl(color: Colors.pink), // 页面控制器 左右翻页按钮
         scale: 1, // 两张图片之间的间隔
       ),
@@ -370,27 +483,48 @@ class HomePageState extends State<HomePage> {
   //公告提醒
   Widget _buildSwiperNotice(var userProvider) {
     return Container(
-      height: 40.0,
-      padding: EdgeInsets.only(left: 25.0, top: 12.0),
-      child: Swiper(
-        loop: swiperLoop,
-        controller: _swipernoticeController,
-        scrollDirection: Axis.vertical, // 横向
-        itemCount:
-            noticeContentList.length <= 5 ? noticeContentList.length : 5, // 数量
-        autoplay: false, // 自动翻页
-        autoplayDelay: 5000,
-        itemBuilder: _buildNoticeContent, // 构建
-        onTap: (index) {
-          if (userProvider.orgId != null || userProvider.companyId != null) {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => NoticePage()));
-          } else {
-            ToastUtil.showShortClearToast("公告暂未开放");
-          }
-        }, // 点击事件 onTap
-        scale: 1, // 两张图片之间的间隔
-      ),
+      height: ScreenUtil().setHeight(88),
+      child: Stack(
+        children: <Widget>[
+          Positioned(
+            top: ScreenUtil().setHeight(22),
+            left: ScreenUtil().setWidth(32),
+            child: Text('公告',style: TextStyle(color: Color(0xFF595959),fontSize: ScreenUtil().setSp(32),fontWeight: FontWeight.w600),),
+          ),
+//          Positioned(
+//            top: ScreenUtil().setHeight(12),
+//            left: ScreenUtil().setWidth(90),
+//            child: Image(
+//              image: AssetImage("assets/images/home_notice_new.png"),
+//              width: ScreenUtil().setWidth(80),
+//              height: ScreenUtil().setHeight(80),
+//            ),
+//          ),
+          Positioned(
+            left: ScreenUtil().setWidth(110),
+//            top: ScreenUtil().setHeight(25),
+            child: Container(
+                  width: ScreenUtil().setWidth(604),
+                  height: ScreenUtil().setHeight(88),
+                  child: Swiper(
+                    loop: swiperLoop,
+                    controller: _swipernoticeController,
+                    scrollDirection: Axis.vertical, // 横向
+                    itemCount:
+                    noticeContentList.length <= 7 ? noticeContentList.length : 7, // 数量
+                    autoplay: false, // 自动翻页
+                    autoplayDelay: 5000,
+                    itemBuilder: _buildNoticeContent, // 构建
+                    onTap: (index) {
+                      Navigator.push(
+                          context, CupertinoPageRoute(builder: (context) => NoticePage()));
+                    },
+                    scale: 1,
+                  ),
+                ),
+          ),
+        ],
+      )
     );
   }
 
@@ -410,6 +544,10 @@ class HomePageState extends State<HomePage> {
           _meetingRoom();
         } else if (iconType == "_inviteReq") {
           _inviteRequest();
+        }else if (iconType == '_teaRoom') {
+          _teaRoom();
+        }else if(iconType == "_attendance"){
+          _attendance();
         }
       },
       child: new Container(
@@ -420,16 +558,17 @@ class HomePageState extends State<HomePage> {
             new Padding(
                 padding: EdgeInsets.only(top: 0.0),
                 child: new Image.asset(
-                  imageurl,
-                  width: 49,
-                  height: 49,
-                )),
+              imageurl,
+              width: ScreenUtil().setWidth(90),
+              height: ScreenUtil().setWidth(90),
+              fit: BoxFit.cover,
+            )),
             new Padding(
               padding: EdgeInsets.only(top: 4.0),
               child: new Text(
                 text,
                 textScaleFactor: 1.0,
-                style: new TextStyle(fontSize: 12),
+                style: new TextStyle(fontSize: ScreenUtil().setSp(24),color: Color(0xFF000000)),
               ),
             ),
           ],
@@ -455,11 +594,26 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget _buildNoticeContent(BuildContext context, int index) {
-    return new Text(
-      noticeContentList[index],
-      textScaleFactor: 1.0,
-      style: new TextStyle(
-          fontSize: 14.0, color: Colors.black, fontWeight: FontWeight.w500),
+    return Row(
+      children: <Widget>[
+        index==1?Container(
+          padding: EdgeInsets.only(top: ScreenUtil().setHeight(12)),
+          child:  Image(
+            image: AssetImage("assets/images/home_notice_new.png"),
+            width: ScreenUtil().setWidth(80),
+            fit: BoxFit.cover,
+          ),
+        ):Container(
+          width: ScreenUtil().setWidth(20),
+          padding: EdgeInsets.only(top: ScreenUtil().setHeight(12)),
+        ),
+        Text(
+        noticeContentList[index],
+          textScaleFactor: 1.0,
+          style: new TextStyle(
+          fontSize: ScreenUtil().setSp(28), color: Color(0xFF656565)),
+        ),
+      ],
     );
   }
 
@@ -491,9 +645,9 @@ class HomePageState extends State<HomePage> {
     if (responseResult.sign == 'success') {
       noticeList = NoticeInfo.getJsonFromDataList(responseResult.data);
       noticeList.forEach((notice) {
-        String noticeContent = notice.content;
-        if (noticeContent.length >= 15) {
-          noticeContent = noticeContent.substring(0, 15);
+        String noticeContent = notice.noticeTitle;
+        if (noticeContent.length >= 19) {
+          noticeContent = noticeContent.substring(0, 19);
         }
         noticeContent += "...";
         noticeContentList.add(noticeContent);
@@ -558,10 +712,7 @@ class HomePageState extends State<HomePage> {
         if (map['data'] != null) {
           //与本地权限匹配
           for (int j = 0; j < _flists.length; j++) {
-            //取得4个中断
-            if (_lists.length == 4) {
-              break;
-            }
+
             for (int i = 0; i < map['data'].length; i++) {
               //默认权限
               if (_flists[j].iconShow == true) {
@@ -605,7 +756,7 @@ class HomePageState extends State<HomePage> {
       List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
       print('$qrMsg[0]');
       Navigator.push(context,
-          new MaterialPageRoute(builder: (BuildContext context) {
+          new CupertinoPageRoute(builder: (BuildContext context) {
         return new Qrcode(qrCodecontent: qrMsg);
       }));
     } else {
@@ -635,7 +786,7 @@ class HomePageState extends State<HomePage> {
           Provider.of<UserModel>(context).init(UserInfo());
           MessageUtils.closeChannel();
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Login()));
+              context, CupertinoPageRoute(builder: (context) => Login()));
         }
       }
     }
@@ -645,7 +796,7 @@ class HomePageState extends State<HomePage> {
     bool isAuth = await checkAuth();
     if (isAuth) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => FastVisitReq()));
+          context, CupertinoPageRoute(builder: (context) => FastVisitReq()));
     } else {
       ToastUtil.showShortClearToast("请先实名认证");
     }
@@ -657,7 +808,7 @@ class HomePageState extends State<HomePage> {
     if (isAuth) {
       Navigator.push(
           context,
-          MaterialPageRoute(
+          CupertinoPageRoute(
               builder: (context) => VisitHistory(
                     userInfo: userInfo,
                   )));
@@ -671,7 +822,7 @@ class HomePageState extends State<HomePage> {
     if (isAuth) {
       Navigator.push(
           context,
-          MaterialPageRoute(
+          CupertinoPageRoute(
               builder: (context) => RoomList(
                     type: 0,
                   )));
@@ -682,14 +833,39 @@ class HomePageState extends State<HomePage> {
 
   _more() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => MoreFunction()));
+        context, CupertinoPageRoute(builder: (context) => MoreFunction()));
   }
 
   _inviteRequest() async {
     bool isAuth = await checkAuth();
     if (isAuth) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => FastInviteReq()));
+          context, CupertinoPageRoute(builder: (context) => FastInviteReq()));
+    } else {
+      ToastUtil.showShortClearToast("请先实名认证");
+    }
+  }
+  _teaRoom() async {
+    UserInfo userInfo = await LocalStorage.load("userInfo");
+    if (userInfo.isAuth == "T") {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => RoomList(
+                type: 1,
+              )));
+    } else {
+      ToastUtil.showShortClearToast("请先实名认证");
+    }
+  }
+  _attendance() async {
+    UserInfo userInfo = await LocalStorage.load("userInfo");
+    if (userInfo.isAuth == "T") {
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => AttendancePage(
+              )));
     } else {
       ToastUtil.showShortClearToast("请先实名认证");
     }

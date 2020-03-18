@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:visitor/com/goldccm/visitor/model/RoomInfo.dart';
@@ -34,7 +35,7 @@ class RoomAfterOrderState extends State<RoomAfterOrder>{
     print(widget.roomInfo.toString());
   }
   willPop(){
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory(userInfo: widget.userInfo,)));
+    Navigator.push(context, CupertinoPageRoute(builder: (context)=>RoomHistory(userInfo: widget.userInfo,)));
   }
   @override
   Widget build(BuildContext context) {
@@ -141,7 +142,7 @@ class RoomAfterOrderState extends State<RoomAfterOrder>{
             ),
           ),
           onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>RoomHistory(userInfo: widget.userInfo,)));
+            Navigator.push(context, CupertinoPageRoute(builder: (context)=>RoomHistory(userInfo: widget.userInfo,)));
           },
         )
     );

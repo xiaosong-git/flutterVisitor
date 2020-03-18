@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
@@ -175,7 +176,7 @@ class MineVisitHistoriesState extends State<MineVisitHistories> {
           trailing: _visitLists[index].cstatus != null ?_visitLists[index].cstatus == "applyConfirm"?Text("审核",style: TextStyle(),): _visitLists[index].cstatus == "applySuccess" ?Text("通过",style: TextStyle(color: Colors.green,),):Text("拒绝",style: TextStyle( color: Colors.red),):Text(""),
           onTap: () {
             Navigator.push(context,
-                MaterialPageRoute(
+                CupertinoPageRoute(
                     builder: (context) => VisitDetail(visitInfo: _visitLists[index],)));
           },
         );

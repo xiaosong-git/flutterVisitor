@@ -62,7 +62,7 @@ android {
                 OPPO_APP_SECRET  : "89f2c5c6fce04a73aa5a19887b10845a",
                 VIVO_APP_ID   : "17687",
                 VIVO_APP_KEY  : "6b2cfb2b-a4d2-4f87-9774-e85003b679be",
-                AMAP_KEY : "e5c38f34ff4a8f7fdbaae51a19660dd8"
+                AMAP_KEY : "8b6f8015e63508ef0362934d43eae78c"
         ]
     }
     signingConfigs{
@@ -89,4 +89,5 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.amap.api:location:latest.integration'
 }

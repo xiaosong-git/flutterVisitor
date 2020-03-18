@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
@@ -111,32 +112,15 @@ class NewFriendPageState extends State<NewFriendPage> {
     PermissionHandlerUtil().askContactPermission().then((value) async {
       if (value) {
         LoadingDialog().show(context, 'Loading');
-//        String _phoneStr = await LocalStorage.load("phoneStr");
-//        if (_phoneStr != "" && _phoneStr != null) {
-//          await loadAll(_phoneStr);
-//          setState(() {
-//            Navigator.pop(context);
-//          });
-//          return;
-//        }
-        String _phoneStr = "";
-        Iterable<Contact> contacts = await ContactsService.getContacts();
-        for (Contact contact in contacts) {
-          for (var phone in contact.phones) {
-            if (phone != null && phone.value != null) {
-              String str = "";
-              var cuts = phone.value.split(" ");
-              for (var cut in cuts) {
-                str = str + cut;
-              }
-              RegExp exp = RegExp('\^[0-9]*\$');
-              if (exp.hasMatch(str)) {
-                _phoneStr += str + ",";
-              }
-            }
-          }
+        String _phoneStr = await LocalStorage.load("phoneStr");
+        if (_phoneStr != "" && _phoneStr != null) {
+          await loadAll(_phoneStr);
+          setState(() {
+            Navigator.pop(context);
+          });
+          return;
         }
-        LocalStorage.save("phoneStr", _phoneStr);
+        _phoneStr = await updateContacts();
         await loadAll( _phoneStr);
         setState(() {
           Navigator.pop(context);
@@ -144,7 +128,27 @@ class NewFriendPageState extends State<NewFriendPage> {
       }
     });
   }
-
+  updateContacts() async {
+    String _phoneStr = "";
+    Iterable<Contact> contacts = await ContactsService.getContacts();
+    for (Contact contact in contacts) {
+      for (var phone in contact.phones) {
+        if (phone != null && phone.value != null) {
+          String str = "";
+          var cuts = phone.value.split(" ");
+          for (var cut in cuts) {
+            str = str + cut;
+          }
+          RegExp exp = RegExp('\^[0-9]*\$');
+          if (exp.hasMatch(str)) {
+            _phoneStr += str + ",";
+          }
+        }
+      }
+    }
+    LocalStorage.save("phoneStr", _phoneStr);
+    return _phoneStr;
+  }
   addFriend(String name, String phone, UserInfo user) async {
     String url = "userFriend/addFriendByPhoneAndUser";
     String threshold = await CommonUtil.calWorkKey();
@@ -406,7 +410,7 @@ class NewFriendPageState extends State<NewFriendPage> {
                             onPressed: () async {
                               Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                       builder: (context) => remarkFriendPage(
                                             userId: _request[index].userId,
                                             userInfo: _userInfo,
@@ -471,7 +475,8 @@ class remarkFriendPage extends StatelessWidget {
                       formKey.currentState.save();
                       bool result=await agreeRequest(userId, remark, userInfo);
                       if(result){
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>AddressPage()));
+                       Navigator.pop(context);
+                       Navigator.pop(context);
                       }
                     },
                   ),

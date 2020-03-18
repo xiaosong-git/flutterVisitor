@@ -36,5 +36,14 @@ class RouterList{
     routerAddress = json ['addr'];
     port = json['port'];
     imagePort= json ['nginxPort'].toString();
+    province= json['province'];
+    city = json['city'];
+    area = json['area'];
   }
+
+  @override
+  String toString() {
+    return 'RouterList{routerID: $routerID, routerName: $routerName, routerAddress: $routerAddress, province: $province, city: $city, area: $area, port: $port, imagePort: $imagePort, ip: $ip, routerServerUrl: $routerServerUrl, routerImageUrl: $routerImageUrl, routerWebSocketUrl: $routerWebSocketUrl, routerFileUrl: $routerFileUrl}';
+  }
+
 }

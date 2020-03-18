@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/RoomInfo.dart';
@@ -149,7 +150,7 @@ class RoomListState extends State<RoomList>{
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
-        title:Text(roomName,   style: new TextStyle(
+        title:Text(roomName, style: new TextStyle(
             fontSize: 17.0, color: Colors.white),textScaleFactor: 1.0,),
         backgroundColor: Theme.of(context).appBarTheme.color,
         leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context);}),
@@ -275,7 +276,7 @@ class RoomListState extends State<RoomList>{
                       borderRadius: BorderRadius.circular(3.0),
                       color: Colors.blue[200],
                     ),
-                    child: Text('开放时间：${room.roomOpenTime}-${room.roomCloseTime}',style: TextStyle(fontSize: 12.0,color: Colors.blue[700]),textScaleFactor: 1.0,),
+                    child: Text('开放时间：${room.roomOpenTime}-${room.roomCloseTime}',style: TextStyle(fontSize: 10.0,color: Colors.blue[700]),textScaleFactor: 1.0,),
                   ),
                   top: 88,
                   left:120,
@@ -287,10 +288,10 @@ class RoomListState extends State<RoomList>{
                       borderRadius: BorderRadius.circular(3.0),
                       color: Colors.orange[200],
                     ),
-                    child: room.roomType==1?Text('容纳约1-10人',style: TextStyle(fontSize: 12.0,color: Colors.orange[700]),textScaleFactor: 1.0,):room.roomType==2?Text('容纳约10-20人',style: TextStyle(fontSize: 12.0,color: Colors.orange[700]),textScaleFactor: 1.0,):Text('容纳约30人以上',style: TextStyle(fontSize: 12.0,color: Colors.orange[700]),textScaleFactor: 1.0,)
+                    child: room.roomType==1?Text('容纳约1-10人',style: TextStyle(fontSize: 10.0,color: Colors.orange[700]),textScaleFactor: 1.0,):room.roomType==2?Text('容纳约10-20人',style: TextStyle(fontSize: 10.0,color: Colors.orange[700]),textScaleFactor: 1.0,):Text('容纳约30人以上',style: TextStyle(fontSize: 10.0,color: Colors.orange[700]),textScaleFactor: 1.0,)
                   ),
                   top: 88,
-                  left: 246,
+                  left: 236,
                 ),
                 Positioned(
                   child: RichText(
@@ -318,7 +319,7 @@ class RoomListState extends State<RoomList>{
           ),
           onTap: (){
             if(room.isOpen=="is") {
-              Navigator.push(context, MaterialPageRoute(
+              Navigator.push(context, CupertinoPageRoute(
                   builder: (context) => RoomDetail(roomInfo: room,)));
             }else{
               ToastUtil.showShortClearToast("会议室暂不开放");

@@ -39,9 +39,15 @@ class RegisterPageState extends State<RegisterPage> {
   bool isComplete = false;
   String activeRadioValue = "";
   NewsWebPage _newsWebPage = new NewsWebPage(news_url:"http://121.36.45.232:8082/visitor/xieyi2.html",title:"用户协议",news_bar: false,);
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  }
+
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -301,7 +307,7 @@ class RegisterPageState extends State<RegisterPage> {
           if(map['verify']['sign']=="fail"){
             ToastUtil.showShortClearToast("手机号已被注册");
           }else{
-            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> VerifyCodePage(phone: _phoneController.text,title: '注册',)));
+            Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=> VerifyCodePage(phone: _phoneController.text,title: '注册',outer: true,)));
           }
         }
       }else{
@@ -329,8 +335,12 @@ class SetPasswordPageState extends State<SetPasswordPage>{
   bool isComplete=false;
   bool isSeen=false;
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  }
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -502,11 +512,11 @@ class SetPasswordPageState extends State<SetPasswordPage>{
       _register().then((value) async {
         Navigator.pop(context);
         if(value=="true"){
-          Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
+          Navigator.of(context).pushAndRemoveUntil(new CupertinoPageRoute(builder: (BuildContext context) => new MyHomeApp(),), (Route route) => route == null);
         }
         if(value=="loginFail"){
           ToastUtil.showShortToast("注册成功");
-          Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => new Login(),), (Route route) => route == null);
+          Navigator.of(context).pushAndRemoveUntil(new CupertinoPageRoute(builder: (BuildContext context) => new Login(),), (Route route) => route == null);
         }
       });
     }

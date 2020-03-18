@@ -65,8 +65,6 @@ class QrcodeHandler {
     UserInfo userInfo = qrCodeMode.userInfo;
     VisitInfo visitInfo = qrCodeMode.visitInfo;
     int totalPage = qrCodeMode.totalPages;
-    print(userInfo);
-    print(visitInfo.toString());
     List<String> qrContentList =[];
     String qrContent = '';
     if(visitInfo==null){

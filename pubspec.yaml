@@ -10,7 +10,7 @@ description: 朋悦比邻
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.2.9+20
+version: 3.3.0+21
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -46,7 +46,6 @@ dependencies:
   badges: ^1.1.0
   date_range_picker: ^1.0.5
   lpinyin: ^1.0.7
-  tobias: ^1.1.0+1
   flutter_exif_rotation: ^0.2.4
   flutter_des: ^1.1.0
   table_calendar: ^2.1.0
@@ -61,12 +60,18 @@ dependencies:
   flutter_custom_dialog: ^1.0.15
   flutter_screenutil: ^0.7.0
   flutter_svg: ^0.15.00
+  amap_location: ^0.2.0
+
   city_pickers:
-    git: https://github.com/hanxu317317/city_pickers.git
+    git:  https://github.com/hanxu317317/city_pickers.git
   permission_handler:
     path: plugin/flutter_permission_handler
   image_picker_saver:
     path: plugin/image_picker_saver
+  flutter_arcface:
+    path: plugin/flutter_arcface
+#  tobias:
+#    git:  https://github.com/OpenFlutter/tobias.git
 
 dev_dependencies:
   flutter_test:

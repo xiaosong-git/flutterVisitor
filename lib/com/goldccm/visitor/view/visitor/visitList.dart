@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/AddressInfo.dart';
@@ -431,7 +432,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
                                       title: Text('访问地址',textScaleFactor: 1.0,),
                                       subtitle: Text(_visitMyPeopleLists[index].companyId == null ? "点击选择访问地址" : _visitMyPeopleLists[index].companyName!=null?_visitMyPeopleLists[index].companyName:"",textScaleFactor: 1.0,),
                                       onTap: () {
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>VisitAddress(lists: _addressLists,))).then((value){
+                                        Navigator.push(context, CupertinoPageRoute(builder: (context)=>VisitAddress(lists: _addressLists,))).then((value){
                                           selectedCompanyId=_addressLists[value].companyId;
                                           setState(() {
                                             _visitMyPeopleLists[index].companyId = _addressLists[value].companyId;
@@ -543,7 +544,7 @@ class VisitListState extends State<VisitList> with SingleTickerProviderStateMixi
                 ToastUtil.showShortClearToast("访问已过期");
               }else{
                 Navigator.push(context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                         builder: (context) => VisitDetail(visitInfo: _visitLists[index],)));
               }
             },

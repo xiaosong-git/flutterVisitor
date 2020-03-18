@@ -2,6 +2,7 @@
  * 用户协议
  * create_time:2020/1/9
  */
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
@@ -104,7 +105,7 @@ class UserAgreementDealPageState extends State<UserAgreementDealPage>{
                         color: Color(0xFF0073FE),
                         onPressed: (){
                           Navigator.pop(context);
-                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> VerifyCodePage(phone: widget.phone,title: '注册',)));
+                          Navigator.push(context, CupertinoPageRoute(builder: (BuildContext context)=> VerifyCodePage(phone: widget.phone,title: '注册',)));
                         },
                       ),
                     ),

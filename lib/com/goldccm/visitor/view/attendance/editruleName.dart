@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 
 /*
  * 规则改名
@@ -48,7 +49,11 @@ class EditRuleNamePageState extends State<EditRuleNamePage>{
   }
   //保存名称
   void saveName(){
-
+    if(_textEditingController.text!=""){
+      Navigator.pop(context,_textEditingController.text);
+    }else{
+      ToastUtil.showShortClearToast("名称不能为空");
+    }
   }
   @override
   void initState() {

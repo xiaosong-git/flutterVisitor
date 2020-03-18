@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'package:visitor/com/goldccm/visitor/eventbus/FriendListEvent.dart';
@@ -34,10 +35,12 @@ class FriendDetailPage extends StatefulWidget {
 
 class FriendDetailPageState extends State<FriendDetailPage> {
   FriendInfo _user;
+  String belongTo="所属公司：";
   @override
   void initState() {
     super.initState();
     _user = widget.user;
+    getStatus();
   }
   deleteSingleFriend() async {
     UserInfo userInfo = await  LocalStorage.load("userInfo");
@@ -62,6 +65,14 @@ class FriendDetailPageState extends State<FriendDetailPage> {
           ToastUtil.showShortClearToast("删除好友失败");
         }
       }
+    }
+  }
+  getStatus() async {
+    String status=await RouterUtil.getStatus();
+    if(status=="local"){
+      setState(() {
+        belongTo="部门名称：";
+      });
     }
   }
   @override
@@ -116,6 +127,7 @@ class FriendDetailPageState extends State<FriendDetailPage> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   Text(_user.notice != null && _user.notice !="" ? _user.notice : _user.name,
                       style: TextStyle(
@@ -136,14 +148,19 @@ class FriendDetailPageState extends State<FriendDetailPage> {
                         fontSize: 15.0,
                       ),
                       textScaleFactor: 1.0),
-                  Text(
-                      "所属公司：" +
+                  Container(
+                    width: 250,
+                    child: Text(
+                        belongTo +
                           (_user.companyName != null ? _user.companyName : '无'),
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15.0,
-                      ),
-                      textScaleFactor: 1.0),
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15.0,
+                        ),
+                        softWrap: true,
+                        overflow:TextOverflow.ellipsis,
+                        textScaleFactor: 1.0),
+                  )
                 ],
               ),
             ],
@@ -163,7 +180,7 @@ class FriendDetailPageState extends State<FriendDetailPage> {
               onPressed: () async {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                         builder: (context) => ChatPage(
                               user: widget.user,
                         )));

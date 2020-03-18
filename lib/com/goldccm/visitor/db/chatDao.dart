@@ -112,7 +112,6 @@ class ChatDao extends BaseDBProvider {
     List<Map<String, dynamic>> listRes = await db.rawQuery(
         "select c.unreadCount,a.* from $table_name a  join (select M_FriendId,max(M_Time) M_Time from $table_name group by M_FriendId) b on a.M_FriendId = b.M_FriendId and a.M_Time = b.M_Time left join (select M_FriendId,count(*) unreadCount from $table_name where M_status='0' group by M_FriendId) c on a.M_FriendId = c.M_FriendId  where M_userId = $userId order by a.M_Time  desc");
     if (listRes.length > 0) {
-      print(listRes);
       List<ChatMessage> msgs =
           listRes.map((item) => ChatMessage.fromJson(item)).toList();
       return msgs;

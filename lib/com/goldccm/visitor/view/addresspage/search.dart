@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/db/FriendInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
@@ -116,7 +117,7 @@ class FriendSearchState extends State<FriendSearch> {
               title: Text( _selectUserLists[index].name,textScaleFactor: 1.0,),
               leading:  _selectUserLists[index].virtualImageUrl!=null?CircleAvatar(backgroundImage:NetworkImage(_imageUrl+ _selectUserLists[index].virtualImageUrl),):CircleAvatar(backgroundImage: AssetImage("assets/images/visitor_icon_head.png"),),
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>FriendDetailPage(user: _selectUserLists[index],)));
+                Navigator.push(context, CupertinoPageRoute(builder: (context)=>FriendDetailPage(user: _selectUserLists[index],)));
               },
             ),
           );

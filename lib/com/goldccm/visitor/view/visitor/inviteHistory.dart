@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visitor/com/goldccm/visitor/component/Qrcode.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
@@ -70,7 +71,7 @@ class InviteHistoryState extends State<InviteHistory>{
                     visitInfo: _inviteLists[index]);
                 List<String> qrMsg = QrcodeHandler.buildQrcodeData(model);
                 Navigator.push(context,
-                    new MaterialPageRoute(builder: (BuildContext context) {
+                    new CupertinoPageRoute(builder: (BuildContext context) {
                       return new Qrcode(qrCodecontent: qrMsg);
                     }));
               }

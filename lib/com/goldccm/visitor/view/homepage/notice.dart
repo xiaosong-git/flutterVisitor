@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
@@ -38,15 +41,52 @@ class NoticePageState extends State<NoticePage> {
     if (res is String) {
       Map map = jsonDecode(res);
       if(map['verify']['sign']=="success") {
-        for (var info in map['data']['rows']) {
-          Notice notice = new Notice(
-            noticeTitle: info['noticeTitle'],
-            content: info['content'],
-            createDate: info['createDate'],
-            createTime: info['createTime'],
-            orgType: info['orgType'],
-          );
-          _lists.insert(0, notice);
+        for (int i=map['data']['rows'].length-1;i>=0;i--) {
+          Notice notice;
+          if(i==map['data']['rows'].length-1){
+            notice = new Notice(
+              noticeTitle: map['data']['rows'][i]['noticeTitle'],
+              content: map['data']['rows'][i]['content'],
+              createDate: map['data']['rows'][i]['createDate'],
+              createTime: map['data']['rows'][i]['createTime'],
+              orgType: map['data']['rows'][i]['orgType'],
+              isDayFirst: true,
+              isYearFirst: true,
+            );
+          }else{
+            String date = map['data']['rows'][i]['createDate'];
+            String preDate = map['data']['rows'][i+1]['createDate'];
+            if(int.parse(date.substring(0,4))!=int.parse(preDate.substring(0,4))){
+                notice = new Notice(
+                  noticeTitle: map['data']['rows'][i]['noticeTitle'],
+                  content: map['data']['rows'][i]['content'],
+                  createDate: map['data']['rows'][i]['createDate'],
+                  createTime: map['data']['rows'][i]['createTime'],
+                  orgType: map['data']['rows'][i]['orgType'],
+                  isDayFirst: true,
+                  isYearFirst: true,
+                );
+            }
+            if(int.parse(date.substring(8,10))!=int.parse(preDate.substring(8,10))){
+              notice = new Notice(
+                noticeTitle: map['data']['rows'][i]['noticeTitle'],
+                content: map['data']['rows'][i]['content'],
+                createDate: map['data']['rows'][i]['createDate'],
+                createTime: map['data']['rows'][i]['createTime'],
+                orgType: map['data']['rows'][i]['orgType'],
+                isDayFirst: true,
+              );
+            }else{
+               notice = new Notice(
+                noticeTitle: map['data']['rows'][i]['noticeTitle'],
+                content: map['data']['rows'][i]['content'],
+                createDate: map['data']['rows'][i]['createDate'],
+                createTime: map['data']['rows'][i]['createTime'],
+                orgType: map['data']['rows'][i]['orgType'],
+              );
+            }
+          }
+          _lists.add(notice);
         }
       }else{
         setState(() {
@@ -60,12 +100,29 @@ class NoticePageState extends State<NoticePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('公告栏',style: new TextStyle(
-            fontSize: 17.0, color: Colors.white),textScaleFactor: 1.0),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).appBarTheme.color,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){Navigator.pop(context);}),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(160),
+        child: AppBar(
+          title: Text('公告',style: new TextStyle(
+              fontSize: ScreenUtil().setSp(70), color: Colors.white),textScaleFactor: 1.0),
+          flexibleSpace: Image(
+            image: AssetImage('assets/images/login_background.png'),
+            fit: BoxFit.fill,
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+              icon: Image(
+                image: AssetImage("assets/images/login_back.png"),
+                width: ScreenUtil().setWidth(36),
+                height: ScreenUtil().setHeight(36),
+                color: Color(0xFFFFFFFF),),
+              onPressed: () {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              }),
+        ),
       ),
       body: notEmpty==true?FutureBuilder(
         builder: noticeFuture,
@@ -142,13 +199,9 @@ class NoticePageState extends State<NoticePage> {
   }
 
   Widget _buildNoticeList() {
-    return ListView.separated(
+    return ListView.builder(
       itemBuilder: (_, int index) => _lists[index],
-      padding: EdgeInsets.all(8),
       itemCount: _lists.length,
-      separatorBuilder: (context,index){
-        return Divider(height: 0.0,);
-      },
     );
   }
 }
@@ -159,57 +212,124 @@ class Notice extends StatelessWidget {
   final String createDate;
   final String createTime;
   final String orgType;
+  final bool isDayFirst;
+  final bool isYearFirst;
   Notice(
       {this.noticeTitle,
       this.content,
       this.createTime,
       this.createDate,
-      this.orgType});
+      this.orgType,
+      this.isDayFirst,
+      this.isYearFirst});
   @override
   Widget build(BuildContext context) {
-    return  Container(
-        width: MediaQuery.of(context).size.width,
-        color: Colors.white,
-        height: 67,
+    return  isYearFirst==true?Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          width: ScreenUtil().setWidth(750),
+          child: Text('${createDate.substring(0,4)}年',style: TextStyle(fontSize: ScreenUtil().setSp(40),color: Colors.black),),
+          padding: EdgeInsets.only(left: ScreenUtil().setWidth(32),bottom: ScreenUtil().setHeight(24),top: 0),
+          color: Colors.white,
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.only(left: ScreenUtil().setWidth(32)),
+          color: Colors.white,
+          height: ScreenUtil().setHeight(140),
           child:InkWell(
             child:Container(
-              padding: EdgeInsets.all(10),
               child: Stack(
                 children: <Widget>[
-                  Positioned(
-                    child: FittedBox(
-                      fit: BoxFit.fill,
-                      child: Image.asset("assets/icons/building.png"),
+                  isDayFirst==true? Positioned(
+                    child: Column(
+                      children: <Widget>[
+                        RichText(
+                          text: TextSpan(
+                            text: createDate.substring(8,10),
+                            style: TextStyle(fontSize: ScreenUtil().setSp(40),color: Colors.black),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: int.parse(createDate.substring(5,7))<10?'${createDate.substring(6,7)}月':'${createDate.substring(5,7)}月',
+                                style: TextStyle(fontSize: ScreenUtil().setSp(24),color:Color(0xFF787878)),
+                              ),
+                            ],
+                          ),
+                          textScaleFactor: 1.0,
+                        ),
+                        DateTime.parse(createDate).weekday==1?Text('星期一',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==2?Text('星期二',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==3?Text('星期三',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==4?Text('星期四',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==5?Text('星期五',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==6?Text('星期六',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==7?Text('星期天',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):Text(''),
+                      ],
                     ),
-                    width: 40,
-                    height: 40,
+                  ): Positioned(
+                    child: Container(),
                   ),
                   Positioned(
-                    child: Text('$noticeTitle',overflow: TextOverflow.ellipsis,maxLines: 1,style: TextStyle(fontSize: 16.0),textScaleFactor: 1.0),
-                    left: 60,
-                    width: 220,
-                  ),
-                  Positioned(
-                    child: Text('${content}',overflow: TextOverflow.ellipsis,maxLines: 1,style: TextStyle(fontSize: 15.0,color: Colors.black45),textScaleFactor: 1.0),
-                    left: 60,
-                    width: 270,
-                    top: 20,
-                  ),
-                  Positioned(
-                    child: Container(
-                      padding: EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(3.0),
-                      ),
-                      child: Text('${createDate}',style: TextStyle(fontSize: 14.0,color: Colors.black45),textScaleFactor: 1.0),
-                    ),
                     right: 0,
+                    child: Container(
+                      width: ScreenUtil().setWidth(594),
+                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(16),top: ScreenUtil().setHeight(16),bottom: ScreenUtil().setHeight(16)),
+//                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(46)),
+                      color: Color(0xFFF9F9F9),
+                      child: Text('$noticeTitle',style: TextStyle(fontSize: ScreenUtil().setSp(32),color: Color(0xFF373737)),maxLines: 2,overflow: TextOverflow.ellipsis,),
+                    ),
                   ),
                 ],
               ),
             ),
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>NoticeDetail (noticeTitle: noticeTitle,content: content,createDate: createDate,createTime: createTime,orgType: orgType,)));
+              Navigator.push(context, CupertinoPageRoute(builder: (context)=>NoticeDetail (noticeTitle: noticeTitle,content: content,createDate: createDate,createTime: createTime,orgType: orgType,)));
+            },
+          ),
+        )
+      ],
+    ):Container(
+        width: MediaQuery.of(context).size.width,
+        color: Colors.white,
+      padding: EdgeInsets.only(left: ScreenUtil().setWidth(32)),
+        height: ScreenUtil().setHeight(140),
+          child:InkWell(
+            child:Container(
+              child: Stack(
+                children: <Widget>[
+                  isDayFirst==true? Positioned(
+                    child: Column(
+                      children: <Widget>[
+                        RichText(
+                          text: TextSpan(
+                            text: createDate.substring(8,10),
+                            style: TextStyle(fontSize: ScreenUtil().setSp(40),color: Colors.black),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: int.parse(createDate.substring(5,7))<10?'${createDate.substring(6,7)}月':'${createDate.substring(5,7)}月',
+                                style: TextStyle(fontSize: ScreenUtil().setSp(24),color:Color(0xFF787878)),
+                              ),
+                            ],
+                          ),
+                          textScaleFactor: 1.0,
+                        ),
+                        DateTime.parse(createDate).weekday==1?Text('星期一',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==2?Text('星期二',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==3?Text('星期三',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==4?Text('星期四',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==5?Text('星期五',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==6?Text('星期六',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):DateTime.parse(createDate).weekday==7?Text('星期天',style: TextStyle(color: Color(0xFF6C6C6C),fontSize: ScreenUtil().setSp(28)),):Text(''),
+                      ],
+                    ),
+                  ): Positioned(
+                    child: Container(),
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: Container(
+                      width: ScreenUtil().setWidth(594),
+                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(16),top: ScreenUtil().setHeight(16),bottom: ScreenUtil().setHeight(16)),
+//                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(46)),
+                      color: Color(0xFFF9F9F9),
+                      child: Text('$noticeTitle',style: TextStyle(fontSize: ScreenUtil().setSp(32),color: Color(0xFF373737)),maxLines: 2,overflow: TextOverflow.ellipsis,),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: (){
+              Navigator.push(context, CupertinoPageRoute(builder: (context)=>NoticeDetail (noticeTitle: noticeTitle,content: content,createDate: createDate,createTime: createTime,orgType: orgType,)));
             },
           ),
     );
