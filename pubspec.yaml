@@ -61,6 +61,7 @@ dependencies:
   flutter_screenutil: ^0.7.0
   flutter_svg: ^0.15.00
   amap_location: ^0.2.0
+#  flutter_arcface: ^0.0.2
 
   city_pickers:
     git:  https://github.com/hanxu317317/city_pickers.git

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:amap_location/amap_location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_arcface/flutter_arcface.dart';
@@ -11,19 +10,14 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
-import 'package:visitor/com/goldccm/visitor/model/RuleInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/UserInfo.dart';
 import 'package:visitor/com/goldccm/visitor/model/checkInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/CommonUtil.dart';
-import 'package:visitor/com/goldccm/visitor/util/Constant.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
 import 'package:visitor/com/goldccm/visitor/util/PremissionHandlerUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
-//import 'package:amap_location/amap_location.dart';
-import 'package:visitor/com/goldccm/visitor/view/attendance/editruleTime.dart';
 import 'package:visitor/com/goldccm/visitor/view/attendance/statistical.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 /*
@@ -160,20 +154,26 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
   }
   @override
   void dispose() {
+    //AMapLocationClient.stopLocation();
     AMapLocationClient.shutdown();
     super.dispose();
   }
   //获取当前经纬度
-  void initVariables()async{
+  Future initVariables()async{
     if(await requestPermission()){
-      AMapLocationClient.onLocationUpate.listen((AMapLocation loc){
-        if(!mounted)return;
-        setState(() {
-          _location = loc;
-          shownAddress = getLocationStr(loc);
-        });
+//      AMapLocationClient.onLocationUpate.listen((AMapLocation loc){
+////        if(!mounted)return;
+////        setState(() {
+////          _location = loc;
+////          shownAddress = getLocationStr(loc);
+////        });
+////      });
+////      AMapLocationClient.startLocation();
+      AMapLocation loc = await AMapLocationClient.getLocation(true);
+      setState(() {
+        _location = loc;
+        shownAddress = getLocationStr(loc);
       });
-      AMapLocationClient.startLocation();
     }
   }
   void appbarMore(){
@@ -337,6 +337,7 @@ class CheckPointPageState extends State<CheckPointPage> with SingleTickerProvide
    * 根据比对的结果打卡
    */
    checkNormal() async {
+     await initVariables();
     if(_location==null){
       ToastUtil.showShortClearToast("无法定位");
       return ;

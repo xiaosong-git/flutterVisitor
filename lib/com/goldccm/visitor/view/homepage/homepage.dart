@@ -618,8 +618,9 @@ class HomePageState extends State<HomePage> {
   }
 
   getBanner() async {
+    UserInfo userInfo=await LocalStorage.load("userInfo");
     var response =
-        await Http.instance.get(Constant.getBannerUrl, debugMode: true);
+        await Http.instance.get(Constant.getBannerUrl, queryParameters:{"userId":userInfo.id},debugMode: true);
 //    new Timer(Duration(milliseconds: 500),(){
     JsonResult responseResult = JsonResult.fromJson(response);
     if (responseResult.sign == 'success') {
@@ -679,10 +680,14 @@ class HomePageState extends State<HomePage> {
   }
 
   getNewsInfoList() async {
+    UserInfo userInfo =await LocalStorage.load("userInfo");
     this.newsCurrentPage++;
     String url = Constant.getNewsListUrl + newsCurrentPage.toString() + "/5";
     var response = await Http.instance.get(url,
-        queryParameters: {"pageNum": newsCurrentPage, "pageSize": "5"});
+        queryParameters: {
+      "pageNum": newsCurrentPage,
+          "pageSize": "5",
+        "userId":userInfo.id});
     JsonResult responseResult = JsonResult.fromJson(response);
     if (responseResult.sign == 'success') {
       newsInfoList.addAll(NewsInfo.getJsonFromDataList(responseResult.data));
