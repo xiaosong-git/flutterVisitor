@@ -15,6 +15,11 @@ import com.arcsoft.face.FaceInfo;
 import com.arcsoft.face.FaceSimilar;
 import com.arcsoft.face.GenderInfo;
 import com.arcsoft.face.LivenessInfo;
+import com.arcsoft.face.enums.DetectFaceOrientPriority;
+import com.arcsoft.face.enums.DetectMode;
+import com.arcsoft.imageutil.ArcSoftImageFormat;
+import com.arcsoft.imageutil.ArcSoftImageUtil;
+import com.arcsoft.imageutil.ArcSoftImageUtilError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +30,8 @@ public class MultiImageActivity {
     /**
      * 选择图片时的类型
      */
-    private int TYPE_MAIN = 0;
-    private int TYPE_ITEM = 1;
+    private static final int TYPE_MAIN = 0;
+    private static final int TYPE_ITEM = 1;
 
     /**
      * 主图的第0张人脸的特征数据
@@ -48,13 +53,9 @@ public class MultiImageActivity {
     public void initEngine(Activity activity) {
         showInfoList = new ArrayList<>();
         faceEngine = new FaceEngine();
-        faceEngineCode = faceEngine.init(activity, FaceEngine.ASF_DETECT_MODE_IMAGE, FaceEngine.ASF_OP_0_ONLY,
+        faceEngineCode = faceEngine.init(activity, DetectMode.ASF_DETECT_MODE_IMAGE, DetectFaceOrientPriority.ASF_OP_0_ONLY,
                 16, 6, FaceEngine.ASF_FACE_RECOGNITION | FaceEngine.ASF_AGE | FaceEngine.ASF_FACE_DETECT | FaceEngine.ASF_GENDER | FaceEngine.ASF_FACE3DANGLE);
         Log.i(TAG, "initEngine: init " + faceEngineCode);
-        if (faceEngineCode != ErrorInfo.MOK) {
-
-        }
-
     }
 
     public void unInitEngine() {
@@ -97,7 +98,7 @@ public class MultiImageActivity {
         }
 
         //NV21宽度必须为4的倍数,高度为2的倍数
-        bitmap = ImageUtil.alignBitmapForNv21(bitmap);
+        bitmap = ArcSoftImageUtil.getAlignedBitmap(bitmap, true);
 
         if (bitmap == null) {
             return;
@@ -105,20 +106,23 @@ public class MultiImageActivity {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         //bitmap转NV21
-        final byte[] nv21 = ImageUtil.bitmapToNv21(bitmap, width, height);
-
-        if (nv21 != null) {
+        byte[] bgr24 = ArcSoftImageUtil.createImageData(bitmap.getWidth(), bitmap.getHeight(), ArcSoftImageFormat.BGR24);
+//        final byte[] nv21 = ImageUtil.bitmapToNv21(bitmap, width, height);
+        int transformCode = ArcSoftImageUtil.bitmapToImageData(bitmap, bgr24, ArcSoftImageFormat.BGR24);
+        if (transformCode != ArcSoftImageUtilError.CODE_SUCCESS) {
+            return ;
+        }
+        if (bgr24 != null) {
 
             List<FaceInfo> faceInfoList = new ArrayList<>();
             //人脸检测
-            int detectCode = faceEngine.detectFaces(nv21, width, height, FaceEngine.CP_PAF_NV21, faceInfoList);
+            int detectCode = faceEngine.detectFaces(bgr24, width, height, FaceEngine.CP_PAF_BGR24, faceInfoList);
             if (detectCode != 0 || faceInfoList.size() == 0) {
                 return;
             }
             //绘制bitmap
             bitmap = bitmap.copy(Bitmap.Config.RGB_565, true);
-
-            int faceProcessCode = faceEngine.process(nv21, width, height, FaceEngine.CP_PAF_NV21, faceInfoList, FaceEngine.ASF_AGE | FaceEngine.ASF_GENDER | FaceEngine.ASF_FACE3DANGLE);
+            int faceProcessCode = faceEngine.process(bgr24, width, height, FaceEngine.CP_PAF_BGR24, faceInfoList, FaceEngine.ASF_AGE | FaceEngine.ASF_GENDER | FaceEngine.ASF_FACE3DANGLE);
             Log.i(TAG, "processImage: " + faceProcessCode);
             if (faceProcessCode != ErrorInfo.MOK) {
                 return;
@@ -145,7 +149,7 @@ public class MultiImageActivity {
                     Log.i(TAG, "type_main: " + faceInfoList.size());
                     showInfoList.clear();
                     mainFeature = new FaceFeature();
-                    int res = faceEngine.extractFaceFeature(nv21, width, height, FaceEngine.CP_PAF_NV21, faceInfoList.get(0), mainFeature);
+                    int res = faceEngine.extractFaceFeature(bgr24, width, height, FaceEngine.CP_PAF_BGR24, faceInfoList.get(0), mainFeature);
                     if (res != ErrorInfo.MOK) {
                         mainFeature = null;
                     }
@@ -171,7 +175,7 @@ public class MultiImageActivity {
                 } else if (type == TYPE_ITEM) {
                     Log.i(TAG, "type_item: " + faceInfoList.size());
                     FaceFeature faceFeature = new FaceFeature();
-                    int res = faceEngine.extractFaceFeature(nv21, width, height, FaceEngine.CP_PAF_NV21, faceInfoList.get(0), faceFeature);
+                    int res = faceEngine.extractFaceFeature(bgr24, width, height, FaceEngine.CP_PAF_BGR24, faceInfoList.get(0), faceFeature);
                     if (res == 0) {
                         FaceSimilar faceSimilar = new FaceSimilar();
                         int compareResult = faceEngine.compareFaceFeature(mainFeature, faceFeature, faceSimilar);
@@ -191,6 +195,7 @@ public class MultiImageActivity {
             }
 
         }else {
+
         }
     }
 }

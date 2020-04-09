@@ -168,126 +168,128 @@ class MessageUtils {
     type=3是自己发送的访问邀约消息被通过或拒绝的回馈消息
   */
   static _onData(event) async {
-    if (event == "pong") {
-      received = true;
-    } else {
-      print(event);
-      Map map = jsonDecode(event);
-      if (map['code'] != null) {
-        if (map['code'] == "200") {
-          if (map['type'] == 1) {
-            await updateLastMessage();
-          }
-          if (map['type'] == 2) {
-            await updateMessageVisitId(map['id']);
+      var res=pong(event);
+      if(!res){
+        Map map = jsonDecode(event);
+        if (map['code'] != null) {
+          if (map['code'] == "200") {
+            if (map['type'] == 1) {
+              await updateLastMessage();
+            }
+            if (map['type'] == 2) {
+              await updateMessageVisitId(map['id']);
+            }
           }
         } else {
-          ToastUtil.showShortClearToast(map['desc']);
-        }
-      } else {
-        //播放提示音
-        player.play("message.mp3");
-        //更新消息数
-        if (map['type'] == 1 || map['type'] == 2 || map['type'] == 3) {
-          EventBusUtil().eventBus.fire(MessageCountChangeEvent(0));
-        }
-        ChatMessage msg;
-        ChatDao chatDao = new ChatDao();
-        if (map['type'] == 1) {
-          msg = new ChatMessage(
-            M_FriendId: int.parse(map['fromUserId'].toString()),
-            M_Status: "0",
-            M_IsSend: "1",
-            M_MessageContent: map['message'].toString(),
-            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-            M_MessageType: map['type'].toString(),
-            M_userId: int.parse(map['toUserId'].toString()),
-            M_FrealName: map['realName'].toString(),
-            M_FheadImgUrl: map['headImgUrl'].toString(),
-            M_FnickName: map['nickName'].toString(),
-            M_orgId: map['orgId'],
-            M_isSended: 1,
-          );
-          chatDao.insertNewMessage(msg);
-        } else if (map['type'] == 2) {
-          msg = new ChatMessage(
-            M_cStatus: map['cstatus'].toString(),
-            M_Status: "0",
-            M_IsSend: "1",
-            M_MessageType: "3",
-            M_userId: int.parse(map['toUserId'].toString()),
-            M_FriendId: int.parse(map['fromUserId'].toString()),
-            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-            M_StartDate: map['startDate'].toString(),
-            M_visitId: int.parse(map['id'].toString()),
-            M_EndDate: map['endDate'].toString(),
-            M_FheadImgUrl: map['headImgUrl'] != null
-                ? map['idHandleImgUrl'].toString()
-                : map['idHandleImgUrl'].toString(),
-            M_FnickName: map['nickName'].toString(),
-            M_FrealName: map['realName'].toString(),
-            M_companyName: map['companyName'].toString(),
-            M_recordType: map['recordType'].toString(),
-            M_answerContent: map['answerContent'].toString(),
-            M_MessageContent: map['recordType'] == "1" ? '访问消息' : '邀约消息',
-            M_isSended: 1,
-            M_orgId: map['orgId'].toString(),
-          );
-          chatDao.insertNewMessage(msg);
-        } else if (map['type'] == 3) {
-          msg = new ChatMessage(
-            M_FriendId: int.parse(map['fromUserId'].toString()),
-            M_userId: int.parse(map['toUserId'].toString()),
-            M_Status: "0",
-            M_IsSend: "1",
-            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-            M_cStatus: map['cstatus'].toString(),
-            M_visitId: int.parse(map['id'].toString()),
-            M_StartDate: map['startDate'].toString(),
-            M_EndDate: map['endDate'].toString(),
-            M_companyName: map['companyName'].toString(),
-            M_FheadImgUrl: map['headImgUrl'] != null
-                ? map['idHandleImgUrl'].toString()
-                : map['idHandleImgUrl'].toString(),
-            M_FnickName: map['nickName'].toString(),
-            M_FrealName: map['realName'].toString(),
-            M_MessageType: "2",
-            M_recordType: map['recordType'].toString(),
-            M_answerContent: map['answerContent'].toString(),
-            M_MessageContent: map['recordType'] == "1" ? '访问消息' : '邀约消息',
-            M_isSended: 1,
-            M_orgId: map['orgId'].toString(),
-          );
-          chatDao.updateMessage(msg);
+          //播放提示音
+          player.play("message.mp3");
+          //更新消息数
+          if (map['type'] == 1 || map['type'] == 2 || map['type'] == 3) {
+            EventBusUtil().eventBus.fire(MessageCountChangeEvent(0));
+          }
+          ChatMessage msg;
+          ChatDao chatDao = new ChatDao();
+          if (map['type'] == 1) {
+            msg = new ChatMessage(
+              M_FriendId: int.parse(map['fromUserId'].toString()),
+              M_Status: "0",
+              M_IsSend: "1",
+              M_MessageContent: map['message'].toString(),
+              M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+              M_MessageType: map['type'].toString(),
+              M_userId: int.parse(map['toUserId'].toString()),
+              M_FrealName: map['realName'].toString(),
+              M_FheadImgUrl: map['headImgUrl'].toString(),
+              M_FnickName: map['nickName'].toString(),
+              M_orgId: map['orgId'],
+              M_isSended: 1,
+            );
+            chatDao.insertNewMessage(msg);
+          } else if (map['type'] == 2) {
+            msg = new ChatMessage(
+              M_cStatus: map['cstatus'].toString(),
+              M_Status: "0",
+              M_IsSend: "1",
+              M_MessageType: "3",
+              M_userId: int.parse(map['toUserId'].toString()),
+              M_FriendId: int.parse(map['fromUserId'].toString()),
+              M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+              M_StartDate: map['startDate'].toString(),
+              M_visitId: int.parse(map['id'].toString()),
+              M_EndDate: map['endDate'].toString(),
+              M_FheadImgUrl: map['headImgUrl'] != null
+                  ? map['idHandleImgUrl'].toString()
+                  : map['idHandleImgUrl'].toString(),
+              M_FnickName: map['nickName'].toString(),
+              M_FrealName: map['realName'].toString(),
+              M_companyName: map['companyName'].toString(),
+              M_recordType: map['recordType'].toString(),
+              M_answerContent: map['answerContent'].toString(),
+              M_MessageContent: map['recordType'] == "1" ? '访问消息' : '邀约消息',
+              M_isSended: 1,
+              M_orgId: map['orgId'].toString(),
+            );
+            chatDao.insertNewMessage(msg);
+          } else if (map['type'] == 3) {
+            msg = new ChatMessage(
+              M_FriendId: int.parse(map['fromUserId'].toString()),
+              M_userId: int.parse(map['toUserId'].toString()),
+              M_Status: "0",
+              M_IsSend: "1",
+              M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+              M_cStatus: map['cstatus'].toString(),
+              M_visitId: int.parse(map['id'].toString()),
+              M_StartDate: map['startDate'].toString(),
+              M_EndDate: map['endDate'].toString(),
+              M_companyName: map['companyName'].toString(),
+              M_FheadImgUrl: map['headImgUrl'] != null
+                  ? map['idHandleImgUrl'].toString()
+                  : map['idHandleImgUrl'].toString(),
+              M_FnickName: map['nickName'].toString(),
+              M_FrealName: map['realName'].toString(),
+              M_MessageType: "2",
+              M_recordType: map['recordType'].toString(),
+              M_answerContent: map['answerContent'].toString(),
+              M_MessageContent: map['recordType'] == "1" ? '访问消息' : '邀约消息',
+              M_isSended: 1,
+              M_orgId: map['orgId'].toString(),
+            );
+            chatDao.updateMessage(msg);
 //          chatDao.insertNewMessage(msg);
-          ChatMessage notice = new ChatMessage(
-            M_FriendId: int.parse(map['fromUserId'].toString()),
-            M_userId: int.parse(map['toUserId'].toString()),
-            M_Status: "0",
-            M_IsSend: "1",
-            M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now().add(Duration(seconds: 1))),
-            M_cStatus: map['cstatus'].toString(),
-            M_visitId: int.parse(map['id'].toString()),
-            M_StartDate: map['startDate'].toString(),
-            M_EndDate: map['endDate'].toString(),
-            M_companyName: map['companyName'].toString(),
-            M_MessageType: "notice",
-            M_recordType: map['recordType'].toString(),
-            M_answerContent: map['answerContent'].toString(),
-            M_isSended: 1,
-            M_MessageContent: "您有一条信息已审核",
-          );
-          chatDao.insertNewMessage(notice);
-        } else if (map['type'] == 4) {
-          EventBusUtil().eventBus.fire(FriendCountChangeEvent(map['count']));
-        } else {}
-        if (msg == null) {
-          debugPrint('插入数据库失败');
+            ChatMessage notice = new ChatMessage(
+              M_FriendId: int.parse(map['fromUserId'].toString()),
+              M_userId: int.parse(map['toUserId'].toString()),
+              M_Status: "0",
+              M_IsSend: "1",
+              M_Time: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now().add(Duration(seconds: 1))),
+              M_cStatus: map['cstatus'].toString(),
+              M_visitId: int.parse(map['id'].toString()),
+              M_StartDate: map['startDate'].toString(),
+              M_EndDate: map['endDate'].toString(),
+              M_companyName: map['companyName'].toString(),
+              M_MessageType: "notice",
+              M_recordType: map['recordType'].toString(),
+              M_answerContent: map['answerContent'].toString(),
+              M_isSended: 1,
+              M_MessageContent: "您有一条信息已审核",
+            );
+            chatDao.insertNewMessage(notice);
+          } else if (map['type'] == 4) {
+            EventBusUtil().eventBus.fire(FriendCountChangeEvent(map['count']));
+          } else {}
         }
       }
-    }
   }
+  static pong(event){
+    if(event=="pong"){
+      received = true;
+      return true;
+    }
+    return false;
+  }
+  static sendMessage(){
 
+  }
   //通过FriendID获取本地消息列表
   static getMessageList(int id) async {
     ChatDao chatDao = new ChatDao();

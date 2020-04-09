@@ -84,7 +84,9 @@ class RouterUtil{
     return sp.getString(serverStatus);
   }
   static refresh(){
-     Http.modifyChange(apiServerUrl);
+    if(Http.instance!=null){
+      Http.modifyChange(apiServerUrl);
+    }
   }
   static saveServerInfo(RouterList routerList) async {
     SharedPreferences sp;

@@ -1,3 +1,6 @@
+## 0.0.2
+* 移除多余的引用文件和更新yaml、androi、ios代码。
 ## 0.0.1
+* 人脸比对插件
 
-* TODO: Describe initial release.
+

@@ -16,35 +16,35 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 public class FlutterArcfacePlugin implements MethodCallHandler,PluginRegistry.RequestPermissionsResultListener {
 
     private final Registrar registrar;
-   private Activity activitys;
+    private Activity activitys;
     private Result result;
     private MethodCall call;
     private MultiImageActivity multiImageActivity;
     private SingleActivity singleActivity;
     private final PermissionManager permissionManager;
 
-   static final int REQUEST_EXTERNAL_ARCFACE_STORAGE_PERMISSION = 15880;
+    static final int REQUEST_EXTERNAL_ARCFACE_STORAGE_PERMISSION = 15880;
 
-   private FlutterArcfacePlugin(Registrar registrat,final Activity activity){
+    private FlutterArcfacePlugin(Registrar registrat,final Activity activity){
 
-       this.registrar=registrat;
+        this.registrar=registrat;
 
-       activitys=activity;
+        activitys=activity;
 
-       permissionManager = new PermissionManager() {
-           @Override
-           public boolean isPermissionGranted(String permissionName) {
-               return ActivityCompat.checkSelfPermission(activity, permissionName)
-                       == PackageManager.PERMISSION_GRANTED;
-           }
+        permissionManager = new PermissionManager() {
+            @Override
+            public boolean isPermissionGranted(String permissionName) {
+                return ActivityCompat.checkSelfPermission(activity, permissionName)
+                        == PackageManager.PERMISSION_GRANTED;
+            }
 
-           @Override
-           public void askForPermission(String[] permissions, int requestCode) {
-               ActivityCompat.requestPermissions(activity, permissions, requestCode);
-           }
+            @Override
+            public void askForPermission(String[] permissions, int requestCode) {
+                ActivityCompat.requestPermissions(activity, permissions, requestCode);
+            }
 
-       };
-   }
+        };
+    }
 
     interface PermissionManager {
         boolean isPermissionGranted(String permissionName);
@@ -54,12 +54,12 @@ public class FlutterArcfacePlugin implements MethodCallHandler,PluginRegistry.Re
 
 
     /** Plugin registration. */
-  public static void registerWith(Registrar registrar) {
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "flutter_arcface");
-    FlutterArcfacePlugin flutterArcfacePlugin=new FlutterArcfacePlugin(registrar,registrar.activity());
-    channel.setMethodCallHandler(flutterArcfacePlugin);
-    registrar.addRequestPermissionsResultListener(flutterArcfacePlugin);
-  }
+    public static void registerWith(Registrar registrar) {
+        final MethodChannel channel = new MethodChannel(registrar.messenger(), "flutter_arcface");
+        FlutterArcfacePlugin flutterArcfacePlugin=new FlutterArcfacePlugin(registrar,registrar.activity());
+        channel.setMethodCallHandler(flutterArcfacePlugin);
+        registrar.addRequestPermissionsResultListener(flutterArcfacePlugin);
+    }
 
     @Override
     public boolean onRequestPermissionsResult(
@@ -99,75 +99,75 @@ public class FlutterArcfacePlugin implements MethodCallHandler,PluginRegistry.Re
         return true;
     }
 
-  @Override
-  public void onMethodCall(MethodCall call, Result result) {
-      this.call=call;
-      this.result=result;
-    if (call.method.equals("activeCode")) {
-        active();
-    } else if(call.method.equals("singleImage")){
-        String rStr=singleImage(call.argument("path"));
-        unInit();
-        result.success(rStr);
-    }else if(call.method.equals("compareImage")){
-        String similar=compareImage(call.argument("path1"),call.argument("path2"));
-        unInit();
-        result.success(similar);
-    }else{
-        result.notImplemented();
+    @Override
+    public void onMethodCall(MethodCall call, Result result) {
+        this.call=call;
+        this.result=result;
+        if (call.method.equals("activeCode")) {
+            active();
+        } else if(call.method.equals("singleImage")){
+            String rStr=singleImage(call.argument("path"));
+            unInit();
+            result.success(rStr);
+        }else if(call.method.equals("compareImage")){
+            String similar=compareImage(call.argument("path1"),call.argument("path2"));
+            unInit();
+            result.success(similar);
+        }else{
+            result.notImplemented();
+        }
     }
-  }
-  private void active(){
-      if (!checkPermission()){
-          return;
-      }
-      ActiveActivity activeActivity=new ActiveActivity();
-      singleActivity=new SingleActivity();
-      multiImageActivity=new MultiImageActivity();
-      int code=activeActivity.active(activitys);
-      result.success("ActiveCode" + code);
-  }
-  private  boolean checkPermission(){
-      if (!permissionManager.isPermissionGranted(Manifest.permission.READ_PHONE_STATE) ||
-              !permissionManager.isPermissionGranted(Manifest.permission.INTERNET)||
-              !permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)||
-              !permissionManager.isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)||
-              !permissionManager.isPermissionGranted(Manifest.permission.CAMERA)){
+    private void active(){
+        if (!checkPermission()){
+            return;
+        }
+        ActiveActivity activeActivity=new ActiveActivity();
+        singleActivity=new SingleActivity();
+        multiImageActivity=new MultiImageActivity();
+        int code=activeActivity.active(activitys);
+        result.success("ActiveCode" + code);
+    }
+    private  boolean checkPermission(){
+        if (!permissionManager.isPermissionGranted(Manifest.permission.READ_PHONE_STATE) ||
+                !permissionManager.isPermissionGranted(Manifest.permission.INTERNET)||
+                !permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)||
+                !permissionManager.isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)||
+                !permissionManager.isPermissionGranted(Manifest.permission.CAMERA)){
 
-          permissionManager.askForPermission(new String[]{
-                          Manifest.permission.READ_EXTERNAL_STORAGE,
-                          Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                          Manifest.permission.INTERNET,
-                          Manifest.permission.CAMERA,
-                          Manifest.permission.READ_PHONE_STATE},
-                  REQUEST_EXTERNAL_ARCFACE_STORAGE_PERMISSION);
-          return false;
-      }
-          return true;
-  }
-  private String singleImage(Object path){
-      if(!checkPermission()){
-          return "-15880";
-      }
-      String rStr;
-      singleActivity.initEngine(activitys);
-      rStr=singleActivity.processImage(String.valueOf(path));
-      return rStr;
-  }
-  private String compareImage(Object path1,Object path2){
-      if(!checkPermission()){
-          return "-15880";
-      }
-      multiImageActivity.initEngine(activitys);
-      String similar = multiImageActivity.CompareImage(activitys,String.valueOf(path1),String.valueOf(path2));
-      return similar;
-  }
-  private void unInit(){
-      if(singleActivity!=null){
-          singleActivity.unInitEngine();
-      }
-      if(multiImageActivity!=null){
-          multiImageActivity.unInitEngine();
-      }
-  }
+            permissionManager.askForPermission(new String[]{
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.INTERNET,
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.READ_PHONE_STATE},
+                    REQUEST_EXTERNAL_ARCFACE_STORAGE_PERMISSION);
+            return false;
+        }
+        return true;
+    }
+    private String singleImage(Object path){
+        if(!checkPermission()){
+            return "-15880";
+        }
+        String rStr;
+        singleActivity.initEngine(activitys);
+        rStr=singleActivity.processImage(String.valueOf(path));
+        return rStr;
+    }
+    private String compareImage(Object path1,Object path2){
+        if(!checkPermission()){
+            return "-15880";
+        }
+        multiImageActivity.initEngine(activitys);
+        String similar = multiImageActivity.CompareImage(activitys,String.valueOf(path1),String.valueOf(path2));
+        return similar;
+    }
+    private void unInit(){
+        if(singleActivity!=null){
+            singleActivity.unInitEngine();
+        }
+        if(multiImageActivity!=null){
+            multiImageActivity.unInitEngine();
+        }
+    }
 }

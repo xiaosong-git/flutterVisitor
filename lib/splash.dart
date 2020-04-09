@@ -21,14 +21,23 @@ class SplashState extends State<SplashPage> {
   initState() {
     super.initState();
     checkIsLogin();
-    checkPermission();
+    goToHome();
   }
-
-  Future checkPermission() async {
-    if(Platform.isAndroid){
-
-    }
-    //权限获取
+  //IOS开屏直接跳转
+  Future goToHome() async {
+    if(Platform.isIOS){
+      _t = new Timer(const Duration(milliseconds: 0), () {
+        //延时操作启动页面后跳转到主页面
+        try {
+          Navigator.of(context).pushAndRemoveUntil(
+              new CupertinoPageRoute(
+                  builder: (BuildContext context) =>
+                  isLogin == true ? new MyHomeApp() : new Login()
+              ),
+                  (Route route) => route == null);
+        } catch (e) {}
+      });
+    }else{
       _t = new Timer(const Duration(milliseconds: 2000), () {
         //延时操作启动页面后跳转到主页面
         try {
@@ -40,6 +49,7 @@ class SplashState extends State<SplashPage> {
                   (Route route) => route == null);
         } catch (e) {}
       });
+    }
   }
   @override
   void dispose() {

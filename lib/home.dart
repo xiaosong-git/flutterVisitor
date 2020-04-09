@@ -14,10 +14,8 @@ import 'package:visitor/com/goldccm/visitor/model/provider/BadgeInfo.dart';
 import 'package:visitor/com/goldccm/visitor/util/BadgeUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/DataUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/LocalStorage.dart';
-import 'package:visitor/com/goldccm/visitor/view/addresspage/addresspage.dart';
-import 'package:visitor/com/goldccm/visitor/view/contract/chatListItem.dart';
-import 'package:visitor/com/goldccm/visitor/view/homepage/homepage.dart';
-import 'package:visitor/com/goldccm/visitor/view/minepage/minepage.dart';
+import 'package:visitor/com/goldccm/visitor/view/Home/homepage.dart';
+import 'package:visitor/com/goldccm/visitor/view/Mine/minepage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'com/goldccm/visitor/eventbus/EventBusUtil.dart';
 import 'com/goldccm/visitor/eventbus/FriendCountChangeEvent.dart';
@@ -27,6 +25,8 @@ import 'com/goldccm/visitor/util/CommonUtil.dart';
 import 'com/goldccm/visitor/util/Constant.dart';
 import 'com/goldccm/visitor/util/MessageUtils.dart';
 import 'com/goldccm/visitor/util/ToastUtil.dart';
+import 'com/goldccm/visitor/view/Chat/Book/addresspage.dart';
+import 'com/goldccm/visitor/view/Chat/Message/ChatHome.dart';
 import 'com/goldccm/visitor/view/login/Login.dart';
 
 /*
@@ -51,7 +51,7 @@ Color _keyPrimaryColor = Colors.lightBlue;
 class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
   int _tabIndex = 0;
   var tabImages;
-  var appBarTitles = ['首页', '访客', '通讯录', '我的'];
+  var appBarTitles = ['首页', '消息', '通讯录', '我的'];
   static var _pageList;
   WebSocketChannel channel;
   StreamSubscription _messageSubscription;
@@ -313,7 +313,7 @@ class HomeState extends State<MyHomeApp> with SingleTickerProviderStateMixin {
     //四个主要页面
     _pageList = [
       new HomePage(),
-      new ChatList(),
+      new ChatHomePage(),
       new AddressPage(type: 1,),
       new MinePage(),
     ];

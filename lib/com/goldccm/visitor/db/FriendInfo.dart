@@ -1,6 +1,8 @@
 /*
  * 好友信息
  */
+import 'package:lpinyin/lpinyin.dart';
+
 class FriendInfo {
   String name;
   String nickname;
@@ -35,13 +37,38 @@ class FriendInfo {
       this.lastMessageId,
       this.belongId});
 
-  FriendInfo.fromJson(Map map) {
-    this.userId = map['userId'];
+  FriendInfo.fromJson(Map map,int id) {
+    this.userId = map['id'];
     this.name = map['realName'];
     this.nickname = map['nickName'];
-    this.remarkName = map['remarkName'];
+    this.remarkName = map['remark'];
     this.phone = map['phone'];
-    this.realImageUrl = map['realImgUrl'];
+    this.notice = map['notice'];
+    this.realImageUrl = map['idHandleImgUrl'];
+    this.virtualImageUrl = map['headImgUrl'];
+    this.companyName = map['companyName'];
+    this.notice = map['notice'];
+    this.firstZiMu = map['firstZiMu'];
+    this.orgId = map['orgId'].toString();
+    this.imageServerUrl = map['imageServerUrl'];
+    this.applyType = map['applyType'];
+    this.lastMessageId = map['lastMessageId'];
+    this.belongId = id;
+    this.applyType = map['applyType'];
+    this.firstZiMu = map['realName'] != null
+        ? PinyinHelper.getFirstWordPinyin(map['realName'])
+        .substring(0, 1)
+        .toUpperCase()
+        : "";
+  }
+  FriendInfo.fromData(Map map,int id) {
+    this.userId = map['id'];
+    this.name = map['realName'];
+    this.nickname = map['nickName'];
+    this.remarkName = map['nickName'];
+    this.phone = map['phone'];
+    this.notice = map['notice'];
+    this.realImageUrl = map['idHandleImgUrl'];
     this.virtualImageUrl = map['virtualImageUrl'];
     this.companyName = map['companyName'];
     this.notice = map['notice'];
@@ -50,13 +77,17 @@ class FriendInfo {
     this.imageServerUrl = map['imageServerUrl'];
     this.applyType = map['applyType'];
     this.lastMessageId = map['lastMessageId'];
-    this.belongId = map['belongId'];
+    this.belongId = id;
+    this.applyType = map['applyType'];
+    this.firstZiMu = map['realName'] != null
+        ? PinyinHelper.getFirstWordPinyin(map['realName'])
+        .substring(0, 1)
+        .toUpperCase()
+        : "";
   }
-
   @override
   String toString() {
     return 'FriendInfo{name: $name, nickname: $nickname, remarkName: $remarkName, phone: $phone, realImageUrl: $realImageUrl, virtualImageUrl: $virtualImageUrl, companyName: $companyName, notice: $notice, firstZiMu: $firstZiMu, orgId: $orgId, imageServerUrl: $imageServerUrl, applyType: $applyType, userId: $userId, lastMessageId: $lastMessageId, belongId: $belongId}';
   }
-
 
 }

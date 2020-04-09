@@ -1,8 +1,7 @@
 name: flutter_arcface
-description: A new flutter plugin project.
-version: 0.0.1
-author:
-homepage:
+description: arcface
+version: 0.0.2
+homepage: https://github.com/ody997/flutter_arcface.git
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -49,3 +48,4 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.io/custom-fonts/#from-packages
+

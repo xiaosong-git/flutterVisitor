@@ -57,7 +57,7 @@ class FriendDao extends BaseDBProvider {
     Database db = await getDataBase();
     List<Map> listRes = await db.query(table_name,where: 'userId = ? ',whereArgs: [userId]);
     if(listRes.length>0){
-       List<FriendInfo> msgs= listRes.map((item) => FriendInfo.fromJson(item)).toList();
+       List<FriendInfo> msgs= listRes.map((item) => FriendInfo.fromData(item,userId)).toList();
        return msgs[0];
     }
     return null;
@@ -68,7 +68,7 @@ class FriendDao extends BaseDBProvider {
     List<Map<String, dynamic>> listRes = await db.query(table_name,where: 'belongId = ? ',whereArgs: [belongId]);
     if (listRes.length > 0) {
       List<FriendInfo> msgs =
-      listRes.map((item) => FriendInfo.fromJson(item)).toList();
+      listRes.map((item) => FriendInfo.fromData(item,belongId)).toList();
       return msgs;
     }
     return null;
@@ -87,7 +87,7 @@ class FriendDao extends BaseDBProvider {
   Map<String, dynamic> toMap(FriendInfo info) {
     Map<String, dynamic> map = {
       'realName':info.name,
-      'nickName':info.nickname,
+      'nickName':info.remarkName,
       'phone':info.phone,
       'realImgUrl':info.realImageUrl,
       'virtualImageUrl':info.virtualImageUrl,

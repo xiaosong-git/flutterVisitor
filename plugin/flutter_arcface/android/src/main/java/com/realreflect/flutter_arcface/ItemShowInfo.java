@@ -62,3 +62,4 @@ public class ItemShowInfo {
                         ", similar=" + similar;
     }
 }
+

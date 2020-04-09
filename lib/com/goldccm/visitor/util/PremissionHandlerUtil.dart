@@ -54,7 +54,7 @@ class PermissionHandlerUtil{
       if(contact==null){
         print("通讯录权限尚未完成初始化");
         return false;
-      }else if(contact==2){
+      }else if(contact==1){
         print("通讯录权限已经获取");
         return true;
       }else{
@@ -73,7 +73,7 @@ class PermissionHandlerUtil{
     askStoragePermission() async {
       if(storage==null){
         print("存储权限尚未完成初始化");
-      }else if(storage==2){
+      }else if(storage==1){
         print("存储权限已经获取");
       }else{
         Map<PermissionGroup, PermissionStatus> permissions =
@@ -88,7 +88,7 @@ class PermissionHandlerUtil{
       if(position==null){
         print("定位权限尚未初始化");
         return false;
-      }else if(position==2){
+      }else if(position==1){
         print("定位权限已经获取");
         return true;
       }else{

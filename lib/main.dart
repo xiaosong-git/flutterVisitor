@@ -1,9 +1,12 @@
 
+import 'package:amap_location/amap_location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_arcface/flutter_arcface.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:provider/provider.dart';
+import 'package:visitor/com/goldccm/visitor/httpinterface/http.dart';
+import 'package:visitor/com/goldccm/visitor/util/ContactsUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/NPushUtils.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'com/goldccm/visitor/model/BadgeModel.dart';
@@ -25,6 +28,7 @@ void main() async{
   FlutterArcface.active();
   badgeModel.init();
   NPush().init();
+  AMapLocationClient.setApiKey("7be335ded75b2dfb7ef72c2d9b8423f9");
   RouterUtil.init();
   SystemUiOverlayStyle routerLoginStyle= SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

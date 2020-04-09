@@ -3,15 +3,15 @@
  */
 class Constant {
   //生产环境
-    static final String imageServerApiUrl = "http://47.98.205.206:8081/goldccm-imgServer/goldccm/image/gainData";
-    static final String serverUrl = "http://47.96.71.163:8082/visitor/";
-    static final String webSocketServerUrl ="ws://47.96.71.163:8082/visitor/";
-    static final String imageServerUrl = "http://47.98.205.206/imgserver/";
+//    static final String imageServerApiUrl = "http://47.98.205.206:8081/goldccm-imgServer/goldccm/image/gainData";
+//    static final String serverUrl = "http://47.96.71.163:8082/visitor/";
+//    static final String webSocketServerUrl ="ws://47.96.71.163:8082/visitor/";
+//    static final String imageServerUrl = "http://47.98.205.206/imgserver/";
   // 测试环境
-//  static final String serverUrl = "http://121.36.45.232:8082/visitor/";
-//  static final String webSocketServerUrl = "ws://121.36.45.232:8082/visitor/";
-//  static final String imageServerApiUrl = "http://121.36.45.232:8081/goldccm-imgServer/goldccm/image/gainData";
-//    static final String imageServerUrl = "http://121.36.45.232:8098/imgserver/";
+  static final String serverUrl = "http://121.36.45.232:8082/visitor/";
+  static final String webSocketServerUrl = "ws://121.36.45.232:8082/visitor/";
+  static final String imageServerApiUrl = "http://121.36.45.232:8081/goldccm-imgServer/goldccm/image/gainData";
+    static final String imageServerUrl = "http://121.36.45.232:8098/imgserver/";
 
   //////////////////////////////////////////////
 
