@@ -170,6 +170,7 @@ class MessageUtils {
   static _onData(event) async {
       var res=pong(event);
       if(!res){
+        print(event);
         Map map = jsonDecode(event);
         if (map['code'] != null) {
           if (map['code'] == "200") {

@@ -189,7 +189,7 @@ class FriendDetailInfoPageState extends State<FriendDetailInfoPage> {
       ToastUtil.showShortClearToast("备注不能为空");
       return;
     }
-    String url = " /userFriend/updateFriendRemark";
+    String url = "/userFriend/updateFriendRemark";
     UserInfo userInfo = await LocalStorage.load("userInfo");
     String threshold = await CommonUtil.calWorkKey();
     var res = await Http().post(url, queryParameters: {

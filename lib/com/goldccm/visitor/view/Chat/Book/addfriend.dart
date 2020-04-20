@@ -58,7 +58,7 @@ class AddFriendPageState extends State<AddFriendPage>{
       body: ListView(
         children: <Widget>[
           ListTile(
-              title:Text('手机号添加'),
+              title:Text('手机号查找'),
             leading: Image(
               image: AssetImage('assets/images/book_add_phone.png'),
             ),

@@ -537,8 +537,7 @@ class SetPasswordPageState extends State<SetPasswordPage>{
     }
     JsonResult result = JsonResult.fromJson(response);
     if (result.sign == 'success') {
-      String _passNum =
-      Md5Util().encryptByMD5ByHex(_pwdController.text.toString());
+      String _passNum = Md5Util().encryptByMD5ByHex(_pwdController.text.toString());
       var data = await Http.instance.post(
           Constant.serverUrl+Constant.loginUrl,
           queryParameters: {

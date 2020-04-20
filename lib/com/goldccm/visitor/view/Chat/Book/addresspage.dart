@@ -270,50 +270,6 @@ class AddressPageState extends State<AddressPage> {
                         padding: EdgeInsets.only(left: 60),
                       ),
                       Container(
-                        color: Color(0xFFFFFFFF),
-                        child: ListTile(
-                          title: Text('手机通讯录', textScaleFactor: 1.0),
-                          leading: Provider.of<BadgeModel>(context)
-                                      .badgeInfo
-                                      .newFriendRequestCount >
-                                  0
-                              ? Badge(
-                                  child: Image(
-                                    image: AssetImage(
-                                      "assets/images/chat_friends.png",
-                                    ),
-                                    width: 40,
-                                    height: 40,
-                                  ),
-                                  badgeContent: Text(
-                                    Provider.of<BadgeModel>(context)
-                                        .badgeInfo
-                                        .newFriendRequestCount
-                                        .toString(),
-                                    style: TextStyle(color: Colors.white),
-                                    textScaleFactor: 1.0,
-                                  ),
-                                  badgeColor: Colors.red,
-                                )
-                              : Image(
-                                  image: AssetImage(
-                                    "assets/images/chat_friends.png",
-                                  ),
-                                  width: 40,
-                                  height: 40,
-                                ),
-                          trailing: Image(
-                            width: 20,
-                            height: 20,
-                            image: AssetImage('assets/images/mine_next.png'),
-                            fit: BoxFit.fill,
-                          ),
-                          onTap: () {
-                            openContact();
-                          },
-                        ),
-                      ),
-                      Container(
                         margin: EdgeInsets.only(top: 10),
                         color: Color(0xFFFFFFFF),
                         padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
@@ -391,7 +347,7 @@ class AddressPageState extends State<AddressPage> {
                 child: ListTile(
                   title: Text(_chatHisInfo[index].remarkName != null
                       ? _chatHisInfo[index].remarkName
-                      : _chatHisInfo[index].name),
+                      : _chatHisInfo[index].name??""),
                   leading: _chatHisInfo[index].virtualImageUrl != null &&
                           _chatHisInfo[index].virtualImageUrl != ""
                       ? CircleAvatar(

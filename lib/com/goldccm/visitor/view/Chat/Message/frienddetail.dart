@@ -251,8 +251,8 @@ class FriendDetailPageState extends State<FriendDetailPage> {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           toolBarItem(text:'发消息',iconUrl: 'assets/images/message_chat_talking.png',method: goToChat),
-          toolBarItem(text:'访问',iconUrl: 'assets/images/message_chat_visit.png',method: goToChat),
-          toolBarItem(text:'邀约',iconUrl: 'assets/images/message_chat_invite.png',method: goToChat),
+          toolBarItem(text:'访问',iconUrl: 'assets/images/message_chat_visit.png',method: goToVisit),
+          toolBarItem(text:'邀约',iconUrl: 'assets/images/message_chat_invite.png',method: goToInvite),
           toolBarItem(text:'打电话',iconUrl: 'assets/images/message_chat_call.png',method: makingPhoneCall),
         ],
       ),
@@ -264,6 +264,24 @@ class FriendDetailPageState extends State<FriendDetailPage> {
         CupertinoPageRoute(
             builder: (context) => ChatPage(
               user: widget.user,
+            )));
+  }
+  goToInvite(){
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (context) => ChatPage(
+              user: widget.user,
+              method: 0,
+            )));
+  }
+  goToVisit(){
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (context) => ChatPage(
+              user: widget.user,
+              method: 1,
             )));
   }
   makingPhoneCall() async {

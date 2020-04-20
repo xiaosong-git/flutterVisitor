@@ -18,7 +18,6 @@ import 'package:visitor/com/goldccm/visitor/util/RegExpUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/RouterUtil.dart';
 import 'package:visitor/com/goldccm/visitor/util/ToastUtil.dart';
 import 'package:visitor/com/goldccm/visitor/view/Add/Visit/fastvisitreq.dart';
-import 'package:visitor/com/goldccm/visitor/view/Chat/visitAddress.dart';
 import 'package:visitor/com/goldccm/visitor/view/Chat/visitRequest.dart';
 import 'package:visitor/com/goldccm/visitor/view/common/LoadingDialog.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -33,7 +32,8 @@ import 'Message/MsgSetting.dart';
  */
 class ChatPage extends StatefulWidget {
   final FriendInfo user;
-  ChatPage({Key key, this.user}) : super(key: key);
+  final int method;
+  ChatPage({Key key, this.user,this.method}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return ChatPageState();
@@ -97,6 +97,16 @@ class ChatPageState extends State<ChatPage> {
     _visitReasonControl.dispose();
     _visitReasonDetailControl.dispose();
     super.dispose();
+  }
+  switchMethod(){
+    switch(widget.method){
+      case 0:
+        tapInvite();
+        break;
+      case 1:
+        tapVisit();
+        break;
+    }
   }
   //M_MessageType 1 - 普通聊天消息   2 - 访问普通消息  3 - 访问审核消息
   getUnreadMessage() async {
